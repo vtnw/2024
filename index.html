@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Command</title>
+</head>
+<body>
+    <div id="dv"> </div>
+</body>
+<script>
+    var data = [];
+
+    window.addEventListener("load", () => loadData());
+
+    document.addEventListener("click", (event) => processData(prompt("data")));
+
+    processData = (text) => {
+        let all = text.split(" ");
+        let action = all[0];
+        let content = text.substring(action.length);
+        switch (action) {
+            case "add": {
+                doAdd(content);
+                break;
+            }
+            case "list": {
+                doList();
+                break;
+            }
+            case "filter": {
+                doFilter(content);
+                break;
+            }
+            case "clear": {
+                doClear();
+                break;
+            }
+            case "reset": {
+                doReset();
+                break;
+            }
+        }
+    }
+
+    doAdd = (text) => {
+        let pattern = /#\S+/g;
+        let tags = text.match(pattern);
+        text = text.replace(pattern, "");
+        if ((tags || []).filter(t => t.length > 0) == 0) {
+            tags = ["#note"];
+        }
+        data.push({
+            date: new Date(),
+            tags: tags,
+            text: text
+        });
+        saveData();
+        showData("done", true);
+    }
+
+    doList = () => {
+        showList(data);
+    }
+
+    doFilter = (content) => {
+        let filters = content.split("+");
+        let subData = data.map(d => d);
+        filters.forEach(f => {
+            let field = f.split(":")[0].trim();
+            let condition = f.split(":")[1].trim();
+            switch (field) {
+                case "date": {
+                    let from = new Date(condition.split("-")[0]);
+                    let to = new Date(condition.split("-")[1]);
+                    subData = subData.filter(s => new Date(isoToString(s.date)) >= from && new Date(isoToString(s.date)) <= to);
+                    break;
+                }
+                case "tag": {
+                    subData = subData.filter(s => s.tags.includes(`#${condition}`));
+                    break;
+                }
+                case "text": {
+                    subData = subData.filter(s => s.text.indexOf(condition) > -1);
+                    break;
+                }
+            }
+        });
+
+        showList(subData);
+    }
+
+    doReset = () => {
+        data = [];
+        saveData();
+        showData("");
+    }
+
+    doClear = () => showData("");
+
+    showList = (list) => {
+        list.sort((a, b) => new Date(b.date) - new Date(a.date));
+        let message = "";
+        let currDate;
+        list.forEach(l => {
+            if (currDate != isoToString(l.date)) {
+                message = `${message}${isoToString(l.date)}\n`;
+                currDate = isoToString(l.date);
+            }
+            message = `${message}${l.tags}\n${l.text}\n\n`;
+        });
+        showData(message);
+    }
+
+    showData = (text, append) => document.getElementById("dv").innerText = `${text}\n${append ? document.getElementById("dv").innerText : ""}`;
+
+    saveData = () => localStorage.setItem("command", JSON.stringify(data));
+
+    loadData = () => data = JSON.parse(localStorage.getItem("command") || "[]");
+
+    isoToString = (date) => {
+        date = new Date(date);
+        return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+    }
+</script>
+</html>
