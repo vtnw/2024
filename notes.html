@@ -143,7 +143,7 @@
                     let tagFilters = condition.split("&");
                     tagFilters.forEach(tf => {
                         subData = subData.filter(s => s.tags.includes(`#${tf}`));
-                    }
+                    });
                     break;
                 }
                 case "text": {
