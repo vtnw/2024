@@ -218,6 +218,10 @@
     }
 
     doExport = (content) => {
+        if (!content || !content.trim()) {
+            return;
+        }
+        
         switch (content) {
             case "data": {
                 data.sort((a, b) => new Date(b.date) - new Date(a.date));
