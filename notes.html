@@ -83,12 +83,12 @@
         let tags = text.match(pattern);
         let dates = text.match(/@\S+/g);
         let date = new Date();
-        if ((tags || []).filter(t => t.length > 0) == 0) {
+        if (!(tags || []).some(t => t.length > 0)) {
             tags = [defaultTag];
             text = `${text} ${defaultTag}`;
         }
 
-        if ((dates || []).filter(d => d.length > 0) > 0) {
+        if ((dates || []).some(d => d.length > 0)) {
             date = new Date(dates[0].substring(1));
         }
         
