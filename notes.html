@@ -177,11 +177,7 @@
         data.forEach(d => {
             tags = [...tags, ...d.tags];
         });
-        tags = [... new Set(tags)].sort();
-        var tagList = "";
-        tags.forEach(t => {
-            tagList = `${tagList}\n${t}`;
-        });
+        var tagList = [... new Set(tags)].sort().join("\n");
         showData(tagList);
     }
 
