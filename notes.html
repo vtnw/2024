@@ -88,7 +88,7 @@
             text = `${text} ${defaultTag}`;
         }
 
-        if ((dates || []).filter(d => d.length > 0) > 1) {
+        if ((dates || []).filter(d => d.length > 0) > 0) {
             date = new Date(dates[0].substring(1));
         }
         
@@ -128,6 +128,12 @@
                 }
                 case "text": {
                     subData = subData.filter(s => s.text.indexOf(condition) > -1);
+                    break;
+                }
+                case "recent": {
+                    let from = new Date(condition.split("-")[0]);
+                    let to = new Date(condition.split("-")[1]);
+                    subData = subData.filter(s => new Date(isoToString(s.date)) >= from && new Date(isoToString(s.date)) <= to);
                     break;
                 }
             }
