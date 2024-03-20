@@ -70,6 +70,10 @@
                 doReset();
                 break;
             }
+            case "tags": {
+                doTags();
+                break;
+            }
         }
     }
 
@@ -111,7 +115,7 @@
         }
         
         let filters = content.split("+");
-        let subData = data.map(d => d);
+        let subData = [...data];
         filters.forEach(f => {
             let field = f.split(":")[0].trim();
             let condition = f.split(":")[1].trim();
@@ -147,10 +151,7 @@
                         }
                         case "m": {
                             from.setMonth(from.getMonth()-number);
-                            break;
-                        }
-                        case "w": {
-                            from.setDate(from.getDate()-(number*7));
+                            from.setDate(1);
                             break;
                         }
                     }
@@ -171,7 +172,9 @@
 
     doClear = () => showData("");
 
-    showToday = () => doFilter(`date:${isoToString(new Date())}-${isoToString(new Date())}`);
+    doTags = () => {
+        let tags = data.map(d.tags);
+    }
 
     showList = (list) => {
         list.sort((a, b) => new Date(b.date) - new Date(a.date));
