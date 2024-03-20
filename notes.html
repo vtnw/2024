@@ -42,13 +42,13 @@
 
     processData = (text) => {
         if (!text) {
-            return
+            return;
         }
 
         document.getElementById("tb").value = "";
         let all = text.split(" ");
         let action = all[0];
-        let content = text.substring(action.length);
+        let content = text.substring(action.length+1);
         switch (action) {
             case "add": {
                 doAdd(content);
@@ -75,7 +75,7 @@
 
     doAdd = (text) => {
         if (!text || !text.trim()) {
-            return
+            return;
         }
         
         let pattern = /#\S+/g;
