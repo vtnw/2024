@@ -70,6 +70,10 @@
                 doReset();
                 break;
             }
+            case "export": {
+                doExport(content);
+                break;
+            }
         }
     }
 
@@ -213,6 +217,29 @@
         showData("");
     }
 
+    doExport = (content) => {
+        switch (content) {
+            case "data": {
+                data.sort((a, b) => new Date(b.date) - new Date(a.date));
+                let message = "";
+                let currDate;
+                data.forEach(l => {
+                    if (currDate != isoToString(l.date)) {
+                        message = `${message}[${isoToString(l.date)}]\n\n`;
+                        currDate = isoToString(l.date);
+                    }
+                    message = `${message}${l.text}\n\n`;
+                });
+                saveAsFile(message, "notes_data_" + isoToString(new Date()));
+                break;
+            }
+            case "backup": {
+                saveAsFile(JSON.stringify(data), "notes_backup_" + isoToString(new Date()));
+                break;
+            }
+        }
+    }
+
     doClear = () => showData("");
 
     showTags = () => {
@@ -236,6 +263,17 @@
             message = `${message}${l.text}\n\n`;
         });
         showData(message);
+    }
+
+    saveAsFile = (data, fileName) => {
+        let a = document.createElement("a");
+        a.download = fileName;
+        a.innerHTML = "export";
+        a.href = window.URL.createObjectURL(new Blob([data], { type: "text/plain" }));
+        a.style.display = "none";
+        a.onclick = function (event) { document.body.removeChild(event.target); };
+        document.body.appendChild(a);
+        a.click();
     }
 
     showData = (text, append) => document.getElementById("dv").innerText = `${text}\n${append ? document.getElementById("dv").innerText : ""}`;
