@@ -73,6 +73,10 @@
     }
 
     doAdd = (text) => {
+        if (!text) {
+            return
+        }
+        
         let pattern = /#\S+/g;
         let defaultTag = "#note";
         let tags = text.match(pattern);
@@ -86,7 +90,7 @@
             text: text
         });
         saveData();
-        showData("added", true);
+        showToday();
     }
 
     doList = () => {
@@ -94,6 +98,10 @@
     }
 
     doFilter = (content) => {
+        if (!content) {
+            return
+        }
+        
         let filters = content.split("+");
         let subData = data.map(d => d);
         filters.forEach(f => {
@@ -128,13 +136,15 @@
 
     doClear = () => showData("");
 
+    showToday = () => doFilter(`date:${isoToString(new Date())}-${isoToString(new Date())}`);
+
     showList = (list) => {
         list.sort((a, b) => new Date(b.date) - new Date(a.date));
         let message = "";
         let currDate;
         list.forEach(l => {
             if (currDate != isoToString(l.date)) {
-                message = `${message}${isoToString(l.date)}\n`;
+                message = `${message}[${isoToString(l.date)}]\n\n`;
                 currDate = isoToString(l.date);
             }
             message = `${message}${l.text}\n\n`;
