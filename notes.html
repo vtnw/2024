@@ -131,8 +131,29 @@
                     break;
                 }
                 case "recent": {
-                    let from = new Date(condition.split("-")[0]);
-                    let to = new Date(condition.split("-")[1]);
+                    if (!condition || !condition.trim()) {
+                        condition = "1d";
+                    }
+                    
+                    let today = new Date();
+                    let to = new Date(today.getYear(), today.getMonth(), today.getDate());
+                    let mode = condition.substring(condition.length-1);
+                    let number = condition.substring(0, condition.length-1);
+                    let from = to;
+                    switch (mode) {
+                        case "d": {
+                            from.setDate(from.getDate()-number);
+                            break;
+                        }
+                        case "m": {
+                            from.setMonth(from.getMonth()-number);
+                            break;
+                        }
+                        case "w": {
+                            from.setDate(from.getDate()-(number*7));
+                            break;
+                        }
+                    }
                     subData = subData.filter(s => new Date(isoToString(s.date)) >= from && new Date(isoToString(s.date)) <= to);
                     break;
                 }
