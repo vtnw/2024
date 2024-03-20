@@ -173,7 +173,18 @@
     doClear = () => showData("");
 
     doTags = () => {
-        let tags = data.map(d => d.tags);
+        let tags2 = data.map(d => d.tags);
+        let tags = [];
+        data.foreac(d => {
+            tags = [..tags ..d.tags];
+        });
+        tags = [... new Set(tags)]
+        tags.sort();
+        var tagList = "";
+        tags.foreach(t => {
+            tagList = `${tagList}\n${t}`;
+        });
+        showData(tagList);
     }
 
     showList = (list) => {
