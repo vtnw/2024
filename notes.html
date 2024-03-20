@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE =edge">
     <meta name="viewport" content="width =device-width, initial-scale=1.0">
     <title>Notes</title>
-    <style> body { background-color: black; color:white; font-family: "Courier New" } input { width: 100%; } </style>
+    <style> body { background-color: black; color:white; font-family: "Courier New" } input { width: 100%; background-color: black; color:white; font-family: "Courier New" } </style>
 </head>
 <body>
     <input type="text" id="tb" />
@@ -16,13 +16,16 @@
 
     window.addEventListener("load", () => loadData());
 
-    document.addEventListener("click", (event) => processData(prompt("data")));
+    document.addEventListener("click", (event) => document.getElementById("tb").focus());
+
+    document.getElementById("tb").addEventListener("keyup", (event) => if (event.keyCode == 13) processData(document.getElementById("tb").value); );
 
     processData = (text) => {
         if (!text) {
             return
         }
-        
+
+        document.getElementById("tb").value = "";
         let all = text.split(" ");
         let action = all[0];
         let content = text.substring(action.length);
