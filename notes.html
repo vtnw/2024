@@ -177,6 +177,29 @@
                     subData = subData.filter(s => new Date(isoToString(s.date)) >= from && new Date(isoToString(s.date)) <= to);
                     break;
                 }
+                case "next": {
+                    if (!condition || !condition.trim()) {
+                        condition = "1d";
+                    }
+                    
+                    let from  = new Date();
+                    from.setDate(from .getDate() + 1);
+                    let mode = condition.substring(condition.length-1);
+                    let number = condition.substring(0, condition.length-1)-1;
+                    let to = new Date(from .getFullYear(), from.getMonth(), from.getDate());
+                    switch (mode) {
+                        case "d": {
+                            to.setDate(to.getDate()-number);
+                            break;
+                        }
+                        case "m": {
+                            to = new Date(to.getFullYear(), to.getMonth()+1+number, 0)
+                            break;
+                        }
+                    }
+                    subData = subData.filter(s => new Date(isoToString(s.date)) >= from && new Date(isoToString(s.date)) <= to);
+                    break;
+                }
             }
         });
 
