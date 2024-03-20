@@ -73,7 +73,7 @@
     }
 
     doAdd = (text) => {
-        if (!text) {
+        if (!text || !text.trim()) {
             return
         }
         
