@@ -55,7 +55,7 @@
                 break;
             }
             case "list": {
-                doList();
+                doList(content);
                 break;
             }
             case "filter": {
@@ -68,10 +68,6 @@
             }
             case "reset": {
                 doReset();
-                break;
-            }
-            case "tags": {
-                doTags();
                 break;
             }
         }
@@ -105,13 +101,26 @@
         showData(text);
     }
 
-    doList = () => {
-        showList(data);
+    doList = (content) => {
+        if (!content) {
+            content = "notes";
+        }
+        
+        switch (content) {
+            case "notes: {
+                showList(data);
+                break;
+            }
+            case "tags": {
+                showTags();
+                break;
+            }
+        }
     }
 
     doFilter = (content) => {
         if (!content) {
-            return
+            return;
         }
         
         let filters = content.split("+");
@@ -172,7 +181,7 @@
 
     doClear = () => showData("");
 
-    doTags = () => {
+    showTags = () => {
         let tags = [];
         data.forEach(d => {
             tags = [...tags, ...d.tags];
