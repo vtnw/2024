@@ -36,7 +36,7 @@
 <script>
     var data = [];
 
-    window.addEventListener("load", () => { loadData(); showToday(); });
+    window.addEventListener("load", () => loadData());
 
     document.addEventListener("click", (event) => document.getElementById("tb").focus());
 
@@ -93,7 +93,7 @@
             text: text
         });
         saveData();
-        showToday();
+        showMessage(text);
     }
 
     doList = () => {
