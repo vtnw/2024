@@ -139,7 +139,7 @@
                     let to = new Date(today.getFullYear(), today.getMonth(), today.getDate());
                     let mode = condition.substring(condition.length-1);
                     let number = condition.substring(0, condition.length-1)-1;
-                    let from = to;
+                    let from = new Date(today.getFullYear(), today.getMonth(), today.getDate());
                     switch (mode) {
                         case "d": {
                             from.setDate(from.getDate()-number);
