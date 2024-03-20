@@ -190,7 +190,7 @@
                     let to = new Date(from .getFullYear(), from.getMonth(), from.getDate());
                     switch (mode) {
                         case "d": {
-                            to.setDate(to.getDate()-number);
+                            to.setDate(to.getDate()+number);
                             break;
                         }
                         case "m": {
