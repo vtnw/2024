@@ -150,7 +150,7 @@
                     let textFilters = condition.split("&");
                     textFilters.forEach(tf => {
                         subData = subData.filter(s => s.text.indexOf(tf) > -1);
-                    }
+                    });
                     break;
                 }
                 case "recent": {
