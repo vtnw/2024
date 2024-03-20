@@ -134,7 +134,7 @@
                     let from = new Date(range[0]);
                     let to = new Date(range[0]);
                     if (range.length > 1) {
-                        let to = new Date(range[1]);
+                        to = new Date(range[1]);
                     }
                     subData = subData.filter(s => new Date(isoToString(s.date)) >= from && new Date(isoToString(s.date)) <= to);
                     break;
