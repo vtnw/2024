@@ -251,20 +251,18 @@
         }
     }
 
-    doImport = () => {
-        document.getElementById("fl").click();
-    }
+    doImport = () => document.getElementById("fl").click();
 
     doClear = () => showData("");
 
     importFile = () => {
         let fileReader = new FileReader();
-        fileReader.onload = (event) {
+        fileReader.onload = (event) => {
             data = JSON.parse(event.target.result);
             saveData();
             location.reload();
         };
-        fileReader.readAsText(fileRestore.files[0], "UTF-8");
+        fileReader.readAsText(document.getElementById("fl").files[0], "UTF-8");
     }
 
     showTags = () => {
