@@ -130,17 +130,27 @@
             let condition = f.split(":")[1].trim();
             switch (field) {
                 case "date": {
-                    let from = new Date(condition.split("-")[0]);
-                    let to = new Date(condition.split("-")[1]);
+                    let range = condition.split("-");
+                    let from = new Date(range[0]);
+                    let to = new Date(range[0]);
+                    if (range.length > 1) {
+                        let to = new Date(range[1]);
+                    }
                     subData = subData.filter(s => new Date(isoToString(s.date)) >= from && new Date(isoToString(s.date)) <= to);
                     break;
                 }
                 case "tag": {
-                    subData = subData.filter(s => s.tags.includes(`#${condition}`));
+                    let tagFilters = condition.split("&");
+                    tagFilters.forEach(tf => {
+                        subData = subData.filter(s => s.tags.includes(`#${tf}`));
+                    }
                     break;
                 }
                 case "text": {
-                    subData = subData.filter(s => s.text.indexOf(condition) > -1);
+                    let textFilters = condition.split("&");
+                    textFilters.forEach(tf => {
+                        subData = subData.filter(s => s.text.indexOf(tf) > -1);
+                    }
                     break;
                 }
                 case "recent": {
