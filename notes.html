@@ -30,7 +30,7 @@
     <input type="text" id="tb" autocapitalize="none" />
     <hr />
     <div id="dv"> </div>
-    <input type="file" id="fl" />
+    <input style="display:none" type="file" id="fl" />
 </body>
 <script>
     var data = [];
@@ -41,7 +41,7 @@
 
     document.getElementById("tb").addEventListener("keyup", (event) => { if (event.keyCode == 13) processData(document.getElementById("tb").value); } );
 
-    document.getElementById("fl").addEventListener("change", () => importFromFile());
+    document.getElementById("fl").addEventListener("change", () => importFile());
 
     processData = (text) => {
         if (!text) {
@@ -255,6 +255,8 @@
         document.getElementById("fl").click();
     }
 
+    doClear = () => showData("");
+
     importFile = () => {
         let fileReader = new FileReader();
         fileReader.onload = (event) {
@@ -264,8 +266,6 @@
         };
         fileReader.readAsText(fileRestore.files[0], "UTF-8");
     }
-
-    doClear = () => showData("");
 
     showTags = () => {
         let tags = [];
