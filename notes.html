@@ -175,8 +175,8 @@
     doTags = () => {
         let tags2 = data.map(d => d.tags);
         let tags = [];
-        data.foreac(d => {
-            tags = [..tags ..d.tags];
+        data.foreach(d => {
+            tags = [...tags ...d.tags];
         });
         tags = [... new Set(tags)]
         tags.sort();
