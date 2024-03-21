@@ -106,14 +106,11 @@
             && !isNaN(new Date(newDate).getDate())) {
                 date = new Date(newDate);
         }
-        
-        data.push({
-            date: date,
-            tags: tags,
-            text: text
-        });
+
+        let toAdd = { date: date, tags: tags, text: text };
+        data.push(toAdd);
         saveData();
-        showData(text);
+        showList({toAdd]);
     }
 
     doList = (content) => {
