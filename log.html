@@ -88,6 +88,10 @@
                 doImport(content);
                 break;
             }
+            case "remove": {
+                doRemove(content);
+                break;
+            }
             default: {
                 showStatus("failed", true);
             }
