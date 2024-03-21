@@ -335,7 +335,7 @@
 
     showData = (text) => document.getElementById("dv").innerText = text;
 
-    showStatus = (text, append) => document.getElementById("spn").innerText = `${text}\n${append ? document.getElementById("spn").innerText : ""}`;
+    showStatus = (text, append) => document.getElementById("spn").innerText = `${append ? document.getElementById("spn").innerText + " - " : ""}${text}`;
 
     saveData = () => localStorage.setItem("command", JSON.stringify(data));
 
