@@ -99,7 +99,7 @@
             text = `${text} ${defaultTag}`;
         }
 
-        let newDate = (dates || []).some(d => d.length > 0) ? dates[dates.length-1]substring(1) : "";
+        let newDate = (dates || []).some(d => d.length > 0) ? dates[dates.length-1].substring(1) : "";
         if (newDate.length >= 6
             && newDate.length <= 10
             && newDate.index("/") > 0
