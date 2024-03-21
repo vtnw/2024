@@ -24,12 +24,17 @@
         hr {
             border: 0.1px solid #555555;
         }
+        span {
+            color: #555555;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
     <input type="text" id="tb" autocapitalize="none" />
     <hr />
-    <div id="dv"> </div>
+    <span id="spn"></span>
+    <div id="dv"></div>
     <input style="display:none" type="file" id="fl" />
 </body>
 <script>
@@ -44,7 +49,9 @@
     document.getElementById("fl").addEventListener("change", () => importFile());
 
     processData = (text) => {
+        
         if (!text) {
+            showStatus("failed");
             return;
         }
 
@@ -52,6 +59,7 @@
         let all = text.split(" ");
         let action = all[0];
         let content = text.substring(action.length+1);
+        showStatus(action);
         switch (action) {
             case "add": {
                 doAdd(content);
@@ -78,7 +86,7 @@
                 break;
             }                
             case "import": {
-                doImport();
+                doImport(content);
                 break;
             }
         }
@@ -86,6 +94,7 @@
 
     doAdd = (text) => {
         if (!text || !text.trim()) {
+            showStatus("failed", true);
             return;
         }
         
@@ -110,6 +119,8 @@
         let toAdd = { date: date, tags: tags, text: text };
         data.push(toAdd);
         saveData();
+
+        showStatus("1", true);
         showList([toAdd]);
     }
 
@@ -135,6 +146,62 @@
             return;
         }
         
+        showList(filterData(content));
+    }
+
+    doRemove = (content) => {
+        if (!content) {
+            return;
+        }
+        
+        let toRemove = filterData(content);
+        data = data.filter(d => !toRemove.some(tr => tr.date == d.date && tr.text == d.text));
+
+        showList(reRemove);
+    }
+
+    doReset = () => {
+        data = [];
+        saveData();
+        showData("");
+        showStatus("done", true);
+    }
+
+    doExport = (content) => {
+        if (!content || !content.trim()) {
+            showStatus("failed", true);
+            return;
+        }
+        
+        switch (content) {
+            case "data": {
+                data.sort((a, b) => new Date(b.date) - new Date(a.date));
+                let message = "";
+                let currDate;
+                data.forEach(l => {
+                    if (currDate != isoToString(l.date)) {
+                        message = `${message}[${isoToString(l.date)}]\n\n`;
+                        currDate = isoToString(l.date);
+                    }
+                    message = `${message}${l.text}\n\n`;
+                });
+                saveAsFile(message, "notes_data_" + isoToString(new Date()));
+                break;
+            }
+            case "backup": {
+                saveAsFile(JSON.stringify(data), "notes_backup_" + isoToString(new Date()));
+                break;
+            }
+
+            showStatus("done", true);
+        }
+    }
+
+    doImport = (content) => { if (content == "reset") { data = []; } datadocument.getElementById("fl").click(); }
+
+    doClear = () => { showData(""); showStatus("done", true); }
+
+    filterData(content) {
         let filters = content.split("+");
         let subData = [...data];
         filters.forEach(f => {
@@ -215,53 +282,17 @@
                 }
             }
         });
-
-        showList(subData);
+        return subData;
     }
-
-    doReset = () => {
-        data = [];
-        saveData();
-        showData("");
-    }
-
-    doExport = (content) => {
-        if (!content || !content.trim()) {
-            return;
-        }
-        
-        switch (content) {
-            case "data": {
-                data.sort((a, b) => new Date(b.date) - new Date(a.date));
-                let message = "";
-                let currDate;
-                data.forEach(l => {
-                    if (currDate != isoToString(l.date)) {
-                        message = `${message}[${isoToString(l.date)}]\n\n`;
-                        currDate = isoToString(l.date);
-                    }
-                    message = `${message}${l.text}\n\n`;
-                });
-                saveAsFile(message, "notes_data_" + isoToString(new Date()));
-                break;
-            }
-            case "backup": {
-                saveAsFile(JSON.stringify(data), "notes_backup_" + isoToString(new Date()));
-                break;
-            }
-        }
-    }
-
-    doImport = () => document.getElementById("fl").click();
-
-    doClear = () => showData("");
 
     importFile = () => {
         let fileReader = new FileReader();
         fileReader.onload = (event) => {
-            data = JSON.parse(event.target.result);
+            let importedData = JSON.parse(event.target.result);
+            importedData.forEach(i => data.push(i));
             saveData();
-            location.reload();
+            showStatus("done", true);
+            setTimeout(location.reload(), 1000);
         };
         fileReader.readAsText(document.getElementById("fl").files[0], "UTF-8");
     }
@@ -273,6 +304,7 @@
         });
         var tagList = [... new Set(tags)].sort().join("\n");
         showData(tagList);
+        showStatus(tagList.length, true);
     }
 
     showList = (list) => {
@@ -287,6 +319,7 @@
             message = `${message}${l.text}\n\n`;
         });
         showData(message);
+        showStatus(list.length, true);
     }
 
     saveAsFile = (data, fileName) => {
@@ -300,7 +333,9 @@
         a.click();
     }
 
-    showData = (text, append) => document.getElementById("dv").innerText = `${text}\n${append ? document.getElementById("dv").innerText : ""}`;
+    showData = (text) => document.getElementById("dv").innerText = text;
+
+    showStatus = (text, append) => document.getElementById("spn").innerText = `${text}\n${append ? document.getElementById("spn").innerText : ""}`;
 
     saveData = () => localStorage.setItem("command", JSON.stringify(data));
 
