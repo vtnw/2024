@@ -162,7 +162,7 @@
         let toRemove = filterData(content);
         data = data.filter(d => !toRemove.some(tr => tr.date == d.date && tr.text == d.text));
 
-        showList(reRemove);
+        showList(toRemove);
     }
 
     doReset = () => {
