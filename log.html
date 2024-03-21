@@ -49,7 +49,6 @@
     document.getElementById("fl").addEventListener("change", () => importFile());
 
     processData = (text) => {
-        
         if (!text) {
             showStatus("failed");
             return;
@@ -89,6 +88,9 @@
                 doImport(content);
                 break;
             }
+            default: {
+                showStatus("failed", true);
+            }
         }
     }
 
@@ -119,8 +121,7 @@
         let toAdd = { date: date, tags: tags, text: text };
         data.push(toAdd);
         saveData();
-
-        showStatus("1", true);
+        
         showList([toAdd]);
     }
 
@@ -197,7 +198,7 @@
         }
     }
 
-    doImport = (content) => { if (content == "reset") { data = []; } datadocument.getElementById("fl").click(); }
+    doImport = (content) => { if (content == "reset") { data = []; } document.getElementById("fl").click(); }
 
     doClear = () => { showData(""); showStatus("done", true); }
 
