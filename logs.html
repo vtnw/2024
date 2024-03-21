@@ -89,7 +89,7 @@
             return;
         }
         
-        let pattern = /#\S+/g;
+        let pattern = /#[a-z0-9-]+/g;
         let defaultTag = "#note";
         let tags = text.match(pattern);
         let dates = text.match(/@\S+/g);
