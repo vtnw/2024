@@ -201,7 +201,7 @@
 
     doClear = () => { showData(""); showStatus("done", true); }
 
-    filterData(content) {
+    filterData = (content) => {
         let filters = content.split("+");
         let subData = [...data];
         filters.forEach(f => {
