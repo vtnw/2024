@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE =edge">
     <meta name="viewport" content="width =device-width, initial-scale=1.0">
-    <title>Logs</title>
+    <title>Log</title>
     <style> 
         body {
             background-color: black;
@@ -78,7 +78,7 @@
                 break;
             }                
             case "import": {
-                doImport(content);
+                doImport();
                 break;
             }
         }
@@ -99,8 +99,12 @@
             text = `${text} ${defaultTag}`;
         }
 
-        if ((dates || []).some(d => d.length > 0)) {
-            date = new Date(dates[0].substring(1));
+        let newDate = (dates || []).some(d => d.length > 0) ? dates[dates.length-1]substring(1) : "";
+        if (newDate.length >= 6
+            && newDate.length <= 10
+            && newDate.index("/") > 0
+            && !isNaN(new Date(newDate).getDate())) {
+                date = new Date(newDate);
         }
         
         data.push({
