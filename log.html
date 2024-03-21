@@ -309,8 +309,8 @@
         data.forEach(d => {
             tags = [...tags, ...d.tags];
         });
-        var tagList = [... new Set(tags)].sort().join("\n");
-        showData(tagList);
+        let tagList = [... new Set(tags)].sort();
+        showData(tagList.join("\n"));
         showStatus(tagList.length, true);
     }
 
