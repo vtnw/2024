@@ -167,7 +167,8 @@
     }
 
     doFilter = (content) => {
-        if (!content) {
+        if (!content || !content.trim()) {
+            showStatus("failed", true);
             return;
         }
         
@@ -175,13 +176,13 @@
     }
 
     doRemove = (content) => {
-        if (!content) {
+        if (!content || !content.trim()) {
+            showStatus("failed", true);
             return;
         }
         
         let toRemove = filterData(content);
         data = data.filter(d => !toRemove.some(tr => tr.date == d.date && tr.text == d.text));
-
         showList(toRemove);
     }
 
@@ -193,7 +194,7 @@
     }
 
     doExport = (content) => {
-        let toExport = filterData(content);        
+       let toExport = filterData(content);        
        saveAsFile(JSON.stringify(toExport), "notes_backup_" + isoToString(new Date()));
        showStatus("done", true);
     }
@@ -220,7 +221,7 @@
     doClear = () => { showData(""); showStatus("done", true); }
 
     filterData = (content) => {
-        let filters = content.split("+");
+        let filters = !content || !content.trim() ? [] : content.split("+");
         let subData = [...data];
         filters.forEach(f => {
             let field = f.split(":")[0].trim();
