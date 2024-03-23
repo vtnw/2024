@@ -150,7 +150,7 @@
     }
 
     doList = (content) => {
-        if (!content) {
+        if (!content || !content.trim()) {
             content = "notes";
         }
         
