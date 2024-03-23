@@ -59,43 +59,61 @@
         document.getElementById("tb").value = "";
         let all = text.split(" ");
         let action = all[0];
-        let content = text.substring(action.length+1);
-        showStatus(action);
+        let content = text.substring(action.length + 1);
+        
         switch (action) {
-            case "add": {
+            case ".add": {
+                showStatus(action);
                 doAdd(content);
                 break;
             }
-            case "list": {
+            case ".list": {
+                showStatus(action);
                 doList(content);
                 break;
             }
-            case "filter": {
+            case ".filter": {
+                showStatus(action);
                 doFilter(content);
                 break;
             }
-            case "clear": {
+            case ".clear": {
+                showStatus(action);
                 doClear();
                 break;
             }
-            case "reset": {
+            case ".reset": {
+                showStatus(action);
                 doReset();
                 break;
             }
-            case "export": {
+            case ".export": {
+                showStatus(action);
                 doExport(content);
                 break;
-            }                
-            case "import": {
+            }    
+            case ".print": {
+                showStatus(action);
+                doPrint(content);
+                break;
+            } 
+            case ".import": {
+                showStatus(action);
                 doImport(content);
                 break;
             }
-            case "remove": {
+            case ".remove": {
+                showStatus(action);
                 doRemove(content);
                 break;
             }
             default: {
-                showStatus("failed", true);
+                if (action.substring(0, 1) == ".") {
+                    showStatus(`${action} - failed`);
+                } else {
+                    showStatus(".add");
+                    doAdd(text);
+                }
             }
         }
     }
@@ -175,33 +193,26 @@
     }
 
     doExport = (content) => {
-        if (!content || !content.trim()) {
-            showStatus("failed", true);
-            return;
-        }
-        
-        switch (content) {
-            case "data": {
-                data.sort((a, b) => new Date(b.date) - new Date(a.date));
-                let message = "";
-                let currDate;
-                data.forEach(l => {
-                    if (currDate != isoToString(l.date)) {
-                        message = `${message}[${isoToString(l.date)}]\n\n`;
-                        currDate = isoToString(l.date);
-                    }
-                    message = `${message}${l.text}\n\n`;
-                });
-                saveAsFile(message, "notes_data_" + isoToString(new Date()));
-                break;
-            }
-            case "backup": {
-                saveAsFile(JSON.stringify(data), "notes_backup_" + isoToString(new Date()));
-                break;
-            }
+        let toExport = filterData(content);        
+       saveAsFile(JSON.stringify(toExport), "notes_backup_" + isoToString(new Date()));
+       showStatus("done", true);
+    }
 
-            showStatus("done", true);
-        }
+    doPrint = (content) => {
+        let toPrint = filterData(content);        
+        toPrint.sort((a, b) => new Date(b.date) - new Date(a.date));
+        let message = "";
+        let currDate;
+        toPrint.forEach(l => {
+            if (currDate != isoToString(l.date)) {
+                message = `${message}[${isoToString(l.date)}]\n\n`;
+                currDate = isoToString(l.date);
+            }
+            
+            message = `${message}${l.text}\n\n`;
+        });
+        saveAsFile(message, "notes_data_" + isoToString(new Date()));
+        showStatus("done", true);
     }
 
     doImport = (content) => { if (content == "reset") { data = []; } document.getElementById("fl").click(); }
