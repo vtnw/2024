@@ -44,9 +44,11 @@
 </body>
 <script>
     var notes = [];
+    var expenses = [];
+    var links = [];
     var command = "";
 
-    window.addEventListener("load", () => loadData());
+    window.addEventListener("load", () => loadNotes());
 
     document.addEventListener("click", (event) => document.getElementById("tb").focus());
 
@@ -152,7 +154,7 @@
 
         let toAdd = { date: date, tags: tags, text: text };
         notes.push(toAdd);
-        saveData();
+        saveNotes();
 
         showList([toAdd]);
     }
@@ -196,7 +198,7 @@
 
     doReset = () => {
         notes = [];
-        saveData();
+        saveNotes();
         showData("");
         showStatus("done", true);
     }
@@ -317,7 +319,7 @@
         fileReader.onload = (event) => {
             let importedData = JSON.parse(event.target.result);
             importedData.forEach(i => notes.push(i));
-            saveData();
+            saveNotes();
             showStatus("done", true);
             setTimeout(location.reload(), 1000);
         };
@@ -364,9 +366,17 @@
 
     showStatus = (text, append) => document.getElementById("spn").innerText = `${append ? document.getElementById("spn").innerText + " - " : ""}${text}`;
 
-    saveData = () => localStorage.setItem("command", JSON.stringify(notes));
+    saveNotes = () => localStorage.setItem("notes", JSON.stringify(notes));
 
-    loadData = () => notes = JSON.parse(localStorage.getItem("command") || "[]");
+    loadNotes = () => notes = JSON.parse(localStorage.getItem("notes") || "[]");
+
+    saveExpenses = () => localStorage.setItem("expenses", JSON.stringify(expenses));
+
+    loadExpenses = () => expenses = JSON.parse(localStorage.getItem("expenses") || "[]");
+
+    saveLinks = () => localStorage.setItem("links", JSON.stringify(links));
+
+    loadLinks = () => links = JSON.parse(localStorage.getItem("links") || "[]");
 
     isoToString = (date) => {
         date = new Date(date);
