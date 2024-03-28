@@ -13,14 +13,8 @@
             font-size: large;
         }
 
-        input {
-            width: 100%;
-            background-color: black;
-            color: white;
-            font-family: "Courier New";
-            border: none;
-            outline: none;
-            font-size: large;
+        hr {
+            border: 0.1px solid #555555;
         }
 
         #tb {
@@ -33,11 +27,7 @@
             font-size: large;
         }
 
-        hr {
-            border: 0.1px solid #555555;
-        }
-
-        span {
+        #spn {
             color: #aaaaaa;
             font-style: italic;
             display: block;
@@ -53,7 +43,8 @@
     <input style="display:none" type="file" id="fl" />
 </body>
 <script>
-    var data = [];
+    var notes = [];
+    var command = "";
 
     window.addEventListener("load", () => loadData());
 
@@ -64,9 +55,12 @@
     document.getElementById("fl").addEventListener("change", () => importFile());
 
     processData = (text) => {
-        if (!text) {
-            showStatus("failed");
+        if (!text || /\s$/.test(text)) {
             return;
+        }
+
+        if (!text.startsWith(".")) {
+            text = `.add ${text}`;
         }
 
         document.getElementById("tb").innerText = "";
@@ -75,6 +69,10 @@
         let content = text.substring(action.length + 1);
 
         switch (action) {
+            case "..": {
+                document.getElementById("tb").innerText = command;
+                break;
+            }
             case ".add": {
                 showStatus(action);
                 doAdd(content);
@@ -121,14 +119,11 @@
                 break;
             }
             default: {
-                if (action.substring(0, 1) == ".") {
-                    showStatus(`${action} - failed`);
-                } else {
-                    showStatus(".add");
-                    doAdd(text);
-                }
+                showStatus(`${action} - failed`);
             }
         }
+
+        command = text;
     }
 
     doAdd = (text) => {
@@ -156,7 +151,7 @@
         }
 
         let toAdd = { date: date, tags: tags, text: text };
-        data.push(toAdd);
+        notes.push(toAdd);
         saveData();
 
         showList([toAdd]);
@@ -169,7 +164,7 @@
 
         switch (content) {
             case "notes": {
-                showList(data);
+                showList(notes);
                 break;
             }
             case "tags": {
@@ -195,12 +190,12 @@
         }
 
         let toRemove = filterData(content);
-        data = data.filter(d => !toRemove.some(tr => tr.date == d.date && tr.text == d.text));
+        notes = notes.filter(d => !toRemove.some(tr => tr.date == d.date && tr.text == d.text));
         showList(toRemove);
     }
 
     doReset = () => {
-        data = [];
+        notes = [];
         saveData();
         showData("");
         showStatus("done", true);
@@ -229,13 +224,13 @@
         showStatus("done", true);
     }
 
-    doImport = (content) => { if (content == "reset") { data = []; } document.getElementById("fl").click(); }
+    doImport = (content) => { if (content == "reset") { notes = []; } document.getElementById("fl").click(); }
 
     doClear = () => { showData(""); showStatus("done", true); }
 
     filterData = (content) => {
         let filters = !content || !content.trim() ? [] : content.split("+");
-        let subData = [...data];
+        let subData = [...notes];
         filters.forEach(f => {
             let field = f.split(":")[0].trim();
             let condition = f.split(":")[1].trim();
@@ -321,7 +316,7 @@
         let fileReader = new FileReader();
         fileReader.onload = (event) => {
             let importedData = JSON.parse(event.target.result);
-            importedData.forEach(i => data.push(i));
+            importedData.forEach(i => notes.push(i));
             saveData();
             showStatus("done", true);
             setTimeout(location.reload(), 1000);
@@ -331,7 +326,7 @@
 
     showTags = () => {
         let tags = [];
-        data.forEach(d => {
+        notes.forEach(d => {
             tags = [...tags, ...d.tags];
         });
         let tagList = [... new Set(tags)].sort();
@@ -369,9 +364,9 @@
 
     showStatus = (text, append) => document.getElementById("spn").innerText = `${append ? document.getElementById("spn").innerText + " - " : ""}${text}`;
 
-    saveData = () => localStorage.setItem("command", JSON.stringify(data));
+    saveData = () => localStorage.setItem("command", JSON.stringify(notes));
 
-    loadData = () => data = JSON.parse(localStorage.getItem("command") || "[]");
+    loadData = () => notes = JSON.parse(localStorage.getItem("command") || "[]");
 
     isoToString = (date) => {
         date = new Date(date);
