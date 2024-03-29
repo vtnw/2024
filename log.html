@@ -356,9 +356,9 @@
 
     showStatus = (text, append) => document.getElementById("spn").innerText = `${append ? document.getElementById("spn").innerText + " - " : ""}${text}`;
 
-    saveData = () => localStorage.setItem("command", JSON.stringify(data));
+    saveData = () => localStorage.setItem("notes", JSON.stringify(data));
 
-    loadData = () => data = JSON.parse(localStorage.getItem("command") || "[]");
+    loadData = () => data = JSON.parse(localStorage.getItem("notes") || "[]");
 
     isoToString = (date) => {
         date = new Date(date);
