@@ -44,8 +44,6 @@
 </body>
 <script>
     var notes = [];
-    var expenses = [];
-    var links = [];
     var command = "";
 
     window.addEventListener("load", () => loadNotes());
@@ -369,14 +367,6 @@
     saveNotes = () => localStorage.setItem("notes", JSON.stringify(notes));
 
     loadNotes = () => notes = JSON.parse(localStorage.getItem("notes") || "[]");
-
-    saveExpenses = () => localStorage.setItem("expenses", JSON.stringify(expenses));
-
-    loadExpenses = () => expenses = JSON.parse(localStorage.getItem("expenses") || "[]");
-
-    saveLinks = () => localStorage.setItem("links", JSON.stringify(links));
-
-    loadLinks = () => links = JSON.parse(localStorage.getItem("links") || "[]");
 
     isoToString = (date) => {
         date = new Date(date);
