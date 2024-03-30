@@ -334,17 +334,34 @@
         showStatus(tagList.length, true);
     }
 
-    showList = (list) => {
+    showList = (list, fields = ["date", "text"], group = "date") => {
         list.sort((a, b) => new Date(b.date) - new Date(a.date));
         let message = "";
         let currDate;
-        list.forEach(l => {
-            if (currDate != isoToString(l.date)) {
-                message = `${message}[${isoToString(l.date)}]\n\n`;
-                currDate = isoToString(l.date);
-            }
-            message = `${message}${l.text}\n\n`;
-        });
+
+        if (group == "date") {
+            list.forEach(l => {
+                if (currDate != isoToString(l.date)) {
+                    message = `${message}[${isoToString(l.date)}]\n\n`;
+                    currDate = isoToString(l.date);
+                }
+                message = `${message}${l.text}\n\n`;
+            });
+        }
+
+        let currTag = "";
+        if (group == "tag") {
+            list.forEach(l => {
+                let tag = l.tags.join("/")
+                if (tag != currTag) {
+                    message = `${message}[${tag}]\n`;
+                    currTag = tag;
+                }
+                
+                message = `${message}${l.number}\n\n`;
+            });
+        }
+        
         showData(message);
         showStatus(list.length, true);
     }
