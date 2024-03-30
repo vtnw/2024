@@ -29,9 +29,6 @@ processData = (text) => {
     }
 
     document.getElementById("tb").innerText = "";
-    let all = text.split(" ");
-    let action = all[0];
-    let content = text.substring(action.length + 1);
 
     switch (action) {
         case "..": {
@@ -43,7 +40,8 @@ processData = (text) => {
             break;
         }
         case ".expense": {
-            processExpenses(action, context);
+            showStatus(action);
+            processExpenses(content);
             break;
         }
         default: {
