@@ -43,7 +43,7 @@
                 processNotes(action, content);
                 break;
             }
-            case ".cost": {
+            case ".expense": {
                 processExpenses(action, context);
                 break;
             }
