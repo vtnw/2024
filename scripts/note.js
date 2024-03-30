@@ -48,10 +48,6 @@
                 doRemove(content);
                 break;
             }
-            default: {
-                showStatus(`${action} - failed`);
-                break;
-            }
         }
 
         command = text;
