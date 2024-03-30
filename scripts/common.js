@@ -39,7 +39,7 @@
                 document.getElementById("tb").innerText = command;
                 break;
             }
-            default: {
+          case ".add": case ".list": case ".filter": case ".clear": case ".reset": case ".export": case ".print": case ".import": case ".remove": {
                 processNotes(action, content);
               break;
             }
