@@ -48,8 +48,6 @@ processNotes = (action, content) => {
             break;
         }
     }
-
-    command = text;
 }
 
 doAdd = (text) => {
