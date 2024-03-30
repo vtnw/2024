@@ -39,9 +39,17 @@
                 document.getElementById("tb").innerText = command;
                 break;
             }
-          case ".add": case ".list": case ".filter": case ".clear": case ".reset": case ".export": case ".print": case ".import": case ".remove": {
+            case ".add": case ".list": case ".filter": case ".clear": case ".reset": case ".export": case ".print": case ".import": case ".remove": {
                 processNotes(action, content);
-              break;
+                break;
+            }
+            case ".cost": {
+                processExpenses(action, context);
+                break;
+            }
+            default: {
+                showStatus(`${action} - failed`);
+                break;
             }
         }
 
