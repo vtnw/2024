@@ -410,7 +410,7 @@
             }
         });
         let message = "";
-        summaryList.forEach(sl => message = `${message}\n${sl.name}\n\n${sl.item}\n\n`);
+        summaryList.forEach(sl => message = `${message}${sl.name}\n\n${sl.item}\n\n`);
         showData(message);
         showStatus(list.length, true);
     }
