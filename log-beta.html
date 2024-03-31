@@ -390,7 +390,7 @@
         message = `${message}\n\n[Details]\n`;
         summaryList.forEach(sl => message = `${message}\n${sl.category} ${sl.value}\n${sl.detail}`);
         showData(message);
-        showStatus(subList.length - 1, true);
+        showStatus(summaryList.length - 1, true);
     }
 
     saveAsFile = (data, fileName) => {
