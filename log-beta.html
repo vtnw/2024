@@ -362,9 +362,9 @@
         let subList = [];
         let message = "";
         list.forEach(l => {
-            let entries = l.split("£");
+            let entries = l.text.split("£");
             let category = entries[0].trim();
-            let value = parseInt(entries[1]);
+            let value = parseInt(entries[1].split("@")[0]);
             let matchingEntry = subList.find(sl => sl.category == category);
             if (!matchingEntry) {
                 subList.push(new { category, value });
