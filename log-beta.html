@@ -200,7 +200,7 @@
     }
 
     doExpense = (content) => {
-        showExpenses(filterData(content));
+        showExpenses(filterData(`tag:expense ${content}`));
     }
 
     doReset = () => {
@@ -373,8 +373,8 @@
             }
         });
         let total = subList.reduce((accumulated, item) => accumulated + item.value, 0);
-        subList.push({ category: "[Total]", value: total });
         subList.sort((a, b) => b.value == a.value ? b.category - a.category  : b.value - a.value);
+        let message = `[Total - ${total}]`;
         subList.forEach(sl => message = `${message}\n${sl.category} - ${sl.value}`);
         showData(message);
         showStatus(subList.length - 1, true);
