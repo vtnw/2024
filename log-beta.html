@@ -361,11 +361,15 @@
     showExpenses = (list) => {
         let subList = [];
         let message = "";
+        let minDate = new Date();
+        let maxDate = new Date();
         list.forEach(l => {
             let entries = l.text.split("£");
             let category = entries[0].trim();
             let value = parseInt(entries[1].split("@")[0]);
             let matchingEntry = subList.find(sl => sl.category == category);
+            minDate = minDate > new Date(l.date) ? new Date(l.date) : minDate;
+            maxDate = maxDate < new Date(l.date) ? new Date(l.date) : maxDate;
             if (!matchingEntry) {
                 subList.push({ category, value });
             } else {
@@ -374,8 +378,8 @@
         });
         let total = subList.reduce((accumulated, item) => accumulated + item.value, 0);
         subList.sort((a, b) => b.value == a.value ? b.category - a.category  : b.value - a.value);
-        let message = `[Total - ${total}]`;
-        subList.forEach(sl => message = `${message}\n${sl.category} - ${sl.value}`);
+        let message = `[${isoToString(minDate)} - ${isoToString(minDate)}] £${total}`;
+        subList.forEach(sl => message = `${message}\n${sl.category} £${sl.value}`);
         showData(message);
         showStatus(subList.length - 1, true);
     }
