@@ -90,7 +90,7 @@
             }
             case ".note": {
                 showStatus(action);
-                showList(notes);
+                showNotes(notes);
                 break;
             }
             case ".filter": {
@@ -168,24 +168,11 @@
         notes.push({ date: date, tags: tags, text: text });
         saveNotes();
         let tagList = tags.map(t => t.substring(1)).join("&");
-        showList(filterData(`.filter recent:1m+tag:${tagList}`));
+        showNotes(filterData(`.filter recent:1m+tag:${tagList}`));
     }
 
     doList = (content) => {
-        if (!content || !content.trim()) {
-            content = "notes";
-        }
-
-        switch (content) {
-            case "notes": {
-                showList(notes);
-                break;
-            }
-            case "tags": {
-                showTag();
-                break;
-            }
-        }
+        showLists(filterData(`tag:list+${content}`));
     }
 
     doFilter = (content) => {
@@ -194,7 +181,7 @@
             return;
         }
 
-        showList(filterData(content));
+        showNotes(filterData(content));
     }
 
     doRemove = (content) => {
@@ -205,7 +192,7 @@
 
         let toRemove = filterData(content);
         notes = notes.filter(d => !toRemove.some(tr => tr.date == d.date && tr.text == d.text));
-        showList(toRemove);
+        showNotes(toRemove);
     }
 
     doExpense = (content) => {
@@ -362,7 +349,7 @@
         showStatus(tagList.length, true);
     }
 
-    showList = (list) => {
+    showNotes = (list) => {
         list.sort((a, b) => new Date(b.date) - new Date(a.date));
         let message = "";
         let currDate;
@@ -406,6 +393,28 @@
         summaryList.forEach(sl => message = `${message}\n\n${sl.category} ${sl.value}\n${sl.detail}`);
         showData(message);
         showStatus(summaryList.length, true);
+    }
+
+    showLists = (list) => {
+        list.sort((a, b) => new Date(b.date) - new Date(a.date));
+        let summaryList = [];
+        list.forEach(l => {
+            let tags = l.text.match(/#[a-z0-9-]+/g).filter(t => t != "#list");
+            let name = tags.length >= 1 ? tags.join(", ") : "#general";
+            let values = l.text.match(/£[0-9.]+/g);
+            let item = "";
+            let matchingEntry = summaryList.find(sl => sl.name == name);
+            if (!matchingEntry) {
+                summaryList.push({ name, item });
+            } else {
+                matchingEntry.value = `${matchingEntry.value}\n${item}`;
+            }
+        });
+        let message = `[\nList ${total}\n\n[Summary]`;
+        summaryList.forEach(sl => message = `${message}\n${sl.name}\n${sl.item}`);
+        message = `${message}\n\n[Details]`;
+        showData(message);
+        showStatus(list.length, true);
     }
 
     saveAsFile = (data, fileName) => {
