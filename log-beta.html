@@ -367,13 +367,13 @@
             let value = parseInt(entries[1].split("@")[0]);
             let matchingEntry = subList.find(sl => sl.category == category);
             if (!matchingEntry) {
-                subList.push(new { category, value });
+                subList.push({ category, value });
             } else {
                 matchingEntry.value += value;
             }
         });
         let total = subList.reduce((accumulated, item) => accumulated + item.value, 0);
-        subList.push(new { category: "Total", value: total });
+        subList.push({ category: "Total", value: total });
         subList.sort((a, b) => b.value - a.value);
         subList.forEach(sl => message = `${message}\n${sl.category} - ${value}`);
         showData(message);
