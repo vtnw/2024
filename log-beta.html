@@ -371,7 +371,7 @@
             let tags = l.text.match(/#[a-z0-9-]+/g).filter(t => t != "#expense");
             let category = tags.length >= 1 ? tags.join(", ") : "#other";
             let values = l.text.match(/£[0-9.]+/g);
-            let value = values.length == 0 || isNaN(parseInt(values[0])) ? 0 : parseInt(values[0]);
+            let value = values.length == 0 || isNaN(parseInt(values[0].substring(1))) ? 0 : parseInt(values[0].substring(1));
             let matchingEntry = summaryList.find(sl => sl.category == category);
             minDate = minDate > new Date(l.date) ? new Date(l.date) : minDate;
             maxDate = maxDate < new Date(l.date) ? new Date(l.date) : maxDate;
