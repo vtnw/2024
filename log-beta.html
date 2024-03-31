@@ -250,14 +250,13 @@
         let param = all.length > 1 ? all[1] : "";
         let links = notes.filter(n => n.tags.includes("#link"));
         let link = links.find(n => n.text.startsWith(`#link ${site}`));
-        showStatus(link, true);
+        
         if (!link) {
             showStatus("failed", true);
             return;
         }
 
-        showStatus(link.split(" ")[2], true)
-        let url = link.split(" ")[2].replace("<param>", param);
+        let url = link.text.split(" ")[2].replace("<param>", param);
         showStatus("loading", true);
         window.open(url);
     }
