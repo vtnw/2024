@@ -241,6 +241,10 @@
         let filters = !content || !content.trim() ? [] : content.split("+");
         let subData = [...notes];
         filters.forEach(f => {
+            if (!f || !f.trim()) {
+                continue;
+            }
+            
             let field = f.split(":")[0].trim();
             let condition = f.split(":")[1].trim();
             switch (field) {
