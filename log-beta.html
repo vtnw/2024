@@ -133,6 +133,11 @@
                 doList(content);
                 break;
             }
+            case ".link": {
+                showStatus(action);
+                doLink(content);
+                break;
+            }
             default: {
                 showStatus(`${action} - failed`);
             }
@@ -233,6 +238,26 @@
         } 
         
         document.getElementById("fl").click();
+    }
+
+    doLink = (content) => {
+        if (!content || !content.trim()) {
+           content = "google";
+        }
+
+        let all = content.split(" ");
+        let site = all[0];
+        let param = all.length > 1 ? all[1] : "";
+        let link = notes.find(n => n.tags.includes("#link") && n.text.startsWith(site));
+
+        if (!link) {
+            showStatus("failed", true);
+            return;
+        }
+
+        let url = link.split(" ")[1].replace("<param>", param);
+        showStatus("loading", true);
+        window.open(url);
     }
 
     doClear = () => { showData(""); showStatus("done", true); }
