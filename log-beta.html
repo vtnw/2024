@@ -78,19 +78,14 @@
                 doAdd(content);
                 break;
             }
-            case ".list": {
+            case ".all": {
                 showStatus(action);
-                doList(content);
+                showNotes(notes);
                 break;
             }
             case ".tag": {
                 showStatus(action);
-                showTag();
-                break;
-            }
-            case ".all": {
-                showStatus(action);
-                showNotes(notes);
+                showTags();
                 break;
             }
             case ".note": {
@@ -131,6 +126,11 @@
             case ".expense": {
                 showStatus(action);
                 doExpense(content);
+                break;
+            }
+            case ".list": {
+                showStatus(action);
+                doList(content);
                 break;
             }
             default: {
@@ -176,11 +176,7 @@
     }
 
     doNote = (content) => {
-        if (!content || !content.trim()) {
-            content = "recent:1m";
-        }
-
-        showNotes(filterData(content));
+        showNotes(filterData((!content || !content.trim()) ? "recent:1m" : content);
     }
 
     doRemove = (content) => {
@@ -339,7 +335,7 @@
         fileReader.readAsText(document.getElementById("fl").files[0], "UTF-8");
     }
 
-    showTag = () => {
+    showTags = () => {
         let tags = [];
         notes.forEach(d => {
             tags = [...tags, ...d.tags];
@@ -397,20 +393,20 @@
 
     showLists = (list) => {
         list.sort((a, b) => new Date(b.date) - new Date(a.date));
-        let summaryList = [];
+        let subList = [];
         list.forEach(l => {
             let tags = l.text.match(/#[a-z0-9-]+/g).filter(t => t != "#list");
             let name = tags.length >= 1 ? tags.join(", ") : "#general";
             let item = l.text.replace(/#[a-z0-9-]+/g, "");
-            let matchingEntry = summaryList.find(sl => sl.name == name);
+            let matchingEntry = subList.find(sl => sl.name == name);
             if (!matchingEntry) {
-                summaryList.push({ name, item });
+                subList.push({ name, item });
             } else {
                 matchingEntry.item = `${matchingEntry.item}\n${item}`;
             }
         });
         let message = "";
-        summaryList.forEach(sl => message = `${message}${sl.name}\n\n${sl.item}\n\n`);
+        subList.forEach(sl => message = `${message}${sl.name}\n\n${sl.item}\n\n`);
         showData(message);
         showStatus(list.length, true);
     }
