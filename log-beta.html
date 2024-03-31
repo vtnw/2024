@@ -258,10 +258,15 @@
                     break;
                 }
                 case "tag": {
-                    let tagFilters = condition.split("&");
-                    tagFilters.forEach(tf => {
-                        subData = subData.filter(s => s.tags.includes(`#${tf}`));
-                    });
+                    if (condition.indexOf("|") > 0) {
+                        subData = subData.filter(s => tagFilters.some(tf => s.tags.includes(`#${tf}`)));
+                    }
+                    else {
+                        let tagFilters = condition.split("&");
+                        tagFilters.forEach(tf => {
+                            subData = subData.filter(s => s.tags.includes(`#${tf}`));
+                        });
+                    }
                     break;
                 }
                 case "text": {
