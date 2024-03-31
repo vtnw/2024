@@ -248,14 +248,15 @@
         let all = content.split(" ");
         let site = all[0];
         let param = all.length > 1 ? all[1] : "";
-        let link = notes.find(n => n.tags.includes("#link") && n.text.startsWith(site));
+        let links = notes.filter(n => n.tags.includes("#link"));
+        let link = links.find(n => n.text.startsWith(`#link ${site}`));
 
         if (!link) {
             showStatus("failed", true);
             return;
         }
 
-        let url = link.split(" ")[1].replace("<param>", param);
+        let url = link.split(" ")[2].replace("<param>", param);
         showStatus("loading", true);
         window.open(url);
     }
