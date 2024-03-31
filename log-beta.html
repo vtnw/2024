@@ -88,14 +88,14 @@
                 showTag();
                 break;
             }
-            case ".note": {
+            case ".all": {
                 showStatus(action);
                 showNotes(notes);
                 break;
             }
-            case ".filter": {
+            case ".note": {
                 showStatus(action);
-                doFilter(content);
+                doNote(content);
                 break;
             }
             case ".clear": {
@@ -175,10 +175,9 @@
         showLists(filterData(`tag:list+${content}`));
     }
 
-    doFilter = (content) => {
+    doNote = (content) => {
         if (!content || !content.trim()) {
-            showStatus("failed", true);
-            return;
+            content = "recent:1m";
         }
 
         showNotes(filterData(content));
@@ -196,7 +195,8 @@
     }
 
     doExpense = (content) => {
-        showExpenses(filterData(`tag:expense+${content}`));
+        let condition = `tag:expense+${(!content || !content.trim()) ? "recent:1m" : content}`;
+        showExpenses(filterData(condition));
     }
 
     doReset = () => {
