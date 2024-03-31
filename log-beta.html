@@ -366,7 +366,7 @@
         list.sort((a, b) => new Date(b.date) - new Date(a.date));
         let summaryList = [];
         let minDate = new Date();
-        let maxDate = new Date();
+        let maxDate = new Date("3/1/24");
         list.forEach(l => {
             let tags = l.text.match(/#[a-z0-9-]+/g).filter(t => t != "#expense");
             let category = tags.length >= 1 ? tags.join(", ") : "#other";
@@ -388,7 +388,7 @@
         let message = `[${isoToString(minDate)} - ${isoToString(maxDate)}] ${total}\n`;
         summaryList.forEach(sl => message = `${message}\n${sl.category} ${sl.value}`);
         message = `${message}\n\n[Details]\n`;
-        summaryList.forEach(sl => detailMessage = `${detailMessage}\n${sl.category} ${sl.value}\n${sl.detail}`);
+        summaryList.forEach(sl => message = `${message}\n${sl.category} ${sl.value}\n${sl.detail}`);
         showData(message);
         showStatus(subList.length - 1, true);
     }
