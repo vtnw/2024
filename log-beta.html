@@ -363,18 +363,18 @@
     }
 
     showExpenses = (list) => {
+        list.sort((a, b) => new Date(b.date) - new Date(a.date));
         let summaryList = [];
         let minDate = new Date();
         let maxDate = new Date();
-        let detail;
         list.forEach(l => {
-            let tags = text.match(/#[a-z0-9-]+/g).filter(t => t != "expense");
+            let tags = l.text.match(/#[a-z0-9-]+/g).filter(t => t != "expense");
             let category = tags.length >= 1 ? tags.join(", ") : "others";
-            let value = parseInt(text.match(/@\S+/g));
+            let value = parseInt(l.text.match(/£\S+/g));
             let matchingEntry = subList.find(sl => sl.category == category);
             minDate = minDate > new Date(l.date) ? new Date(l.date) : minDate;
             maxDate = maxDate < new Date(l.date) ? new Date(l.date) : maxDate;
-            detail = `${isoToString(l.date)} ${text}`;
+            let detail = `${isoToString(l.date)} ${l.text}`;
             if (!matchingEntry) {
                 summaryList.push({ category, value, detail });
             } else {
