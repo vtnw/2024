@@ -196,6 +196,7 @@
     }
 
     doReset = () => {
+        doExport();
         notes = [];
         saveNotes();
         showData("");
@@ -225,7 +226,14 @@
         showStatus("done", true);
     }
 
-    doImport = (content) => { if (content == "reset") { notes = []; } document.getElementById("fl").click(); }
+    doImport = (content) => {
+        doExport();
+        if (content == "reset") {
+            notes = [];
+        } 
+        
+        document.getElementById("fl").click();
+    }
 
     doClear = () => { showData(""); showStatus("done", true); }
 
