@@ -83,6 +83,16 @@
                 doList(content);
                 break;
             }
+            case ".tag": {
+                showStatus(action);
+                showTag();
+                break;
+            }
+            case ".note": {
+                showStatus(action);
+                showList(notes);
+                break;
+            }
             case ".filter": {
                 showStatus(action);
                 doFilter(content);
@@ -172,7 +182,7 @@
                 break;
             }
             case "tags": {
-                showTags();
+                showTag();
                 break;
             }
         }
@@ -342,7 +352,7 @@
         fileReader.readAsText(document.getElementById("fl").files[0], "UTF-8");
     }
 
-    showTags = () => {
+    showTag = () => {
         let tags = [];
         notes.forEach(d => {
             tags = [...tags, ...d.tags];
