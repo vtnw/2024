@@ -242,7 +242,7 @@
         let subData = [...notes];
         filters.forEach(f => {
             if (!f || !f.trim()) {
-                continue;
+                return;
             }
             
             let field = f.split(":")[0].trim();
