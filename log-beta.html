@@ -259,6 +259,7 @@
                 }
                 case "tag": {
                     if (condition.indexOf("|") > 0) {
+                        let tagFilters = condition.split("|");
                         subData = subData.filter(s => tagFilters.some(tf => s.tags.includes(`#${tf}`)));
                     }
                     else {
