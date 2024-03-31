@@ -401,17 +401,16 @@
         list.forEach(l => {
             let tags = l.text.match(/#[a-z0-9-]+/g).filter(t => t != "#list");
             let name = tags.length >= 1 ? tags.join(", ") : "#general";
-            let values = l.text.match(/£[0-9.]+/g);
-            let item = "";
+            let item = l.text.replace(/#[a-z0-9-]+/g, "");
             let matchingEntry = summaryList.find(sl => sl.name == name);
             if (!matchingEntry) {
                 summaryList.push({ name, item });
             } else {
-                matchingEntry.value = `${matchingEntry.value}\n${item}`;
+                matchingEntry.item = `${matchingEntry.item}\n${item}`;
             }
         });
         let message = "";
-        summaryList.forEach(sl => message = `${message}\n[${sl.name}]\n\n${sl.item}\n\n`);
+        summaryList.forEach(sl => message = `${message}\n${sl.name}\n\n${sl.item}\n\n`);
         showData(message);
         showStatus(list.length, true);
     }
