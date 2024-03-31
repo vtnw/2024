@@ -371,7 +371,7 @@
             let tags = l.text.match(/#[a-z0-9-]+/g).filter(t => t != "#expense");
             let category = tags.length >= 1 ? tags.join(", ") : "#other";
             let value = parseInt(l.text.match(/£[0-9.]+/g));
-            let matchingEntry = subList.find(sl => sl.category == category);
+            let matchingEntry = summaryList.find(sl => sl.category == category);
             minDate = minDate > new Date(l.date) ? new Date(l.date) : minDate;
             maxDate = maxDate < new Date(l.date) ? new Date(l.date) : maxDate;
             let detail = `${isoToString(l.date)} ${l.text}`;
