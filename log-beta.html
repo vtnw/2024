@@ -157,7 +157,8 @@
 
         notes.push({ date: date, tags: tags, text: text });
         saveNotes();
-        showList(filterData(`.filter recent:1m+tag:${tags.join("&")}`));
+        let tagList = tags.map(t => t.substring(1)).join("&");
+        showList(filterData(`.filter recent:1m+tag:${tagList}`));
     }
 
     doList = (content) => {
