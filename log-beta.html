@@ -385,7 +385,7 @@
         });
         let total = summaryList.reduce((accumulated, item) => accumulated + item.value, 0);
         summaryList.sort((a, b) => b.value == a.value ? b.category - a.category  : b.value - a.value);
-        let message = `[${isoToString(minDate)} - ${isoToString(maxDate)}]\n\n Total ${total}\n\n[Summary]`;
+        let message = `[${isoToString(minDate)} - ${isoToString(maxDate)}]\nTotal ${total}\n\n[Summary]`;
         summaryList.forEach(sl => message = `${message}\n${sl.category} ${sl.value}`);
         message = `${message}\n\n[Details]`;
         summaryList.forEach(sl => message = `${message}\n\n${sl.category} ${sl.value}\n${sl.detail}`);
