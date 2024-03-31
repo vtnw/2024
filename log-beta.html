@@ -200,7 +200,7 @@
     }
 
     doExpense = (content) => {
-        showExpenses(filterData(`tag:expense ${content}`));
+        showExpenses(filterData(`tag:expense+${content}`));
     }
 
     doReset = () => {
@@ -377,8 +377,8 @@
         });
         let total = subList.reduce((accumulated, item) => accumulated + item.value, 0);
         subList.sort((a, b) => b.value == a.value ? b.category - a.category  : b.value - a.value);
-        let message = `[${isoToString(minDate)} - ${isoToString(minDate)}] £${total}`;
-        subList.forEach(sl => message = `${message}\n${sl.category} £${sl.value}`);
+        let message = `[${isoToString(minDate)} - ${isoToString(maxDate)}] ${total}\n`;
+        subList.forEach(sl => message = `${message}\n${sl.category} ${sl.value}`);
         showData(message);
         showStatus(subList.length - 1, true);
     }
