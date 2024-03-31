@@ -410,9 +410,7 @@
                 matchingEntry.value = `${matchingEntry.value}\n${item}`;
             }
         });
-        let message = `[\nList ${total}\n\n[Summary]`;
-        summaryList.forEach(sl => message = `${message}\n${sl.name}\n${sl.item}`);
-        message = `${message}\n\n[Details]`;
+        summaryList.forEach(sl => message = `${message}\n[${sl.name}]\n\n${sl.item}\n\n`);
         showData(message);
         showStatus(list.length, true);
     }
