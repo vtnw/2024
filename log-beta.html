@@ -70,7 +70,7 @@
         document.getElementById("tb").innerText = "";
         let all = text.split(" ");
         let action = all[0];
-        let content = text.substring(action.length + 1);
+        let content = text.substring(action.length + 1).trim();
 
         switch (action) {
             case "..": {
@@ -161,7 +161,7 @@
     }
 
     doAdd = (text) => {
-        if (!text || !text.trim()) {
+        if (!text) {
             showStatus("failed", true);
             return;
         }
@@ -199,11 +199,11 @@
     }
 
     doNote = (content) => {
-        showNotes(filterData((!content || !content.trim()) ? "recent:1m" : content));
+        showNotes(filterData(!content ? "recent:1m" : content));
     }
 
     doRemove = (content) => {
-        if (!content || !content.trim()) {
+        if (!content) {
             showStatus("failed", true);
             return;
         }
@@ -214,7 +214,7 @@
     }
 
     doEdit = (content) => {
-        if (!content || !content.trim()) {
+        if (!content) {
             showStatus("failed", true);
             return;
         }
@@ -231,7 +231,7 @@
     }
 
     doExpense = (content) => {
-        let condition = `tag:expense+${(!content || !content.trim()) ? "recent:1m" : content}`;
+        let condition = `tag:expense+${ !content ? "recent:1m" : content }`;
         showExpenses(filterData(condition));
     }
 
@@ -276,7 +276,7 @@
     }
 
     doLink = (content) => {
-        if (!content || !content.trim()) {
+        if (!content) {
            content = "google";
         }
 
@@ -306,10 +306,10 @@
     doClear = () => { showData(""); showStatus("done", true); }
 
     filterData = (content) => {
-        let filters = !content || !content.trim() ? [] : content.split("+");
+        let filters = !content ? [] : content.split("+");
         let subData = [...notes];
         filters.forEach(f => {
-            if (!f || !f.trim()) {
+            if (!f || !f.trim() || f.split(":").length < 2) {
                 return;
             }
             
@@ -360,10 +360,6 @@
                     break;
                 }
                 case "recent": {
-                    if (!condition || !condition.trim()) {
-                        condition = "1d";
-                    }
-
                     let today = new Date();
                     let to = new Date(today.getFullYear(), today.getMonth(), today.getDate());
                     let mode = condition.substring(condition.length - 1);
@@ -383,17 +379,7 @@
                     subData = subData.filter(s => new Date(isoToString(s.date)) >= from && new Date(isoToString(s.date)) <= to);
                     break;
                 }
-                case "today": {
-                    let today = new Date();
-                    let date = new Date(today.getFullYear(), today.getMonth(), today.getDate());                    
-                    subData = subData.filter(s => new Date(isoToString(s.date)) == date);
-                    break;
-                }
                 case "next": {
-                    if (!condition || !condition.trim()) {
-                        condition = "1d";
-                    }
-
                     let today = new Date();
                     today.setDate(today.getDate() + 1);
                     let from = new Date(today.getFullYear(), today.getMonth(), today.getDate());
