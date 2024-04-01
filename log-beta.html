@@ -92,6 +92,11 @@
                 showTags();
                 break;
             }
+            case ".name": {
+                showStatus(action);
+                showNames(content);
+                break;
+            }
             case ".note": {
                 showStatus(action);
                 doNote(content);
@@ -426,6 +431,24 @@
         let tagList = [... new Set(tags)].sort();
         showData(tagList.join("\n"));
         showStatus(tagList.length, true);
+    }
+
+    showNames = (content) => {
+        if (!content) {
+            showStatus("failed", true);
+            return;
+        }
+
+        let names = [];
+        let subList = filterData(`tag:${content}`);
+        subList.forEach(sl => {
+            let matches = /![a-z0-9-]/g.match(sl.text);
+            subList = [...subList, ...matches];
+        });
+        
+        let nameList = [... new Set(names)].sort();
+        showData(nameList.join("\n"));
+        showStatus(nameList.length, true);
     }
 
     showNotes = (list) => {
