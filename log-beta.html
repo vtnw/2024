@@ -47,7 +47,10 @@
     var notes = [];
     var command = "";
 
-    window.addEventListener("load", () => loadNotes());
+    window.addEventListener("load", () => {
+        loadNotes();
+        processData(".task date:today");
+    });
 
     document.addEventListener("click", (event) => document.getElementById("tb").focus());
 
@@ -507,6 +510,7 @@
         let subList = [];
         let currDate = new Date();
         let currName = "";
+        list.sort((a, b) => new Date(a.date) - new Date(b.date));
         list.forEach(l => {
             let names = l.text.match(/![a-z0-9-]+/g);
             let name = (names || []).length > 0 ? names[0].substring(1) : "general";
@@ -514,7 +518,7 @@
             let date = isoToString(l.date);
             let matchingDate = subList.find(sl => sl.date == date);
             if (!matchingDate) {
-                subList.push({ key: l.date, date, tasks: [ { name, items: [ item ] } ] });
+                subList.push({ date, tasks: [ { name, items: [ item ] } ] });
             } else {
                 let matchingName = matchingDate.tasks.find(md => md.name == name);
                 if (!matchingName) {
@@ -525,20 +529,14 @@
                 }
             }
         });
-        let today = isoToString(new Date());
-        if (!subList.some(sl => sl.date == today)) {
-            subList.push({ date: today, tasks: [] });
-        }
 
-        subList.sort((a, b) => new Date(a.key) - new Date(b.key));
         subList.forEach(d => {
             d.tasks.sort();
             d.tasks.forEach(t => t.items.sort());
         });
         let message = "";
         subList.forEach(d => {
-            let isToday = d.date == today;
-            message = `${message}[${isToday ? "Today" : d.date}]\n\n`;
+            message = `${message}[${d.date}]\n\n`;
             d.tasks.forEach(t => {
                 message = `${message}${t.name}\n`;
                 t.items.forEach(i => {
@@ -546,9 +544,6 @@
                 });
                 message = `${message}\n`;
             });
-            if (isToday) {
-                message = `${message}${d.tasks.length > 0 ? "" : "nothing\n\n"}------------------------------\n`;
-            }
         });
         showData(message);
         showStatus(list.length, true);
