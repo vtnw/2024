@@ -510,7 +510,7 @@
             let item = l.text.replace(/![a-z0-9-]+/g, "").replace(/#[a-z0-9-]+/g, "");
             let matchingEntry = subList.find(sl => sl.name == name);
             if (!matchingEntry) {
-                subList.push({ name, item });
+                subList.push({ name, `- ${item}` });
             } else {
                 matchingEntry.item = `${matchingEntry.item}\n- ${item}`;
             }
