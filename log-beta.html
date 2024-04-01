@@ -445,7 +445,9 @@
         let subList = filterData(`tag:${content}`);
         subList.forEach(sl => {
             let matches = sl.text.match(/![a-z0-9-]+/g);
-            subList = [...subList, ...matches];
+            if (matches) {
+                subList = [...subList, ...matches];
+            }
         });
         
         let nameList = [... new Set(names)].sort();
