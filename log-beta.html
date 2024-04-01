@@ -49,7 +49,7 @@
 
     window.addEventListener("load", () => {
         loadNotes();
-        processData(".task today");
+        processData(`.task date:${isoToString(new Date())}`);
     });
 
     document.addEventListener("click", (event) => document.getElementById("tb").focus());
