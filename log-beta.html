@@ -555,10 +555,11 @@
             d.tasks.forEach(t => {
                 // message = `${message}${t.name}\n`;
                 t.items.forEach(i => {
-                    message = `${message}${i} (${t.name})\n`;
+                    message = `${message}${i} !${t.name}\n`;
                 });
                 // message = `${message}\n`;
             });
+            message = `${message}\n`;
         });
         showData(message);
         showStatus(list.length, true);
