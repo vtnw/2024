@@ -522,7 +522,7 @@
         });
         subList.forEach(d => {
             d.tasks.sort((da, db) => da.name - db.name);
-            d.tasks.forEach(t => t.sort((ta, tb) => ta - tb));
+            d.tasks.forEach(t => t.items.sort((ta, tb) => ta - tb));
         });
         let message = "";
         subList.forEach(d => {
