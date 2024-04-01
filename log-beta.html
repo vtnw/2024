@@ -526,7 +526,7 @@
         });
         let message = "";
         subList.forEach(d => {
-            message = `${message}${isoToString(d.date)}\n\n`;
+            message = `${message}[${isoToString(d.date)}]\n\n`;
             d.tasks.forEach(t => {
                 message = `${message}${t.name}\n`;
                 t.items.forEach(i => {
