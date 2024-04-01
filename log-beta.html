@@ -498,7 +498,7 @@
     }
 
     showTasks = (list) => {
-        list.sort((a, b) => new Date(b.date) - new Date(a.date));
+        list.sort((a, b) => new Date(a.date) - new Date(b.date));
         let subList = [];
         let currDate = new Date();
         let currName = "";
@@ -521,8 +521,8 @@
             }
         });
         subList.forEach(d => {
-            d.tasks.sort((da, db) => da.name - db.name);
-            d.tasks.forEach(t => t.items.sort((ta, tb) => ta - tb));
+            d.tasks.sort();
+            d.tasks.forEach(t => t.items.sort();
         });
         let message = "";
         subList.forEach(d => {
@@ -532,6 +532,7 @@
                 t.items.forEach(i => {
                     message = `${message}- ${i}\n`;
                 });
+                message = `${message}\n`;
             });
             message = `${message}\n`;
         });
