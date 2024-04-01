@@ -532,7 +532,7 @@
         let message = "";
         subList.forEach(d => {
             d.date = d.date == today ? "Today" : d.date;
-            message = `${message}[${date}]\n\n`;
+            message = `${message}[${d.date}]\n\n`;
             d.tasks.forEach(t => {
                 message = `${message}${t.name}\n`;
                 t.items.forEach(i => {
