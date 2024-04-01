@@ -210,6 +210,7 @@
 
         let toRemove = filterData(content);
         notes = notes.filter(d => !toRemove.some(tr => tr.date == d.date && tr.text == d.text));
+        saveNotes();
         showNotes(toRemove);
     }
 
@@ -226,6 +227,7 @@
         }
 
         notes = notes.filter(d => !toRemove.some(tr => tr.date == d.date && tr.text == d.text));
+        saveNotes();
         document.getElementById("tb").innerText = toRemove[0].text;
         showNotes(toRemove);
     }
