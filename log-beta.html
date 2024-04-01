@@ -461,7 +461,7 @@
         list.forEach(l => {
             let names = l.text.match(/![a-z0-9-]+/g);
             let name = (names || []).length > 0 ? names[0].substring(1) : "general";
-            let item = l.text.replace(/![a-z0-9-]+/g, "");
+            let item = l.text.replace(/![a-z0-9-]+/g, "").replace(/#[a-z0-9-]+/g, "");
             let matchingEntry = subList.find(sl => sl.name == name);
             if (!matchingEntry) {
                 subList.push({ name, item });
