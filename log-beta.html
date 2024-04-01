@@ -431,7 +431,7 @@
         let maxDate = new Date("3/1/24");
         list.forEach(l => {
             let categories = l.text.match(/![a-z0-9-]+/g);
-            let category = (categories || []).length >= 1 ? tags[0].substring(1) : "other";
+            let category = (categories || []).length >= 1 ? categories[0].substring(1) : "other";
             let values = l.text.match(/£[0-9.]+/g);
             let value = (values || []).length == 0 || isNaN(parseInt(values[0].substring(1))) ? 0 : parseInt(values[0].substring(1));
             let matchingEntry = summaryList.find(sl => sl.category == category);
@@ -459,9 +459,9 @@
         list.sort((a, b) => new Date(b.date) - new Date(a.date));
         let subList = [];
         list.forEach(l => {
-            let tags = l.text.match(/#[a-z0-9-]+/g).filter(t => t != "#list");
-            let name = tags.length >= 1 ? tags.join(", ") : "#general";
-            let item = l.text.replace(/#[a-z0-9-]+/g, "");
+            let names = l.text.match(/![a-z0-9-]+/g);
+            let name = (names || []).length > 0 ? names[0].substring(1) : "general";
+            let item = l.text.replace(/![a-z0-9-]+/g, "");
             let matchingEntry = subList.find(sl => sl.name == name);
             if (!matchingEntry) {
                 subList.push({ name, item });
