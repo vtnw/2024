@@ -521,8 +521,7 @@
             }
         });
         let today = isoToString(new Date());
-        let todayEntry = subList.find(sl => sl.date == );
-        if (!todayEntry) {
+        if (!subList.some(sl => sl.date == today)) {
             subList.push({ date: today, tasks: [] });
         }
         
