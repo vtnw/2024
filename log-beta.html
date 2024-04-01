@@ -477,7 +477,7 @@
         let maxDate = new Date("3/1/24");
         list.forEach(l => {
             let categories = l.text.match(/![a-z0-9-]+/g);
-            let category = (categories || []).length >= 1 ? categories[0].substring(1) : "other";
+            let category = (categories || []).length >= 1 ? categories[0].substring(1) : "expense";
             let values = l.text.match(/£[0-9.]+/g);
             let value = (values || []).length == 0 || isNaN(parseInt(values[0].substring(1))) ? 0 : parseInt(values[0].substring(1));
             let matchingEntry = summaryList.find(sl => sl.category == category);
@@ -506,7 +506,7 @@
         let subList = [];
         list.forEach(l => {
             let names = l.text.match(/![a-z0-9-]+/g);
-            let name = (names || []).length > 0 ? names[0].substring(1) : "general";
+            let name = (names || []).length > 0 ? names[0].substring(1) : "list";
             let item = l.text.replace(/![a-z0-9-]+/g, "").replace(/#[a-z0-9-]+/g, "");
             let matchingEntry = subList.find(sl => sl.name == name);
             if (!matchingEntry) {
@@ -528,7 +528,7 @@
         list.sort((a, b) => new Date(a.date) - new Date(b.date));
         list.forEach(l => {
             let names = l.text.match(/![a-z0-9-]+/g);
-            let name = (names || []).length > 0 ? names[0].substring(1) : "general";
+            let name = (names || []).length > 0 ? names[0].substring(1) : "task";
             let item = l.text.replace(/![a-z0-9-]+/g, "").replace(/#[a-z0-9-]+/g, "").replace(/@\S+/g, "");
             let date = isoToString(l.date);
             let matchingDate = subList.find(sl => sl.date == date);
@@ -555,7 +555,7 @@
             d.tasks.forEach(t => {
                 // message = `${message}${t.name}\n`;
                 t.items.forEach(i => {
-                    message = `${message}- ${i} (${t.name})\n`;
+                    message = `${message}${i} (${t.name})\n`;
                 });
                 // message = `${message}\n`;
             });
