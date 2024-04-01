@@ -256,10 +256,16 @@
             return;
         }
 
-        let url = link.text.match(/!\S+/g)[1].replace("<param>", param);
+        all = link.text.match(/!\S+/g);
+        let url = all.length > 1 ? all[1] : null;
+        if (!url) {
+            showStatus("failed", true);
+            return;
+        }
+
         showData(link.text);
         showStatus("opened", true);
-        window.open(url);
+        window.open(url.replace("<param>", param));
     }
 
     doClear = () => { showData(""); showStatus("done", true); }
