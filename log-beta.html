@@ -553,7 +553,7 @@
         subList.forEach(d => {
             message = `${message}[${d.date}]\n\n`;
             d.tasks.forEach(t => {
-                message = `${message}${t.name}\n`;
+                // message = `${message}${t.name}\n`;
                 t.items.forEach(i => {
                     message = `${message}- ${i}\n`;
                 });
