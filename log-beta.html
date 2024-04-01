@@ -430,9 +430,9 @@
                 tags = [...tags, ...d.tags];
             }
         });
-        let tagList = [... new Set(tags)].sort();
-        showData(tagList.join("\n"));
-        showStatus(tagList.length, true);
+        tags = [... new Set(tags)].sort();
+        showData(tags.join("\n"));
+        showStatus(tags.length, true);
     }
 
     showNames = (content) => {
@@ -446,13 +446,13 @@
         subList.forEach(sl => {
             let matches = sl.text.match(/![a-z0-9-]+/g);
             if (matches) {
-                subList = [...subList, ...matches];
+                names = [...names, ...matches];
             }
         });
         
-        let nameList = [... new Set(names)].sort();
-        showData(nameList.join("\n"));
-        showStatus(nameList.length, true);
+        names = [... new Set(names)].sort();
+        showData(names.join("\n"));
+        showStatus(names.length, true);
     }
 
     showNotes = (list) => {
