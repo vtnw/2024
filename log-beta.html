@@ -213,7 +213,7 @@
         }
 
         notes = notes.filter(d => !toRemove.some(tr => tr.date == d.date && tr.text == d.text));
-        command = toRemove[0].text;
+        documnent.getElementById("tb").innerText = toRemove[0].text;
         showNotes(toRemove);
     }
 
