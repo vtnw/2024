@@ -249,7 +249,7 @@
         let site = all[0];
         let param = all.length > 1 ? all[1] : "";
         let links = notes.filter(n => n.tags.includes("#link"));
-        let link = links.find(n => n.text.test(new RegExp(`/!${site}/`));
+        let link = links.find(n => n.text.test(new RegExp(`/!${site}/`)));
         
         if (!link) {
             showStatus("failed", true);
