@@ -531,7 +531,7 @@
         });
         let message = "";
         subList.forEach(d => {
-            date = date == today ? "Today" : date;
+            d.date = d.date == today ? "Today" : d.date;
             message = `${message}[${date}]\n\n`;
             d.tasks.forEach(t => {
                 message = `${message}${t.name}\n`;
@@ -540,7 +540,7 @@
                 });
                 message = `${message}\n`;
             });
-            if (date == today) {
+            if (d.date == today) {
                 message = `${message}${d.tasks.some() ? "" : "\n\n"}------------------------------\n`;
             }
         });
