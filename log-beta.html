@@ -327,6 +327,19 @@
                     }
                     break;
                 }
+                case "name": {
+                    if (condition.indexOf("|") > 0) {
+                        let nameFilters = condition.split("|");
+                        subData = subData.filter(s => nameFilters.some(nf => s.text.test(new RegExp(`!${nf}`))));
+                    }
+                    else {
+                        let nameFilters = condition.split("&");
+                        nameFilters.forEach(nf => {
+                            subData = subData.filter(s => s.text.test(new RegExp(`!${nf}`)));
+                        });
+                    }
+                    break;
+                }
                 case "text": {
                     let textFilters = condition.split("&");
                     textFilters.forEach(tf => {
@@ -447,7 +460,7 @@
         });
         let total = summaryList.reduce((accumulated, item) => accumulated + item.value, 0);
         summaryList.sort((a, b) => b.value == a.value ? b.category - a.category  : b.value - a.value);
-        let message = `[${isoToString(minDate)} - ${isoToString(maxDate)}]\nTotal ${total}\n\n[Summary]`;
+        let message = `[${isoToString(minDate)} - ${isoToString(maxDate)}]\n\nTotal ${total}\n\n[Summary]\n`;
         summaryList.forEach(sl => message = `${message}\n${sl.category} ${sl.value}`);
         message = `${message}\n\n[Details]`;
         summaryList.forEach(sl => message = `${message}\n\n${sl.category} ${sl.value}\n${sl.detail}`);
@@ -470,7 +483,7 @@
             }
         });
         let message = "";
-        subList.forEach(sl => message = `${message}${sl.name}\n\n${sl.item}\n\n`);
+        subList.forEach(sl => message = `${message}[${sl.name}]\n\n${sl.item}\n\n`);
         showData(message);
         showStatus(list.length, true);
     }
