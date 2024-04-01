@@ -330,12 +330,12 @@
                 case "name": {
                     if (condition.indexOf("|") > 0) {
                         let nameFilters = condition.split("|");
-                        subData = subData.filter(s => nameFilters.some(nf => new RegExp(`!${nf}`).test(s.text)));
+                        subData = subData.filter(s => nameFilters.some(nf => new RegExp(`(^|\\s+)!${nf}($|\\s+)`).test(s.text)));
                     }
                     else {
                         let nameFilters = condition.split("&");
                         nameFilters.forEach(nf => {
-                            subData = subData.filter(s => new RegExp(`!${nf}`).test(s.text));
+                            subData = subData.filter(s => new RegExp(`(^|\\s+)!${nf}($|\\s+)`).test(s.text));
                         });
                     }
                     break;
