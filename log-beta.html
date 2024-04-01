@@ -505,8 +505,8 @@
         list.forEach(l => {
             let names = l.text.match(/![a-z0-9-]+/g);
             let name = (names || []).length > 0 ? names[0].substring(1) : "general";
-            let item = l.text.replace(/![a-z0-9-]+/g, "").replace(/#[a-z0-9-]+/g, "");
-            let date = new Date(isoToString(l.date));
+            let item = l.text.replace(/![a-z0-9-]+/g, "").replace(/#[a-z0-9-]+/g, "").replace(/@\S+/g, "");
+            let date = isoToString(l.date);
             let matchingDate = subList.find(sl => sl.date == date);
             if (!matchingDate) {
                 subList.push({ date, tasks: [ { name, items: [ item ] } ] });
@@ -520,7 +520,6 @@
                 }
             }
         });
-        subList.sort((a, b) => b.date - a.date);
         subList.forEach(d => {
             d.tasks.sort((da, db) => da.name - db.name);
             d.tasks.forEach(t => t.sort((ta, tb) => ta - tb));
