@@ -265,7 +265,7 @@
 
         showData(link.text);
         showStatus("opened", true);
-        window.open(url.replace("<param>", param));
+        window.open(url.substring(1).replace("<param>", param));
     }
 
     doClear = () => { showData(""); showStatus("done", true); }
