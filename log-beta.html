@@ -89,7 +89,7 @@
             }
             case ".tag": {
                 showStatus(action);
-                showTags();
+                showTags(content);
                 break;
             }
             case ".name": {
@@ -423,10 +423,12 @@
         fileReader.readAsText(document.getElementById("fl").files[0], "UTF-8");
     }
 
-    showTags = () => {
+    showTags = (content) => {
         let tags = [];
         notes.forEach(d => {
-            tags = [...tags, ...d.tags];
+            if (!content || d.tags.includes(`#${content}`)) {
+                tags = [...tags, ...d.tags];
+            }
         });
         let tagList = [... new Set(tags)].sort();
         showData(tagList.join("\n"));
