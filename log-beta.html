@@ -512,7 +512,7 @@
             if (!matchingEntry) {
                 subList.push({ name, item });
             } else {
-                matchingEntry.item = `${matchingEntry.item}\n${item}`;
+                matchingEntry.item = `${matchingEntry.item}\n- ${item}`;
             }
         });
         let message = "";
