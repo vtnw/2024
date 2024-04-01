@@ -270,7 +270,7 @@
 
         let all = content.split(" ");
         let site = all[0];
-        let param = all.length > 1 ? all.substring(site.length + 1) : "";
+        let param = all.length > 1 ? content.substring(site.length + 1) : "";
         let links = notes.filter(n => n.tags.includes("#link"));
         let link = links.find(n => new RegExp(`!${site}`).test(n.text));
         
