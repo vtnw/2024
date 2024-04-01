@@ -249,15 +249,16 @@
         let site = all[0];
         let param = all.length > 1 ? all[1] : "";
         let links = notes.filter(n => n.tags.includes("#link"));
-        let link = links.find(n => n.text.startsWith(`#link ${site}`));
+        let link = links.find(n => n.text.match(![a-z0-9-]+/g));
         
         if (!link) {
             showStatus("failed", true);
             return;
         }
 
-        let url = link.text.split(" ")[2].replace("<param>", param);
-        showStatus("loading", true);
+        let url = link.text.match(/^\S+/g).replace("<param>", param);
+        showData(link.text);
+        showStatus("opened", true);
         window.open(url);
     }
 
