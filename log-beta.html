@@ -380,6 +380,12 @@
                     subData = subData.filter(s => new Date(isoToString(s.date)) >= from && new Date(isoToString(s.date)) <= to);
                     break;
                 }
+                case "today": {
+                    let today = new Date();
+                    let date = new Date(today.getFullYear(), today.getMonth(), today.getDate());                    
+                    subData = subData.filter(s => new Date(isoToString(s.date)) == date);
+                    break;
+                }
                 case "next": {
                     if (!condition || !condition.trim()) {
                         condition = "1d";
@@ -541,7 +547,7 @@
                 message = `${message}\n`;
             });
             if (isToday) {
-                message = `${message}${d.tasks.length > 0 ? "" : "\nnothing\n"}------------------------------\n`;
+                message = `${message}${d.tasks.length > 0 ? "" : "nothing\n\n"}------------------------------\n`;
             }
         });
         showData(message);
