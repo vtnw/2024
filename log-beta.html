@@ -498,7 +498,6 @@
     }
 
     showTasks = (list) => {
-        list.sort((a, b) => new Date(a.date) - new Date(b.date));
         let subList = [];
         let currDate = new Date();
         let currName = "";
@@ -509,7 +508,7 @@
             let date = isoToString(l.date);
             let matchingDate = subList.find(sl => sl.date == date);
             if (!matchingDate) {
-                subList.push({ date, tasks: [ { name, items: [ item ] } ] });
+                subList.push({ key: l.date, date, tasks: [ { name, items: [ item ] } ] });
             } else {
                 let matchingName = matchingDate.tasks.find(md => md.name == name);
                 if (!matchingName) {
@@ -524,7 +523,8 @@
         if (!subList.some(sl => sl.date == today)) {
             subList.push({ date: today, tasks: [] });
         }
-        
+
+        subList.sort((a, b) => new Date(a.key) - new Date(b.key));
         subList.forEach(d => {
             d.tasks.sort();
             d.tasks.forEach(t => t.items.sort());
@@ -541,7 +541,7 @@
                 message = `${message}\n`;
             });
             if (isToday) {
-                message = `${message}${d.tasks.length > 0 ? "" : "\n\n"}------------------------------\n`;
+                message = `${message}${d.tasks.length > 0 ? "" : "\nnothing\n"}------------------------------\n`;
             }
         });
         showData(message);
