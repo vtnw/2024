@@ -531,8 +531,8 @@
         });
         let message = "";
         subList.forEach(d => {
-            d.date = d.date == today ? "Today" : d.date;
-            message = `${message}[${d.date}]\n\n`;
+            let isToday = d.date == today;
+            message = `${message}[${isToday ? "Today" : d.date}]\n\n`;
             d.tasks.forEach(t => {
                 message = `${message}${t.name}\n`;
                 t.items.forEach(i => {
@@ -540,12 +540,12 @@
                 });
                 message = `${message}\n`;
             });
-            if (d.date == today) {
+            if (isToday) {
                 message = `${message}${d.tasks.some() ? "" : "\n\n"}------------------------------\n`;
             }
         });
         showData(message);
-        showStatus(subList.length, true);
+        showStatus(list.length, true);
     }
 
     saveAsFile = (data, fileName) => {
