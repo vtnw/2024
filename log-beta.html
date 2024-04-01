@@ -541,7 +541,7 @@
                 message = `${message}\n`;
             });
             if (isToday) {
-                message = `${message}${d.tasks.some() ? "" : "\n\n"}------------------------------\n`;
+                message = `${message}${d.tasks.length > 0 ? "" : "\n\n"}------------------------------\n`;
             }
         });
         showData(message);
