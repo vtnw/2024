@@ -123,6 +123,11 @@
                 doRemove(content);
                 break;
             }
+            case ".edit": {
+                showStatus(action);
+                doEdit(content);
+                break;
+            }
             case ".expense": {
                 showStatus(action);
                 doExpense(content);
@@ -192,6 +197,23 @@
 
         let toRemove = filterData(content);
         notes = notes.filter(d => !toRemove.some(tr => tr.date == d.date && tr.text == d.text));
+        showNotes(toRemove);
+    }
+
+    doEdit = (content) => {
+        if (!content || !content.trim()) {
+            showStatus("failed", true);
+            return;
+        }
+
+        let toRemove = filterData(content);
+        if (toRemove.length != 1) {
+            showStatus("failed", true);
+            return;
+        }
+
+        notes = notes.filter(d => !toRemove.some(tr => tr.date == d.date && tr.text == d.text));
+        command = reRemove[0].text;
         showNotes(toRemove);
     }
 
