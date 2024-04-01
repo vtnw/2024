@@ -533,31 +533,20 @@
             let date = isoToString(l.date);
             let matchingDate = subList.find(sl => sl.date == date);
             if (!matchingDate) {
-                subList.push({ date, tasks: [ { name, items: [ item ] } ] });
+                subList.push({ date, tasks: [ { name, item } ] });
             } else {
-                let matchingName = matchingDate.tasks.find(md => md.name == name);
-                if (!matchingName) {
-                    matchingDate.tasks.push({ name, items: [ item ] });
-                }
-                else {
-                    matchingName.items.push(item);
-                }
+                matchingDate.tasks.push({ name, item });
             }
         });
 
         subList.forEach(d => {
-            d.tasks.sort();
-            d.tasks.forEach(t => t.items.sort());
+            d.tasks.sort((a, b) => a.item - b.item);
         });
         let message = "";
         subList.forEach(d => {
             message = `${message}[${d.date}]\n\n`;
             d.tasks.forEach(t => {
-                // message = `${message}${t.name}\n`;
-                t.items.forEach(i => {
-                    message = `${message}${i} !${t.name}\n`;
-                });
-                // message = `${message}\n`;
+                message = `${message}- ${t.item} !${t.name}\n`;
             });
             message = `${message}\n`;
         });
