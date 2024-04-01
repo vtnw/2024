@@ -520,13 +520,20 @@
                 }
             }
         });
+        let today = isoToString(new Date());
+        let todayEntry = subList.find(sl => sl.date == );
+        if (!todayEntry) {
+            subList.push({ date: today, tasks: [] });
+        }
+        
         subList.forEach(d => {
             d.tasks.sort();
             d.tasks.forEach(t => t.items.sort());
         });
         let message = "";
         subList.forEach(d => {
-            message = `${message}[${isoToString(d.date)}]\n\n`;
+            date = date == today ? "Today" : date;
+            message = `${message}[${date}]\n\n`;
             d.tasks.forEach(t => {
                 message = `${message}${t.name}\n`;
                 t.items.forEach(i => {
@@ -534,6 +541,9 @@
                 });
                 message = `${message}\n`;
             });
+            if (date == today) {
+                message = `${message}${d.tasks.some() ? "" : "\n\n"}------------------------------\n`;
+            }
         });
         showData(message);
         showStatus(subList.length, true);
