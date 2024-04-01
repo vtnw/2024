@@ -139,6 +139,11 @@
                 doList(content);
                 break;
             }
+            case ".task": {
+                showStatus(action);
+                doTask(content);
+                break;
+            }
             case ".link": {
                 showStatus(action);
                 doLink(content);
@@ -184,6 +189,10 @@
 
     doList = (content) => {
         showLists(filterData(`tag:list+${content}`));
+    }
+
+    doTask = (content) => {
+        showTasks(filterData(`tag:task+${content}`));
     }
 
     doNote = (content) => {
@@ -486,6 +495,49 @@
         subList.forEach(sl => message = `${message}[${sl.name}]\n\n${sl.item}\n\n`);
         showData(message);
         showStatus(list.length, true);
+    }
+
+    showTasks = (list) => {
+        list.sort((a, b) => new Date(b.date) - new Date(a.date));
+        let subList = [];
+        let currDate = new Date();
+        let currName = "";
+        list.forEach(l => {
+            let names = l.text.match(/![a-z0-9-]+/g);
+            let name = (names || []).length > 0 ? names[0].substring(1) : "general";
+            let item = l.text.replace(/![a-z0-9-]+/g, "").replace(/#[a-z0-9-]+/g, "");
+            let date = new Date(isoToString(l.date));
+            let matchingDate = subList.find(sl => sl.date == date);
+            if (!matchingDate) {
+                subList.push({ date, tasks: [ { name, items: [ item ] } ] });
+            } else {
+                let matchingName = matchingDate.tasks.find(md => md.name == name);
+                if (!matchingName) {
+                    matchingDate.tasks.push({ name, items: [ item ] });
+                }
+                else {
+                    matchingName.items.push(item);
+                }
+            }
+        });
+        subList.sort((a, b) => b.date - a.date);
+        subList.forEach(d => {
+            d.tasks.sort((da, db) => da.name - db.name);
+            d.tasks.forEach(t => t.sort((ta, tb) => ta - tb));
+        });
+        let message = "";
+        subList.forEach(d => {
+            message = `${message}${isoToString(d.date)}\n\n`;
+            d.tasks.forEach(t => {
+                message = `${message}${t.name}\n`;
+                t.items.forEach(i => {
+                    message = `${message}- ${i}\n`;
+                });
+            });
+            message = `${message}${isoToString(d.date)}\n`;
+        });
+        showData(message);
+        showStatus(subList.length, true);
     }
 
     saveAsFile = (data, fileName) => {
