@@ -566,7 +566,6 @@
             importedData.forEach(i => notes.push(i));
             saveNotes();
             showStatus(importedData.length, true);
-            setTimeout(location.reload(), 1000);
         };
         fileReader.readAsText(document.getElementById("fl").files[0], "UTF-8");
     }
