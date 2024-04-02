@@ -568,6 +568,7 @@
             showStatus(importedData.length, true);
         };
         fileReader.readAsText(document.getElementById("fl").files[0], "UTF-8");
+        document.getElementById("fl").value = null;
     }
 
     showNotes = (list) => {
