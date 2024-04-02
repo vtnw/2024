@@ -69,7 +69,7 @@
     document.getElementById("tb").addEventListener("focus", (event) => {
         editDiv(true);
         textMode = false;
-    }
+    });
 
     document.getElementById("tb").addEventListener("blur", (event) => {
         processData(document.getElementById("tb").innerText);
