@@ -66,12 +66,9 @@
         }
     });
 
-    document.getElementById("tb").addEventListener("focus", (event) => {
+    document.getElementById("tb").addEventListener("blur", (event) => {
         editDiv(false);
         textMode = false;
-    });
-
-    document.getElementById("tb").addEventListener("blur", (event) => {
         processData(document.getElementById("tb").innerText);
     });
 
