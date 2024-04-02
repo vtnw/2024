@@ -380,7 +380,6 @@
     }
 
     doImport = (content) => {
-        doExport();
         if (content == "reset") {
             notes = [];
         } 
@@ -566,7 +565,7 @@
             let importedData = JSON.parse(event.target.result);
             importedData.forEach(i => notes.push(i));
             saveNotes();
-            showStatus("done", true);
+            showStatus(importedData.length, true);
             setTimeout(location.reload(), 1000);
         };
         fileReader.readAsText(document.getElementById("fl").files[0], "UTF-8");
