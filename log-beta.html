@@ -100,17 +100,17 @@
             }
             case ".all": {
                 showStatus(action);
-                showNotes(notes);
+                doAll();
                 break;
             }
             case ".tag": {
                 showStatus(action);
-                showTags(content);
+                doTag(content);
                 break;
             }
             case ".name": {
                 showStatus(action);
-                showNames(content);
+                doName(content);
                 break;
             }
             case ".note": {
@@ -231,6 +231,40 @@
 
     doNote = (content) => {
         showNotes(filterData(!content ? "recent:1m" : content));
+    }
+
+    doAll = () => showNotes(notes);
+
+    doTag = (content) => {
+        let tags = [];
+        notes.forEach(d => {
+            if (!content || d.tags.includes(`#${content}`)) {
+                tags = [...tags, ...d.tags];
+            }
+        });
+        tags = [... new Set(tags)].sort();
+        showData(tags.join("\n"));
+        showStatus(tags.length, true);
+    }
+
+    doName = (content) => {
+        if (!content) {
+            showStatus("failed", true);
+            return;
+        }
+
+        let names = [];
+        let subList = filterData(`tag:${content}`);
+        subList.forEach(sl => {
+            let matches = sl.text.match(/![a-z0-9-]+/g);
+            if (matches) {
+                names = [...names, ...matches];
+            }
+        });
+        
+        names = [... new Set(names)].sort();
+        showData(names.join("\n"));
+        showStatus(names.length, true);
     }
 
     doRemove = (content) => {
@@ -537,38 +571,6 @@
             setTimeout(location.reload(), 1000);
         };
         fileReader.readAsText(document.getElementById("fl").files[0], "UTF-8");
-    }
-
-    showTags = (content) => {
-        let tags = [];
-        notes.forEach(d => {
-            if (!content || d.tags.includes(`#${content}`)) {
-                tags = [...tags, ...d.tags];
-            }
-        });
-        tags = [... new Set(tags)].sort();
-        showData(tags.join("\n"));
-        showStatus(tags.length, true);
-    }
-
-    showNames = (content) => {
-        if (!content) {
-            showStatus("failed", true);
-            return;
-        }
-
-        let names = [];
-        let subList = filterData(`tag:${content}`);
-        subList.forEach(sl => {
-            let matches = sl.text.match(/![a-z0-9-]+/g);
-            if (matches) {
-                names = [...names, ...matches];
-            }
-        });
-        
-        names = [... new Set(names)].sort();
-        showData(names.join("\n"));
-        showStatus(names.length, true);
     }
 
     showNotes = (list) => {
