@@ -46,6 +46,8 @@
 <script>
     let notes = [];
     let command = "";
+    let editMode = false;
+    let textMode = false;
     const hiddenTag = "hidden";
     const noteTag = "note";
     const linkTag = "link";
@@ -58,7 +60,11 @@
         processData(".task recent:30d");
     });
 
-    document.addEventListener("click", (event) => document.getElementById("tb").focus());
+    document.addEventListener("click", (event) => {
+        if (!editMode) {
+            document.getElementById("tb").focus();
+        }
+    });
 
     document.getElementById("tb").addEventListener("blur", (event) => processData(document.getElementById("tb").innerText));
 
@@ -176,6 +182,11 @@
             case ".link": {
                 showStatus(action);
                 doLink(content);
+                break;
+            }            
+            case ".text": {
+                showStatus(action);
+                doResult(content);
                 break;
             }
             default: {
@@ -370,6 +381,38 @@
 
     doClear = () => { showData(""); showStatus("done", true); }
 
+    doText = (content) {
+        if (!content) {
+           showStatus("failed", true);
+           return;
+        }
+        
+        switch (content) {
+            case "load": {
+                textMode = true;
+                document.getElementById("fl").click();
+                break;
+            }
+            case "save": {
+                saveAsFile(document.getElementById("dv").innerText, "data_" + isoToString(new Date()));
+                showStatus("done", true);
+                break;
+            }
+            case "edit": {
+                editMode = true;
+                document.getElementById("dv").contentEditable = editMode;
+                showStatus("done", true);
+                break;
+            }
+            case "read": {
+                editMode = false;
+                document.getElementById("dv").contentEditable = editMode;
+                showStatus("done", true);
+                break;
+            }
+        }
+    }
+
     filterData = (content) => {
         let filters = !content ? [] : content.split("+");
         let subData = [...notes];
@@ -476,6 +519,12 @@
     importFile = () => {
         let fileReader = new FileReader();
         fileReader.onload = (event) => {
+            if (textMode) {
+                document.getElementById("dv").innerText = event.target.result;
+                showStatus("done", true);
+                textMode = false;
+                return;
+            }
             let importedData = JSON.parse(event.target.result);
             importedData.forEach(i => notes.push(i));
             saveNotes();
