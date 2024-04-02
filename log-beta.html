@@ -356,7 +356,7 @@
             return;
         }
 
-        all = link.text.match(/|\S+/g);
+        all = link.text.match(/\^\S+/g);
         let url = all.length > 1 ? all[0] : null;
         if (!url) {
             showStatus("failed", true);
