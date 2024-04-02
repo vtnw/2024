@@ -71,7 +71,11 @@
         processData(document.getElementById("tb").innerText);
     });
 
-    document.getElementById("fl").addEventListener("change", () => importFile());
+    document.getElementById("fl").addEventListener("change", () => {
+        if (document.getElementById("fl").files.length > 0) {
+            importFile());
+        }
+    });
 
     processData = (text) => {
         if (!text || /\s$/.test(text)) {
