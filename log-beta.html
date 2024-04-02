@@ -406,7 +406,7 @@
         }
 
         all = link.text.match(/\^\S+/g);
-        let url = all.length > 0 ? all[0] : null;
+        let url = (all || []).length > 0 ? all[0] : null;
         if (!url) {
             showStatus("failed", true);
             return;
