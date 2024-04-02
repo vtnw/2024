@@ -44,8 +44,14 @@
     <input style="display:none" type="file" id="fl" />
 </body>
 <script>
-    var notes = [];
-    var command = "";
+    let notes = [];
+    let command = "";
+    const hiddenTag = "hidden";
+    const noteTag = "note";
+    const linkTag = "link";
+    const taskTag = "task";
+    const listTag = "list";
+    const expenseTag = "expense";
 
     window.addEventListener("load", () => {
         loadNotes();
@@ -132,9 +138,24 @@
                 doRemove(content);
                 break;
             }
-            case ".edit": {
+            case ".cut": {
                 showStatus(action);
-                doEdit(content);
+                doCut(content);
+                break;
+            }
+            case ".copy": {
+                showStatus(action);
+                doCopy(content);
+                break;
+            }            
+            case ".hide": {
+                showStatus(action);
+                doHide(content);
+                break;
+            }            
+            case ".move": {
+                showStatus(action);
+                doMove(content);
                 break;
             }
             case ".expense": {
@@ -172,21 +193,11 @@
         }
 
         let pattern = /#[a-z0-9-]+/g;
-        let defaultTag = "#note";
         let tags = text.match(pattern);
-        let dates = text.match(/@\S+/g);
-        let date = new Date();
+        let date = extractDate(text);
         if (!(tags || []).some(t => t.length > 0)) {
-            tags = [defaultTag];
-            text = `${text} ${defaultTag}`;
-        }
-
-        let newDate = (dates || []).some(d => d.length > 0) ? dates[dates.length - 1].substring(1) : "";
-        if (newDate.length >= 6
-            && newDate.length <= 10
-            && newDate.indexOf("/") > 0
-            && !isNaN(new Date(newDate).getDate())) {
-            date = new Date(newDate);
+            tags = [`#${noteTag}`];
+            text = `${text} #${noteTag}`;
         }
 
         notes.push({ date: date, tags: tags, text: text });
@@ -196,11 +207,11 @@
     }
 
     doList = (content) => {
-        showLists(filterData(`tag:list+${content}`));
+        showLists(filterData(`tag:${listTag}+${content}`));
     }
 
     doTask = (content) => {
-        showTasks(filterData(`tag:task+${content}`));
+        showTasks(filterData(`tag:${taskTag}&!${hiddenTag}+${content}`));
     }
 
     doNote = (content) => {
@@ -219,7 +230,24 @@
         showNotes(toRemove);
     }
 
-    doEdit = (content) => {
+    doHide = (content) => {
+        if (!content) {
+            showStatus("failed", true);
+            return;
+        }
+
+        let filtered = filterData(`tag:!${iddenTag}+${content}`);
+        let toHide = notes.filter(n => filtered.some(f => f.date == n.date && f.text == n.text));
+        toHide.forEach(th => {
+            th.tags.push(`#${hiddenTag}`);
+            th.text = `${th.text} #${hiddenTag}`;
+        });
+        
+        saveNotes();
+        showNotes(toHide);
+    }
+
+    doCut = (content) => {
         if (!content) {
             showStatus("failed", true);
             return;
@@ -237,8 +265,38 @@
         showNotes(toRemove);
     }
 
+    doCopy = (content) => {
+        if (!content) {
+            showStatus("failed", true);
+            return;
+        }
+
+        let toCopy = filterData(content);
+        if (toCopy.length != 1) {
+            showStatus("failed", true);
+            return;
+        }
+
+        document.getElementById("tb").innerText = toCopy[0].text;
+        showNotes(toCopy);
+    }
+
+    doMove = (content) => {
+        if (!content) {
+            showStatus("failed", true);
+            return;
+        }
+
+        let filter = `tag:!${linkTag}&!${expenseTag}&!${taskTag}&!${listTag}+${content}`;
+        doExport(filter);
+        let toMove = filterData(filter);
+        notes = notes.filter(d => !toMove.some(tr => tr.date == d.date && tr.text == d.text));
+        saveNotes();
+        showNotes(toMove);
+    }
+
     doExpense = (content) => {
-        let condition = `tag:expense+${ !content ? "recent:1m" : content }`;
+        let condition = `tag:${expenseTag}+${ !content ? "recent:1m" : content }`;
         showExpenses(filterData(condition));
     }
 
@@ -290,7 +348,7 @@
         let all = content.split(" ");
         let site = all[0];
         let param = all.length > 1 ? content.substring(site.length + 1) : "";
-        let links = notes.filter(n => n.tags.includes("#link"));
+        let links = filterData(`tag:${linkTag}&!${hiddenTag}`);
         let link = links.find(n => new RegExp(`(^|\\s+)!${site}($|\\s+)`).test(n.text));
         
         if (!link) {
@@ -298,8 +356,8 @@
             return;
         }
 
-        all = link.text.match(/!\S+/g);
-        let url = all.length > 1 ? all[1] : null;
+        let all = link.text.match(/|\S+/g);
+        let url = all.length > 1 ? all[0] : null;
         if (!url) {
             showStatus("failed", true);
             return;
@@ -341,7 +399,11 @@
                     else {
                         let tagFilters = condition.split("&");
                         tagFilters.forEach(tf => {
-                            subData = subData.filter(s => s.tags.includes(`#${tf}`));
+                            if (tf.startsWith("!") {
+                                subData = subData.filter(s => !s.tags.includes(`#${tf.substring(1)}`));
+                            } else {
+                                subData = subData.filter(s => s.tags.includes(`#${tf}`));
+                            }
                         });
                     }
                     break;
@@ -477,7 +539,7 @@
         let maxDate = new Date("3/1/24");
         list.forEach(l => {
             let categories = l.text.match(/![a-z0-9-]+/g);
-            let category = (categories || []).length >= 1 ? categories[0].substring(1) : "expense";
+            let category = (categories || []).length >= 1 ? categories[0].substring(1) : expenseTag;
             let values = l.text.match(/£[0-9.]+/g);
             let value = (values || []).length == 0 || isNaN(parseInt(values[0].substring(1))) ? 0 : parseInt(values[0].substring(1));
             let matchingEntry = summaryList.find(sl => sl.category == category);
@@ -506,7 +568,7 @@
         let subList = [];
         list.forEach(l => {
             let names = l.text.match(/![a-z0-9-]+/g);
-            let name = (names || []).length > 0 ? names[0].substring(1) : "list";
+            let name = (names || []).length > 0 ? names[0].substring(1) : listTag;
             let item = l.text.replace(/![a-z0-9-]+/g, "").replace(/#[a-z0-9-]+/g, "");
             let matchingEntry = subList.find(sl => sl.name == name);
             if (!matchingEntry) {
@@ -528,7 +590,7 @@
         list.sort((a, b) => new Date(a.date) - new Date(b.date));
         list.forEach(l => {
             let names = l.text.match(/![a-z0-9-]+/g);
-            let name = (names || []).length > 0 ? names[0].substring(1) : "task";
+            let name = (names || []).length > 0 ? names[0].substring(1) : taskTag;
             let item = l.text.replace(/![a-z0-9-]+/g, "").replace(/#[a-z0-9-]+/g, "").replace(/@\S+/g, "");
             let date = isoToString(l.date);
             let matchingDate = subList.find(sl => sl.date == date);
@@ -577,5 +639,66 @@
         date = new Date(date);
         return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
     }
+
+    extractDate = (text) => {
+        let dates = text.match(/@\S+/g);
+        let date = new Date();
+        let dateString = (dates || []).some(d => d.length > 0) ? dates[dates.length - 1].substring(1) : "";
+        switch (dateString) {
+            case "tomorrow": {
+                date.setDate(date.getDate() + 1);
+                break;
+            }
+            case "yesterday": {
+                date.setDate(date.getDate() - 1);
+                break;
+            }
+            case "weekend": {
+                let noOfDays = 6 - date.getDay();
+                date.setDate(date.getDate() + (noOfDays > 0 ? noOfDays : 7)));
+                break;
+            }
+            case "month": {
+                date.setMonth(from.getMonth() + 1);
+                date.setDate(1);
+                break;
+            }
+            case "year": {
+                date.setFullYear(from.getFullYear() + 1);
+                date.setMonth(0);
+                date.setDate(1);
+                break;
+            }
+            default: {
+                if ((dateString.endsWith("d") || dateString.endsWith("m") || dateString.endsWith("y"))) {
+                    let mode = dateString.substring(dateString.length - 1);
+                    let number = parseInt(dateString.substring(0, dateString.length - 1));
+                    switch (mode) {
+                        case "d": {
+                            date.setDate(from.getDate() + number);
+                            break;
+                        }
+                        case "m": {
+                            date.setMonth(from.getMonth() + number);
+                            break;
+                        }
+                        case "y": {
+                            date.setYear(from.getFullYear() + number);
+                            break;
+                        }
+                    }
+                }
+                else if (dateString.length >= 6
+                        && dateString.length <= 10
+                        && dateString.indexOf("/") > 0
+                        && !isNaN(new Date(dateString).getDate())) {
+                    date = new Date(dateString);
+                }
+            }
+        }
+
+        return date;
+    }
+    
 </script>
 </html>
