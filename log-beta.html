@@ -66,7 +66,14 @@
         }
     });
 
-    document.getElementById("tb").addEventListener("blur", (event) => processData(document.getElementById("tb").innerText));
+    document.getElementById("tb").addEventListener("focus", (event) => {
+        editDiv(true);
+        textMode = false;
+    }
+
+    document.getElementById("tb").addEventListener("blur", (event) => {
+        processData(document.getElementById("tb").innerText);
+    });
 
     document.getElementById("fl").addEventListener("change", () => importFile());
 
@@ -399,14 +406,7 @@
                 break;
             }
             case "edit": {
-                editMode = true;
-                document.getElementById("dv").contentEditable = editMode;
-                showStatus("done", true);
-                break;
-            }
-            case "read": {
-                editMode = false;
-                document.getElementById("dv").contentEditable = editMode;
+                editDiv(true);
                 showStatus("done", true);
                 break;
             }
@@ -414,6 +414,11 @@
                 showStatus("failed", true);
             }
         }
+    }
+
+    editDiv = (status) => {
+        editMode = status;
+        document.getElementById("dv").contentEditable = status;
     }
 
     filterData = (content) => {
