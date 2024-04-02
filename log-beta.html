@@ -659,12 +659,12 @@
                 break;
             }
             case "month": {
-                date.setMonth(from.getMonth() + 1);
+                date.setMonth(date.getMonth() + 1);
                 date.setDate(1);
                 break;
             }
             case "year": {
-                date.setFullYear(from.getFullYear() + 1);
+                date.setFullYear(date.getFullYear() + 1);
                 date.setMonth(0);
                 date.setDate(1);
                 break;
@@ -675,15 +675,15 @@
                     let number = parseInt(dateString.substring(0, dateString.length - 1));
                     switch (mode) {
                         case "d": {
-                            date.setDate(from.getDate() + number);
+                            date.setDate(date.getDate() + number);
                             break;
                         }
                         case "m": {
-                            date.setMonth(from.getMonth() + number);
+                            date.setMonth(date.getMonth() + number);
                             break;
                         }
                         case "y": {
-                            date.setYear(from.getFullYear() + number);
+                            date.setYear(date.getFullYear() + number);
                             break;
                         }
                     }
