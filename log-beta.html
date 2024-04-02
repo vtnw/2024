@@ -399,7 +399,7 @@
                     else {
                         let tagFilters = condition.split("&");
                         tagFilters.forEach(tf => {
-                            if (tf.startsWith("!") {
+                            if (tf.startsWith("!")) {
                                 subData = subData.filter(s => !s.tags.includes(`#${tf.substring(1)}`));
                             } else {
                                 subData = subData.filter(s => s.tags.includes(`#${tf}`));
