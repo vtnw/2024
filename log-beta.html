@@ -202,6 +202,10 @@
                 doTimer(content);
                 break;
             }
+            case ".calendar": {
+                doCalendar(content);
+                break;
+            }
             default: {
                 showStatus(`${action} - failed`);
             }
@@ -210,15 +214,18 @@
         command = text;
     }
 
+    doCalendar = (content) => {
+    }
+
     doTimer = (content) => {
         if (!content) {
             if (!!startTime) {
-                showMessage(formatMilliSeconds(new Date()-startTime));
-                showData("stopped", true);
+                showData(formatMilliSeconds(new Date()-startTime));
+                showStatus("stopped", true);
                 startTime = null;
             } else {
                 startTime = new Date();
-                showData("started", true);
+                showStatus("started", true);
             }
         }
     }
