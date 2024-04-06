@@ -217,13 +217,13 @@
     }
 
     doCalendar = (content) => {
-        let today = new Date();
+        let date = new Date();
         let title = date.toLocaleString('default',{month:'long', year:'numeric'});
         let columns = "MON TUE WED THU FRI SAT SUN";
         let line = "---------------------------";
-        let day = today.getDay();
-        let start = new Date(today.getFullYear(), today.getMonth(), 1);
-        let end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        let day = date.getDay();
+        let start = new Date(date.getFullYear(), date.getMonth(), 1);
+        let end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
 
         let lines = "";
         for (let d = start; d <= end; d.setDate(d.getDate() + 1)) {
