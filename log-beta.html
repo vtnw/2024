@@ -228,7 +228,7 @@
         let lines = "";
         for (let d = start; d <= end; d.setDate(d.getDate() + 1)) {
             for (let wd = 0; wd <= 6; wd++) {
-                let cell = d.getDay() == wd ? d.getDate().toString() : "";
+                let cell = d.getDay() == wd ? d.getDate().toString() : "    ";
                 lines = `${line}${cell.padStart(" ", 2).padEnd(" ", 3)}{\n}`;
             }
 
