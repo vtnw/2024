@@ -226,13 +226,12 @@
         let end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
 
         let lines = "";
+        let wd = 0;
         for (let d = start; d <= end; d.setDate(d.getDate() + 1)) {
-            for (let wd = 0; wd <= 6; wd++) {
-                let cell = d.getDay() == wd ? d.getDate().toString() : "    ";
-                lines = `${lines}${cell.padStart(" ", 2).padEnd(" ", 3)}`;
-            }
-
+            let cell = d.getDay() == wd ? d.getDate().toString() : "    ";
+            lines = `${lines}${cell.padStart(" ", 2).padEnd(" ", 3)}`;            
             lines = `${lines}\n`;
+            wd = wd == 6 ? 0 : wd + 1;
         }
 
         showData(`[${title}]\n\n${columns}\n${line}\n${lines}`);
