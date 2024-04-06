@@ -729,7 +729,8 @@
     }
 
     formatMilliSeconds = (ms) => {
-        return `${Math.floor(ms/(60*60*1000)).toString().padStart(2,"0")}:${Math.floor((ms%(60*60*1000))/60).toString().padStart(2,"0")}:${Math.floor(ms%60).toString().padStart(2,"0")}`;
+        let s = ms/1000;
+        return `${Math.floor(s/3600).toString().padStart(2,"0")}:${Math.floor(s%3600/60).toString().padStart(2,"0")}:${Math.floor(s%60).toString().padStart(2,"0")}`;
     }
 
     extractDate = (text) => {
