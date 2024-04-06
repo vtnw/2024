@@ -229,13 +229,13 @@
         for (let d = start; d <= end; d.setDate(d.getDate() + 1)) {
             for (let wd = 0; wd <= 6; wd++) {
                 let cell = d.getDay() == wd ? d.getDate().toString() : "    ";
-                lines = `${line}${cell.padStart(" ", 2).padEnd(" ", 3)}{\n}`;
+                lines = `${lines}${cell.padStart(" ", 2).padEnd(" ", 3)}{\n}`;
             }
 
-            lines = `${line}{\n}`;
+            lines = `${lines}{\n}`;
         }
 
-        showData(`${title}\n${columns}\n${columns}\n{lines}`);
+        showData(`${title}\n${columns}\n${line}\n{lines}`);
         showStatus("done", true);
     }
 
