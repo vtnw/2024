@@ -733,7 +733,7 @@
         a.click();
     }
 
-    showData = (text) => document.getElementById("dv").innerText = text;
+    showData = (text) => document.getElementById("dv").textContent = text;
 
     showStatus = (text, append) => document.getElementById("spn").innerText = `${append ? document.getElementById("spn").innerText + " - " : ""}${text}`;
 
