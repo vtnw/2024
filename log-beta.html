@@ -214,11 +214,11 @@
         if (!content) {
             if (!!startTime) {
                 showMessage(formatMilliSeconds(new Date()-startTime));
-                showStatus("stopped", true);
+                showData("stopped", true);
                 startTime = null;
             } else {
                 startTime = new Date();
-                showStatus("started", true);
+                showData("started", true);
             }
         }
     }
