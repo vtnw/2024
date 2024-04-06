@@ -219,7 +219,7 @@
     doCalendar = (content) => {
         let date = new Date();
         let title = date.toLocaleString('default',{month:'long', year:'numeric'});
-        let columns = "MON TUE WED THU FRI SAT SUN";
+        let columns = "SUN MON TUE WED THU FRI SAT";
         let line = "---------------------------";
         let day = date.getDay();
         let start = new Date(date.getFullYear(), date.getMonth(), 1);
@@ -228,8 +228,8 @@
         let lines = "";
         for (let d = start; d <= end; d.setDate(d.getDate() + 1)) {
             for (let wd = 0; wd <= 6; wd++) {
-                let cell = d.getDay() == wd ? d.getDate() : "";
-                lines = `${line}${cell.padEnd(" ", 3).padStart(" ", 3)}{\n}`;
+                let cell = d.getDay() == wd ? d.getDate().toString() : "";
+                lines = `${line}${cell.padStart(" ", 2).padEnd(" ", 3)}{\n}`;
             }
 
             lines = `${line}{\n}`;
