@@ -199,10 +199,12 @@
                 break;
             }
             case ".timer": {
+                showStatus(action);
                 doTimer(content);
                 break;
             }
             case ".calendar": {
+                showStatus(action);
                 doCalendar(content);
                 break;
             }
@@ -215,6 +217,7 @@
     }
 
     doCalendar = (content) => {
+        let today = new Date();
     }
 
     doTimer = (content) => {
@@ -226,6 +229,7 @@
             } else {
                 startTime = new Date();
                 showStatus("started", true);
+                showData("");
             }
         }
     }
@@ -725,7 +729,7 @@
     }
 
     formatMilliSeconds = (ms) => {
-        return `${Math.floor(ms/(60*60*1000)).toString().padStart(2,"0")}:${Math.floor(ms%(60*60*1000)/60).toString().padStart(2,"0")}:${Math.floor(ms%60).toString().padStart(2,"0")}`;
+        return `${Math.floor(ms/(60*60*1000)).toString().padStart(2,"0")}:${Math.floor((ms%(60*60*1000))/60).toString().padStart(2,"0")}:${Math.floor(ms%60).toString().padStart(2,"0")}`;
     }
 
     extractDate = (text) => {
