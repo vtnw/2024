@@ -90,7 +90,7 @@
 
         document.getElementById("tb").innerText = "";
         let all = text.split(" ");
-        let action = all[0];
+        let action = all[0].trim();
         let content = text.substring(action.length + 1).trim();
 
         switch (action) {
