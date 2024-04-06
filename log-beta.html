@@ -217,7 +217,7 @@
     }
 
     doCalendar = (content) => {
-        let calendar = getCalendar(content);
+        let calendar = getCalendar(new Date(content));
         showData(calendar);
         showStatus("done", true);
     }
