@@ -226,7 +226,7 @@
         let end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
 
         let lines = "";
-        for (let wd = 0; wd <= start.getDay(); wd++) {
+        for (let wd = 0; wd < start.getDay(); wd++) {
             lines = `${lines}    `;
         }
         
