@@ -220,12 +220,12 @@
         let date = new Date();
         let calendar = "";
         if (content.length == 1 || content.length == 2) { 
-            date.setMonth(parseInt(content));
-            calendar = getCalendar(new Date(new Date));
+            date.setMonth(parseInt(content)-1);
+            calendar = getCalendar(date);
         } else if (content.length == 4) {
             [0,1,2,3,4,5,6,7,8.9,10,11].forEach(m => calendar = `${calendar}${getCalendar(new Date(parseInt(content), m, 1))}\n\n\n`);
         } else {
-            calendar = getCalendar(new Date());
+            calendar = getCalendar(date);
         }
         
         showData(calendar);
