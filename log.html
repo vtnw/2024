@@ -5,14 +5,20 @@
     <meta http-equiv="X-UA-Compatible" content="IE =edge">
     <meta name="viewport" content="width =device-width, initial-scale=1.0">
     <title>Log</title>
-    <style> 
+    <style>
         body {
             background-color: black;
             color: white;
             font-family: "Courier New";
             font-size: large;
+            overflow-wrap: break-word;
         }
-        input {
+
+        hr {
+            border: 0.1px solid #555555;
+        }
+
+        #tb {
             width: 100%;
             background-color: black;
             color: white;
@@ -21,10 +27,8 @@
             outline: none;
             font-size: large;
         }
-        hr {
-            border: 0.1px solid #555555;
-        }
-        span {
+
+        #spn {
             color: #aaaaaa;
             font-style: italic;
             display: block;
@@ -32,7 +36,7 @@
     </style>
 </head>
 <body>
-    <input type="text" id="tb" autocapitalize="none" />
+    <div contenteditable="true" id="tb"></div>
     <hr />
     <span id="spn"></span>
     <br />
@@ -40,41 +44,81 @@
     <input style="display:none" type="file" id="fl" />
 </body>
 <script>
-    var data = [];
+    let notes = [];
+    let command = "";
+    let editMode = false;
+    let textMode = false;
+    const hiddenTag = "hidden";
+    const noteTag = "note";
+    const linkTag = "link";
+    const taskTag = "task";
+    const listTag = "list";
+    const expenseTag = "expense";
 
-    window.addEventListener("load", () => loadData());
+    window.addEventListener("load", () => {
+        loadNotes();
+        processData(".task recent:30d");
+    });
 
-    document.addEventListener("click", (event) => document.getElementById("tb").focus());
+    document.addEventListener("click", (event) => {
+        if (!editMode) {
+            document.getElementById("tb").focus();
+        }
+    });
 
-    document.getElementById("tb").addEventListener("keyup", (event) => { if (event.keyCode == 13) processData(document.getElementById("tb").value); } );
+    document.getElementById("tb").addEventListener("blur", (event) => {
+        editDiv(false);
+        processData(document.getElementById("tb").innerText);
+    });
 
-    document.getElementById("fl").addEventListener("change", () => importFile());
+    document.getElementById("fl").addEventListener("change", () => {
+        if (document.getElementById("fl").files.length > 0) {
+            importFile();
+        }
+    });
 
     processData = (text) => {
-        if (!text) {
-            showStatus("failed");
+        if (!text || /\s$/.test(text)) {
             return;
         }
 
-        document.getElementById("tb").value = "";
+        if (!text.startsWith(".")) {
+            text = `.add ${text}`;
+        }
+
+        document.getElementById("tb").innerText = "";
         let all = text.split(" ");
         let action = all[0];
-        let content = text.substring(action.length + 1);
-        
+        let content = text.substring(action.length + 1).trim();
+
         switch (action) {
+            case "..": {
+                document.getElementById("tb").innerText = command;
+                break;
+            }
             case ".add": {
                 showStatus(action);
                 doAdd(content);
                 break;
             }
-            case ".list": {
+            case ".all": {
                 showStatus(action);
-                doList(content);
+                doAll();
                 break;
             }
-            case ".filter": {
+            case ".tag": {
                 showStatus(action);
-                doFilter(content);
+                doTag(content);
+                break;
+            }
+            case ".name": {
+                showStatus(action);
+                doName(content);
+                break;
+            }
+            case ".note": {
+                showStatus(action);
+                doNote(content);
                 break;
             }
             case ".clear": {
@@ -91,12 +135,12 @@
                 showStatus(action);
                 doExport(content);
                 break;
-            }    
+            }
             case ".print": {
                 showStatus(action);
                 doPrint(content);
                 break;
-            } 
+            }
             case ".import": {
                 showStatus(action);
                 doImport(content);
@@ -107,100 +151,223 @@
                 doRemove(content);
                 break;
             }
+            case ".cut": {
+                showStatus(action);
+                doCut(content);
+                break;
+            }
+            case ".copy": {
+                showStatus(action);
+                doCopy(content);
+                break;
+            }            
+            case ".hide": {
+                showStatus(action);
+                doHide(content);
+                break;
+            }            
+            case ".move": {
+                showStatus(action);
+                doMove(content);
+                break;
+            }
+            case ".expense": {
+                showStatus(action);
+                doExpense(content);
+                break;
+            }
+            case ".list": {
+                showStatus(action);
+                doList(content);
+                break;
+            }
+            case ".task": {
+                showStatus(action);
+                doTask(content);
+                break;
+            }
+            case ".link": {
+                showStatus(action);
+                doLink(content);
+                break;
+            }            
+            case ".text": {
+                showStatus(action);
+                doText(content);
+                break;
+            }
             default: {
-                if (action.substring(0, 1) == ".") {
-                    showStatus(`${action} - failed`);
-                } else {
-                    showStatus(".add");
-                    doAdd(text);
-                }
+                showStatus(`${action} - failed`);
             }
         }
+
+        command = text;
     }
 
     doAdd = (text) => {
-        if (!text || !text.trim()) {
+        if (!text) {
             showStatus("failed", true);
             return;
         }
-        
+
         let pattern = /#[a-z0-9-]+/g;
-        let defaultTag = "#note";
         let tags = text.match(pattern);
-        let dates = text.match(/@\S+/g);
-        let date = new Date();
+        let date = extractDate(text);
         if (!(tags || []).some(t => t.length > 0)) {
-            tags = [defaultTag];
-            text = `${text} ${defaultTag}`;
+            tags = [`#${noteTag}`];
+            text = `${text} #${noteTag}`;
         }
 
-        let newDate = (dates || []).some(d => d.length > 0) ? dates[dates.length-1].substring(1) : "";
-        if (newDate.length >= 6
-            && newDate.length <= 10
-            && newDate.indexOf("/") > 0
-            && !isNaN(new Date(newDate).getDate())) {
-                date = new Date(newDate);
-        }
-
-        let toAdd = { date: date, tags: tags, text: text };
-        data.push(toAdd);
-        saveData();
-        
-        showList([toAdd]);
+        notes.push({ date: date, tags: tags, text: text });
+        saveNotes();
+        let tagList = tags.map(t => t.substring(1)).join("&");
+        showNotes(filterData(`.filter recent:1m+tag:${tagList}`));
     }
 
     doList = (content) => {
-        if (!content || !content.trim()) {
-            content = "notes";
-        }
-        
-        switch (content) {
-            case "notes": {
-                showList(data);
-                break;
-            }
-            case "tags": {
-                showTags();
-                break;
-            }
-        }
+        showLists(filterData(`tag:${listTag}+${content}`));
     }
 
-    doFilter = (content) => {
-        if (!content || !content.trim()) {
+    doTask = (content) => {
+        showTasks(filterData(`tag:${taskTag}&!${hiddenTag}+${content}`));
+    }
+
+    doNote = (content) => {
+        showNotes(filterData(!content ? "recent:1m" : content));
+    }
+
+    doAll = () => showNotes(notes);
+
+    doTag = (content) => {
+        let tags = [];
+        notes.forEach(d => {
+            if (!content || d.tags.includes(`#${content}`)) {
+                tags = [...tags, ...d.tags];
+            }
+        });
+        tags = [... new Set(tags)].sort();
+        showData(tags.join("\n"));
+        showStatus(tags.length, true);
+    }
+
+    doName = (content) => {
+        if (!content) {
             showStatus("failed", true);
             return;
         }
+
+        let names = [];
+        let subList = filterData(`tag:${content}`);
+        subList.forEach(sl => {
+            let matches = sl.text.match(/![a-z0-9-]+/g);
+            if (matches) {
+                names = [...names, ...matches];
+            }
+        });
         
-        showList(filterData(content));
+        names = [... new Set(names)].sort();
+        showData(names.join("\n"));
+        showStatus(names.length, true);
     }
 
     doRemove = (content) => {
-        if (!content || !content.trim()) {
+        if (!content) {
             showStatus("failed", true);
             return;
         }
-        
+
         let toRemove = filterData(content);
-        data = data.filter(d => !toRemove.some(tr => tr.date == d.date && tr.text == d.text));
-        showList(toRemove);
+        notes = notes.filter(d => !toRemove.some(tr => tr.date == d.date && tr.text == d.text));
+        saveNotes();
+        showNotes(toRemove);
+    }
+
+    doHide = (content) => {
+        if (!content) {
+            showStatus("failed", true);
+            return;
+        }
+
+        let filtered = filterData(`tag:!${hiddenTag}+${content}`);
+        let toHide = notes.filter(n => filtered.some(f => f.date == n.date && f.text == n.text));
+        toHide.forEach(th => {
+            th.tags.push(`#${hiddenTag}`);
+            th.text = `${th.text} #${hiddenTag}`;
+        });
+        
+        saveNotes();
+        showNotes(toHide);
+    }
+
+    doCut = (content) => {
+        if (!content) {
+            showStatus("failed", true);
+            return;
+        }
+
+        let toRemove = filterData(content);
+        if (toRemove.length != 1) {
+            showStatus("failed", true);
+            return;
+        }
+
+        notes = notes.filter(d => !toRemove.some(tr => tr.date == d.date && tr.text == d.text));
+        saveNotes();
+        document.getElementById("tb").innerText = toRemove[0].text;
+        showNotes(toRemove);
+    }
+
+    doCopy = (content) => {
+        if (!content) {
+            showStatus("failed", true);
+            return;
+        }
+
+        let toCopy = filterData(content);
+        if (toCopy.length != 1) {
+            showStatus("failed", true);
+            return;
+        }
+
+        document.getElementById("tb").innerText = toCopy[0].text;
+        showNotes(toCopy);
+    }
+
+    doMove = (content) => {
+        if (!content) {
+            showStatus("failed", true);
+            return;
+        }
+
+        let filter = `tag:!${linkTag}&!${expenseTag}&!${taskTag}&!${listTag}+${content}`;
+        doExport(filter);
+        let toMove = filterData(filter);
+        notes = notes.filter(d => !toMove.some(tr => tr.date == d.date && tr.text == d.text));
+        saveNotes();
+        showNotes(toMove);
+    }
+
+    doExpense = (content) => {
+        let condition = `tag:${expenseTag}+${ !content ? "recent:1m" : content }`;
+        showExpenses(filterData(condition));
     }
 
     doReset = () => {
-        data = [];
-        saveData();
+        doExport();
+        notes = [];
+        saveNotes();
         showData("");
         showStatus("done", true);
     }
 
     doExport = (content) => {
-       let toExport = filterData(content);        
-       saveAsFile(JSON.stringify(toExport), "notes_backup_" + isoToString(new Date()));
-       showStatus("done", true);
+        let toExport = filterData(content);
+        saveAsFile(JSON.stringify(toExport), "notes_backup_" + isoToString(new Date()));
+        showStatus("done", true);
     }
 
     doPrint = (content) => {
-        let toPrint = filterData(content);        
+        let toPrint = filterData(content);
         toPrint.sort((a, b) => new Date(b.date) - new Date(a.date));
         let message = "";
         let currDate;
@@ -209,21 +376,92 @@
                 message = `${message}[${isoToString(l.date)}]\n\n`;
                 currDate = isoToString(l.date);
             }
-            
+
             message = `${message}${l.text}\n\n`;
         });
         saveAsFile(message, "notes_data_" + isoToString(new Date()));
         showStatus("done", true);
     }
 
-    doImport = (content) => { if (content == "reset") { data = []; } document.getElementById("fl").click(); }
+    doImport = (content) => {
+        if (content == "reset") {
+            notes = [];
+        } 
+        
+        document.getElementById("fl").click();
+    }
+
+    doLink = (content) => {
+        if (!content) {
+           content = "google";
+        }
+
+        let all = content.split(" ");
+        let site = all[0];
+        let param = all.length > 1 ? content.substring(site.length + 1) : "";
+        let links = filterData(`tag:${linkTag}&!${hiddenTag}`);
+        let link = links.find(n => new RegExp(`(^|\\s+)!${site}($|\\s+)`).test(n.text));
+        
+        if (!link) {
+            showStatus("failed", true);
+            return;
+        }
+
+        all = link.text.match(/\^\S+/g);
+        let url = (all || []).length > 0 ? all[0] : null;
+        if (!url) {
+            showStatus("failed", true);
+            return;
+        }
+
+        showData(link.text);
+        showStatus("opened", true);
+        window.open(url.substring(1).replace("<param>", param));
+    }
 
     doClear = () => { showData(""); showStatus("done", true); }
 
+    doText = (content) => {
+        if (!content) {
+           showStatus("failed", true);
+           return;
+        }
+        
+        switch (content) {
+            case "load": {
+                textMode = true;
+                document.getElementById("fl").click();
+                break;
+            }
+            case "save": {
+                saveAsFile(document.getElementById("dv").innerText, "data_" + isoToString(new Date()));
+                showStatus("done", true);
+                break;
+            }
+            case "edit": {
+                editDiv(true);
+                showStatus("done", true);
+                break;
+            }
+            default: {
+                showStatus("failed", true);
+            }
+        }
+    }
+
+    editDiv = (status) => {
+        editMode = status;
+        document.getElementById("dv").contentEditable = status;
+    }
+
     filterData = (content) => {
-        let filters = !content || !content.trim() ? [] : content.split("+");
-        let subData = [...data];
+        let filters = !content ? [] : content.split("+");
+        let subData = [...notes];
         filters.forEach(f => {
+            if (!f || !f.trim() || f.split(":").length < 2) {
+                return;
+            }
+            
             let field = f.split(":")[0].trim();
             let condition = f.split(":")[1].trim();
             switch (field) {
@@ -238,10 +476,33 @@
                     break;
                 }
                 case "tag": {
-                    let tagFilters = condition.split("&");
-                    tagFilters.forEach(tf => {
-                        subData = subData.filter(s => s.tags.includes(`#${tf}`));
-                    });
+                    if (condition.indexOf("|") > 0) {
+                        let tagFilters = condition.split("|");
+                        subData = subData.filter(s => tagFilters.some(tf => s.tags.includes(`#${tf}`)));
+                    }
+                    else {
+                        let tagFilters = condition.split("&");
+                        tagFilters.forEach(tf => {
+                            if (tf.startsWith("!")) {
+                                subData = subData.filter(s => !s.tags.includes(`#${tf.substring(1)}`));
+                            } else {
+                                subData = subData.filter(s => s.tags.includes(`#${tf}`));
+                            }
+                        });
+                    }
+                    break;
+                }
+                case "name": {
+                    if (condition.indexOf("|") > 0) {
+                        let nameFilters = condition.split("|");
+                        subData = subData.filter(s => nameFilters.some(nf => new RegExp(`(^|\\s+)!${nf}($|\\s+)`).test(s.text)));
+                    }
+                    else {
+                        let nameFilters = condition.split("&");
+                        nameFilters.forEach(nf => {
+                            subData = subData.filter(s => new RegExp(`(^|\\s+)!${nf}($|\\s+)`).test(s.text));
+                        });
+                    }
                     break;
                 }
                 case "text": {
@@ -252,22 +513,18 @@
                     break;
                 }
                 case "recent": {
-                    if (!condition || !condition.trim()) {
-                        condition = "1d";
-                    }
-                    
                     let today = new Date();
                     let to = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-                    let mode = condition.substring(condition.length-1);
-                    let number = condition.substring(0, condition.length-1)-1;
+                    let mode = condition.substring(condition.length - 1);
+                    let number = condition.substring(0, condition.length - 1) - 1;
                     let from = new Date(today.getFullYear(), today.getMonth(), today.getDate());
                     switch (mode) {
                         case "d": {
-                            from.setDate(from.getDate()-number);
+                            from.setDate(from.getDate() - number);
                             break;
                         }
                         case "m": {
-                            from.setMonth(from.getMonth()-number);
+                            from.setMonth(from.getMonth() - number);
                             from.setDate(1);
                             break;
                         }
@@ -276,23 +533,19 @@
                     break;
                 }
                 case "next": {
-                    if (!condition || !condition.trim()) {
-                        condition = "1d";
-                    }
-                    
-                    let today  = new Date();
-                    today.setDate(today .getDate() + 1);
+                    let today = new Date();
+                    today.setDate(today.getDate() + 1);
                     let from = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-                    let mode = condition.substring(condition.length-1);
-                    let number = condition.substring(0, condition.length-1)-1;
-                    let to = new Date(from .getFullYear(), from.getMonth(), from.getDate());
+                    let mode = condition.substring(condition.length - 1);
+                    let number = condition.substring(0, condition.length - 1) - 1;
+                    let to = new Date(from.getFullYear(), from.getMonth(), from.getDate());
                     switch (mode) {
                         case "d": {
-                            to.setDate(to.getDate()+number);
+                            to.setDate(to.getDate() + number);
                             break;
                         }
                         case "m": {
-                            to = new Date(to.getFullYear(), to.getMonth()+1+number, 0)
+                            to = new Date(to.getFullYear(), to.getMonth() + 1 + number, 0)
                             break;
                         }
                     }
@@ -307,26 +560,22 @@
     importFile = () => {
         let fileReader = new FileReader();
         fileReader.onload = (event) => {
+            if (textMode) {
+                document.getElementById("dv").innerText = event.target.result;
+                showStatus("done", true);
+                textMode = false;
+                return;
+            }
             let importedData = JSON.parse(event.target.result);
-            importedData.forEach(i => data.push(i));
-            saveData();
-            showStatus("done", true);
-            setTimeout(location.reload(), 1000);
+            importedData.forEach(i => notes.push(i));
+            saveNotes();
+            showStatus(importedData.length, true);
         };
         fileReader.readAsText(document.getElementById("fl").files[0], "UTF-8");
+        document.getElementById("fl").value = null;
     }
 
-    showTags = () => {
-        let tags = [];
-        data.forEach(d => {
-            tags = [...tags, ...d.tags];
-        });
-        let tagList = [... new Set(tags)].sort();
-        showData(tagList.join("\n"));
-        showStatus(tagList.length, true);
-    }
-
-    showList = (list) => {
+    showNotes = (list) => {
         list.sort((a, b) => new Date(b.date) - new Date(a.date));
         let message = "";
         let currDate;
@@ -336,6 +585,90 @@
                 currDate = isoToString(l.date);
             }
             message = `${message}${l.text}\n\n`;
+        });
+        showData(message);
+        showStatus(list.length, true);
+    }
+
+    showExpenses = (list) => {
+        list.sort((a, b) => new Date(b.date) - new Date(a.date));
+        let summaryList = [];
+        let minDate = new Date();
+        let maxDate = new Date("3/1/24");
+        list.forEach(l => {
+            let categories = l.text.match(/![a-z0-9-]+/g);
+            let category = (categories || []).length >= 1 ? categories[0].substring(1) : expenseTag;
+            let values = l.text.match(/£[0-9.-]+/g);
+            let value = (values || []).length == 0 || isNaN(parseInt(values[0].substring(1))) ? 0 : parseInt(values[0].substring(1));
+            let matchingEntry = summaryList.find(sl => sl.category == category);
+            minDate = minDate > new Date(l.date) ? new Date(l.date) : minDate;
+            maxDate = maxDate < new Date(l.date) ? new Date(l.date) : maxDate;
+            let detail = `${isoToString(l.date)} ${l.text}`;
+            if (!matchingEntry) {
+                summaryList.push({ category, value, detail });
+            } else {
+                matchingEntry.value += value;
+                matchingEntry.detail = `${matchingEntry.detail}\n${detail}`;
+            }
+        });
+        let total = summaryList.reduce((accumulated, item) => accumulated + item.value, 0);
+        summaryList.sort((a, b) => b.value == a.value ? b.category - a.category  : b.value - a.value);
+        let message = `[${isoToString(minDate)} - ${isoToString(maxDate)}]\n\nTotal ${total}\n`;
+        summaryList.forEach(sl => message = `${message}\n${sl.category} ${sl.value}`);
+        message = `${message}\n`;
+        summaryList.forEach(sl => message = `${message}\n${sl.category} ${sl.value}\n${sl.detail}`);
+        showData(message);
+        showStatus(summaryList.length, true);
+    }
+
+    showLists = (list) => {
+        list.sort((a, b) => new Date(b.date) - new Date(a.date));
+        let subList = [];
+        list.forEach(l => {
+            let names = l.text.match(/![a-z0-9-]+/g);
+            let name = (names || []).length > 0 ? names[0].substring(1) : listTag;
+            let item = l.text.replace(/![a-z0-9-]+/g, "").replace(/#[a-z0-9-]+/g, "");
+            let matchingEntry = subList.find(sl => sl.name == name);
+            if (!matchingEntry) {
+                subList.push({ name, item: `- ${item}` });
+            } else {
+                matchingEntry.item = `${matchingEntry.item}\n- ${item}`;
+            }
+        });
+        let message = "";
+        subList.forEach(sl => message = `${message}[${sl.name}]\n\n${sl.item}\n\n`);
+        showData(message);
+        showStatus(list.length, true);
+    }
+
+    showTasks = (list) => {
+        let subList = [];
+        let currDate = new Date();
+        let currName = "";
+        list.sort((a, b) => new Date(a.date) - new Date(b.date));
+        list.forEach(l => {
+            let names = l.text.match(/![a-z0-9-]+/g);
+            let name = (names || []).length > 0 ? names[0].substring(1) : taskTag;
+            let item = l.text.replace(/![a-z0-9-]+/g, "").replace(/#[a-z0-9-]+/g, "").replace(/@\S+/g, "");
+            let date = isoToString(l.date);
+            let matchingDate = subList.find(sl => sl.date == date);
+            if (!matchingDate) {
+                subList.push({ date, tasks: [ { name, item } ] });
+            } else {
+                matchingDate.tasks.push({ name, item });
+            }
+        });
+
+        subList.forEach(d => {
+            d.tasks.sort((a, b) => a.item - b.item);
+        });
+        let message = "";
+        subList.forEach(d => {
+            message = `${message}[${d.date}]\n\n`;
+            d.tasks.forEach(t => {
+                message = `${message}- ${t.item} !${t.name}\n`;
+            });
+            message = `${message}\n`;
         });
         showData(message);
         showStatus(list.length, true);
@@ -356,13 +689,74 @@
 
     showStatus = (text, append) => document.getElementById("spn").innerText = `${append ? document.getElementById("spn").innerText + " - " : ""}${text}`;
 
-    saveData = () => localStorage.setItem("notes", JSON.stringify(data));
+    saveNotes = () => localStorage.setItem("notes", JSON.stringify(notes));
 
-    loadData = () => data = JSON.parse(localStorage.getItem("notes") || "[]");
+    loadNotes = () => notes = JSON.parse(localStorage.getItem("notes") || "[]");
 
     isoToString = (date) => {
         date = new Date(date);
         return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
     }
+
+    extractDate = (text) => {
+        let dates = text.match(/@\S+/g);
+        let date = new Date();
+        let dateString = (dates || []).some(d => d.length > 0) ? dates[dates.length - 1].substring(1) : "";
+        switch (dateString) {
+            case "tomorrow": {
+                date.setDate(date.getDate() + 1);
+                break;
+            }
+            case "yesterday": {
+                date.setDate(date.getDate() - 1);
+                break;
+            }
+            case "weekend": {
+                let noOfDays = 6 - date.getDay();
+                date.setDate(date.getDate() + (noOfDays > 0 ? noOfDays : 7));
+                break;
+            }
+            case "month": {
+                date.setMonth(date.getMonth() + 1);
+                date.setDate(1);
+                break;
+            }
+            case "year": {
+                date.setFullYear(date.getFullYear() + 1);
+                date.setMonth(0);
+                date.setDate(1);
+                break;
+            }
+            default: {
+                if ((dateString.endsWith("d") || dateString.endsWith("m") || dateString.endsWith("y"))) {
+                    let mode = dateString.substring(dateString.length - 1);
+                    let number = parseInt(dateString.substring(0, dateString.length - 1));
+                    switch (mode) {
+                        case "d": {
+                            date.setDate(date.getDate() + number);
+                            break;
+                        }
+                        case "m": {
+                            date.setMonth(date.getMonth() + number);
+                            break;
+                        }
+                        case "y": {
+                            date.setYear(date.getFullYear() + number);
+                            break;
+                        }
+                    }
+                }
+                else if (dateString.length >= 6
+                        && dateString.length <= 10
+                        && dateString.indexOf("/") > 0
+                        && !isNaN(new Date(dateString).getDate())) {
+                    date = new Date(dateString);
+                }
+            }
+        }
+
+        return date;
+    }
+    
 </script>
 </html>
