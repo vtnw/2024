@@ -734,8 +734,9 @@
             }
 
             if (l.text.match(/!stop/g) && !!start) {
-                let text = !start.text ? l.text : start.text;
-                subList.push({ date: l.date, duration: new Date(l.date)-new Date(start.date), text: text.replace(/!start/g, "").replace(/#[a-z0-9-]+/g, "").trim() });
+                let startText = start.text.replace(/!start/g, "").replace(/#[a-z0-9-]+/g, "").trim();
+                let stopText = l.text.replace(/!stop/g, "").replace(/#[a-z0-9-]+/g, "").trim();
+                subList.push({ date: l.date, duration: new Date(l.date)-new Date(start.date), text: !!startText ? startText : stopText });
                 start = null;
             }            
         });
