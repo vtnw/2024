@@ -757,7 +757,6 @@
         });
 
         if (!!start) {
-            message = `${formatMilliSeconds(new Date()-new Date(start.date))} ${start.text.replace(/!start/g, "").replace(/#[a-z0-9-]+/g, "").trim()}*\n${message}`;
             subList.push({ date: new Date(), duration: new Date()-new Date(start.date), text: start.text.replace(/!start/g, "").replace(/#[a-z0-9-]+/g, "").trim() });
         }
 
