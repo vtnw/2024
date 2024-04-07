@@ -742,13 +742,8 @@
 
     showTimers = (list) => {
         list.sort((a, b) => new Date(a.date) - new Date(b.date));
-        let starts = list.filter(l => l.text.match(/!start/g));
-        let stops = list.filter(l => l.text.match(/!stop/g));
         let subList = [];
         let start = null;
-        let message = "";
-        let count = 0;
-        let currDate;
         list.forEach(l => {
             if (l.text.match(/!start/g)) {
                 start = l;
@@ -756,20 +751,27 @@
             }
 
             if (l.text.match(/!stop/g) && !!start) {
-                if (currDate != isoToString(l.date)) {
-                    message = `${message}[${isoToString(l.date)}]\n\n`;
-                    currDate = isoToString(l.date);
-                }
-                
-                message = `${formatMilliSeconds(new Date(l.date)-new Date(start.date))} ${start.text.replace(/!start/g, "").replace(/#[a-z0-9-]+/g, "").trim()}\n${message}`;
+                subList.push({ date: l.date, duration: new Date(l.date)-new Date(start.date), text: start.text.replace(/!start/g, "").replace(/#[a-z0-9-]+/g, "").trim() });
                 start = null;
-                count++;
             }            
         });
 
         if (!!start) {
             message = `${formatMilliSeconds(new Date()-new Date(start.date))} ${start.text.replace(/!start/g, "").replace(/#[a-z0-9-]+/g, "").trim()}*\n${message}`;
+            subList.push({ date: new Date(), duration: new Date()-new Date(start.date), text: start.text.replace(/!start/g, "").replace(/#[a-z0-9-]+/g, "").trim() });
         }
+
+        let message = "";
+        let currDate;
+        subList.sort((a, b) => new Date(b.date) - new Date(a.date));
+        subList.forEach(l => {
+            if (currDate != isoToString(l.date)) {
+                message = `${message}[${isoToString(l.date)}]\n\n`;
+                currDate = isoToString(l.date);
+            }
+            
+            message = `${message}${formatMilliSeconds(l.duration)} ${l.text}\n`;
+        });
         
         showData(message);
         showStatus(count, true);
