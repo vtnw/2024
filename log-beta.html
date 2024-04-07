@@ -748,6 +748,7 @@
         let start = null;
         let message = "";
         let count = 0;
+        let currDate;
         list.forEach(l => {
             if (l.text.match(/!start/g)) {
                 start = l;
@@ -755,6 +756,11 @@
             }
 
             if (l.text.match(/!stop/g) && !!start) {
+                if (currDate != isoToString(l.date)) {
+                    message = `${message}[${isoToString(l.date)}]\n\n`;
+                    currDate = isoToString(l.date);
+                }
+                
                 message = `${formatMilliSeconds(new Date(l.date)-new Date(start.date))} ${start.text.replace(/!start/g, "").replace(/#[a-z0-9-]+/g, "").trim()}\n${message}`;
                 start = null;
                 count++;
@@ -762,7 +768,7 @@
         });
 
         if (!!start) {
-            message = `${formatMilliSeconds(new Date()-new Date(start.date))}* ${start.text.replace(/!start/g, "").replace(/#[a-z0-9-]+/g, "").trim()}\n${message}`;
+            message = `${formatMilliSeconds(new Date()-new Date(start.date))} ${start.text.replace(/!start/g, "").replace(/#[a-z0-9-]+/g, "").trim()}*\n${message}`;
         }
         
         showData(message);
