@@ -56,6 +56,7 @@
     const taskTag = "task";
     const listTag = "list";
     const expenseTag = "expense";
+    const timerTag = "timer";
 
     window.addEventListener("load", () => {
         loadNotes();
@@ -249,6 +250,9 @@
     }
 
     doTimer = (content) => {
+        showLists(filterData(`tag:${timerTag}+${content}`));
+        return;
+        
         if (!content) {
             if (!!startTime) {
                 showData(formatMilliSeconds(new Date()-startTime));
@@ -262,6 +266,8 @@
         } else {
             
         }
+
+        showTimer(content)
     }
 
     doAdd = (text) => {
@@ -732,6 +738,35 @@
         });
         showData(message);
         showStatus(list.length, true);
+    }
+
+    showTimers = (list) => {
+        list.sort((a, b) => new Date(a.date) - new Date(b.date));
+        let starts = list.filter(l => l.text.match(/!start/g));
+        let stops = list.filter(l => l.text.match(/!stop/g));
+        let subList = [];
+        let start = null;
+        let message = "";
+        let count = 0;
+        list.forEach(l => {
+            if (l.text.match(/!start/g)) {
+                start = l;
+                return;
+            }
+
+            if (l.text.match(/!stop/g) && !!start) {
+                message = `${formatMilliSeconda(l.date-start.date)} ${start.text.replace(/!start/g, "").replace(/#[a-z0-9-]+/g, "").trim()}\n${message}`;
+                start = null;
+                count++;
+            }            
+        });
+
+        if (!!start) {
+            message = `${formatMilliSeconda(new Date()-start.date)}* ${start.text.replace(/!start/g, "").replace(/#[a-z0-9-]+/g, "").trim()}\n${message}`;
+        }
+        
+        showData(message);
+        showStatus(count, true);
     }
 
     saveAsFile = (data, fileName) => {
