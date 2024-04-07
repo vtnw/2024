@@ -734,7 +734,8 @@
             }
 
             if (l.text.match(/!stop/g) && !!start) {
-                subList.push({ date: l.date, duration: new Date(l.date)-new Date(start.date), text: start.text.replace(/!start/g, "").replace(/#[a-z0-9-]+/g, "").trim() });
+                let text = start.text ?? l.text;
+                subList.push({ date: l.date, duration: new Date(l.date)-new Date(start.date), text: text.replace(/!start/g, "").replace(/#[a-z0-9-]+/g, "").trim() });
                 start = null;
             }            
         });
