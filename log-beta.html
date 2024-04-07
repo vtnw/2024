@@ -734,7 +734,7 @@
             }
 
             if (l.text.match(/!stop/g) && !!start) {
-                let text = start.text ?? l.text;
+                let text = !start.text ? l.text : start.text;
                 subList.push({ date: l.date, duration: new Date(l.date)-new Date(start.date), text: text.replace(/!start/g, "").replace(/#[a-z0-9-]+/g, "").trim() });
                 start = null;
             }            
