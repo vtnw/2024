@@ -59,7 +59,8 @@
 
     window.addEventListener("load", () => {
         loadNotes();
-        processData(".task recent:30d");
+        doTask("recent:30d");
+        doCalendar("", true);
     });
 
     document.addEventListener("click", (event) => {
@@ -216,7 +217,7 @@
         command = text;
     }
 
-    doCalendar = (content) => {
+    doCalendar = (content, append = false) => {
         let date = new Date();
         let calendar = "";
         if (content.length == 1 || content.length == 2) { 
@@ -227,8 +228,8 @@
         } else {
             calendar = getCalendar(date);
         }
-        
-        showData(calendar);
+
+        showData(calendar, append, "\n\n");
         showStatus("done", true);
     }
 
@@ -243,6 +244,8 @@
                 showStatus("started", true);
                 showData("");
             }
+        } else {
+            
         }
     }
 
@@ -727,9 +730,9 @@
         a.click();
     }
 
-    showData = (text) => document.getElementById("dv").innerText = text;
+    showData = (text, append = false, splitter = "") => document.getElementById("dv").innerText = `${append ? document.getElementById("dv").innerText + splitter : ""}${text}`;;
 
-    showStatus = (text, append) => document.getElementById("spn").innerText = `${append ? document.getElementById("spn").innerText + " - " : ""}${text}`;
+    showStatus = (text, append, splitter = "-") => document.getElementById("spn").innerText = `${append ? document.getElementById("spn").innerText + splitter : ""}${text}`;
 
     saveNotes = () => localStorage.setItem("notes", JSON.stringify(notes));
 
