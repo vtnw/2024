@@ -755,14 +755,14 @@
             }
 
             if (l.text.match(/!stop/g) && !!start) {
-                message = `${formatMilliSeconds(l.date-start.date)} ${start.text.replace(/!start/g, "").replace(/#[a-z0-9-]+/g, "").trim()}\n${message}`;
+                message = `${formatMilliSeconds(new Date(l.date)-new Date(start.date))} ${start.text.replace(/!start/g, "").replace(/#[a-z0-9-]+/g, "").trim()}\n${message}`;
                 start = null;
                 count++;
             }            
         });
 
         if (!!start) {
-            message = `${formatMilliSeconds(new Date()-start.date)}* ${start.text.replace(/!start/g, "").replace(/#[a-z0-9-]+/g, "").trim()}\n${message}`;
+            message = `${formatMilliSeconds(new Date()-new Date(start.date))}* ${start.text.replace(/!start/g, "").replace(/#[a-z0-9-]+/g, "").trim()}\n${message}`;
         }
         
         showData(message);
