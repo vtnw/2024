@@ -58,9 +58,8 @@
     const expenseTag = "expense";
 
     window.addEventListener("load", () => {
-        loadNotes();        
-        doTask("recent:30d");        
-        doCalendar("", true);
+        loadNotes();
+        processData(".today");
     });
 
     document.addEventListener("click", (event) => {
@@ -209,6 +208,11 @@
                 doCalendar(content);
                 break;
             }
+            case ".today": {
+                showStatus(action);
+                doToday();
+                break;
+            }
             default: {
                 showStatus(`${action} - failed`);
             }
@@ -217,10 +221,18 @@
         command = text;
     }
 
+    doToday = () => {
+        doTask("recent:30d");        
+        let month = new Date().getMonth() + 1;
+        doCalendar(`${month}&${month++}`, true);
+    }
+
     doCalendar = (content, append = false) => {
         let date = new Date();
         let calendar = "";
-        if (content.length == 1 || content.length == 2) { 
+        if (content.indexOf("&" > 0) {
+            content.split("&").forEach(m => calendar = `${calendar}${getCalendar(new Date(parseInt(content), m, 1))}\n\n\n`);
+        } else if (content.length == 1 || content.length == 2) { 
             date.setMonth(parseInt(content)-1);
             calendar = getCalendar(date);
         } else if (content.length == 4) {
