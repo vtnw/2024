@@ -748,7 +748,7 @@
         subList.sort((a, b) => new Date(b.date) - new Date(a.date));
         subList.forEach(l => {
             if (currDate != isoToString(l.date)) {
-                message = `${!!currDate ? "\n" : ""}${message}[${isoToString(l.date)}]\n\n`;
+                message = `${!currDate ? "\n" : ""}${message}[${isoToString(l.date)}]\n\n`;
                 currDate = isoToString(l.date);
             }
             
