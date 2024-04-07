@@ -230,7 +230,7 @@
     doCalendar = (content, append = false) => {
         let date = new Date();
         let calendar = "";
-        if (content.indexOf("&" > 0) {
+        if (content.indexOf("&" > 0)) {
             content.split("&").forEach(m => calendar = `${calendar}${getCalendar(new Date(parseInt(content), m, 1))}\n\n\n`);
         } else if (content.length == 1 || content.length == 2) { 
             date.setMonth(parseInt(content)-1);
