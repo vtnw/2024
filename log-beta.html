@@ -48,7 +48,6 @@
     let command = "";
     let editMode = false;
     let textMode = false;
-    let startTime = null;
     
     const hiddenTag = "hidden";
     const noteTag = "note";
@@ -252,22 +251,6 @@
     doTimer = (content) => {
         showTimers(filterData(`tag:${timerTag}+${content}`));
         return;
-        
-        if (!content) {
-            if (!!startTime) {
-                showData(formatMilliSeconds(new Date()-startTime));
-                showStatus("stopped", true);
-                startTime = null;
-            } else {
-                startTime = new Date();
-                showStatus("started", true);
-                showData("");
-            }
-        } else {
-            
-        }
-
-        showTimer(content)
     }
 
     doAdd = (text) => {
