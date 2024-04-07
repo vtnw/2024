@@ -59,8 +59,9 @@
 
     window.addEventListener("load", () => {
         loadNotes();
-        doTask("recent:30d");
         doCalendar("", true);
+        showStatus("");
+        doTask("recent:30d");        
     });
 
     document.addEventListener("click", (event) => {
@@ -730,7 +731,7 @@
         a.click();
     }
 
-    showData = (text, append = false, splitter = "") => document.getElementById("dv").innerText = `${append ? document.getElementById("dv").innerText + splitter : ""}${text}`;;
+    showData = (text, append = false, splitter = "") => document.getElementById("dv").innerText = `${text}${append ? document.getElementById("dv").innerText + splitter : ""}`;;
 
     showStatus = (text, append, splitter = "-") => document.getElementById("spn").innerText = `${append ? document.getElementById("spn").innerText + splitter : ""}${text}`;
 
