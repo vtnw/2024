@@ -58,10 +58,9 @@
     const expenseTag = "expense";
 
     window.addEventListener("load", () => {
-        loadNotes();
-        doCalendar("", true);
-        showStatus("");
+        loadNotes();        
         doTask("recent:30d");        
+        doCalendar("", true);
     });
 
     document.addEventListener("click", (event) => {
@@ -230,8 +229,11 @@
             calendar = getCalendar(date);
         }
 
-        showData(calendar, append, "\n\n");
-        showStatus("done", true);
+        showData(calendar, append, "\n");
+
+        if (!append) {
+            showStatus("done", true);
+        }
     }
 
     doTimer = (content) => {
@@ -731,7 +733,7 @@
         a.click();
     }
 
-    showData = (text, append = false, splitter = "") => document.getElementById("dv").innerText = `${text}${append ? document.getElementById("dv").innerText + splitter : ""}`;;
+    showData = (text, append = false, splitter = "") => document.getElementById("dv").innerText = `${append ? document.getElementById("dv").innerText + splitter : ""}${text}`;
 
     showStatus = (text, append, splitter = "-") => document.getElementById("spn").innerText = `${append ? document.getElementById("spn").innerText + splitter : ""}${text}`;
 
