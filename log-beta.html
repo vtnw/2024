@@ -219,12 +219,40 @@
                 doCalculate(content);
                 break;
             }
+            case ".milk": {
+                showStatus(action);
+                doMilk(content);
+                break;
+            }
             default: {
                 showStatus(`${action} - failed`);
             }
         }
 
         command = text;
+    }
+
+    doMilk = (content) => {
+        if (!content || content.trim().split().length != 4) {
+            showStatus("failed", true);
+            return;
+        }
+        
+        let greenPrice = 23.50;
+        let bluePrice = 21.50;
+        let normalCount = 4.0;
+        let sc = 30.0;
+
+        let params = content.trim().split(",");
+        let noOfDays = parseInt(content[0]);
+        let noOfNo = parseInt(content[1]);
+        let noOfTwo = parseInt(content[2]);
+        let noOfBlue = parseInt(content[3]);
+        
+        let total = (greenPrice*normalCount*noOfDays) - (greenPrice*noOfTwo*2) - ((greenPrice-bluePrice)*noOfBlue) - (greenPrice*normalCount*noofNo) + sc;
+
+        showData(`${content}\n${total}`);
+        showStatus("done", true);
     }
 
     doCalculate = (content) => {
