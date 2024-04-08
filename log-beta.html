@@ -48,6 +48,7 @@
     let command = "";
     let editMode = false;
     let textMode = false;
+    let lastAdd = "";
     
     const hiddenTag = "hidden";
     const noteTag = "note";
@@ -153,9 +154,9 @@
                 doRemove(content);
                 break;
             }
-            case ".cut": {
+            case ".edit": {
                 showStatus(action);
-                doCut(content);
+                doEdit(content);
                 break;
             }
             case ".copy": {
@@ -271,6 +272,7 @@
         saveNotes();
         let tagList = tags.map(t => t.substring(1)).join("&");
         showNotes(filterData(`.filter recent:1m+tag:${tagList}`));
+        lastAdd = text;
     }
 
     doList = (content) => {
@@ -348,10 +350,9 @@
         showNotes(toHide);
     }
 
-    doCut = (content) => {
+    doEdit = (content) => {
         if (!content) {
-            showStatus("failed", true);
-            return;
+            content = `text:${lastAdd}`;
         }
 
         let toRemove = filterData(content);
