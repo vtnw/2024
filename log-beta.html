@@ -214,12 +214,28 @@
                 doToday();
                 break;
             }
+            case ".calculate": {
+                showStatus(action);
+                doCalculate();
+                break;
+            }
             default: {
                 showStatus(`${action} - failed`);
             }
         }
 
         command = text;
+    }
+
+    doCalculate(content) => {
+        if (!content || content.match(/!start/g)) {
+            showStatus("failed", true);
+            return;
+        }
+
+        let fn = new Function(`return (${content})`);
+        fun();
+        showStatus("done", true);
     }
 
     doToday = () => {
