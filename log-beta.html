@@ -351,7 +351,10 @@
     }
 
     doEdit = (content) => {
-        if (!content) {
+        if (!content && !lastAdd) {
+            showStatus("failed", true);
+            return;
+        } else if (!content)
             content = `text:${lastAdd}`;
         }
 
