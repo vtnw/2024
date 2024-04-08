@@ -238,7 +238,7 @@
         let normalCount = 4.0;
         let sc = 30.0;
 
-        let params = content.trim().split(",");
+        let params = content.split(",");
         let date = params.length > 0 ? new Date(params[0]) : new Date();
         let noOfDays = new Date(date.getFullYear(), date.getMonth()+1, 0).getDate();
         let noOfNo = params.length > 1 ? parseInt(params[1]) : 0;
@@ -260,7 +260,7 @@
         summary = `${summary}\nSC ${sc}`;
         summary = `${summary}\nTotal: ${total}`;
 
-        summary = !content ? `[${content}]\n\n${summary}` : summary;
+        summary = !content ? summary : `[${content}]\n\n${summary}`;
         
         showData(summary);
         showStatus("done", true);
