@@ -244,10 +244,11 @@
         let sc = 30.0;
 
         let params = content.trim().split(",");
-        let noOfDays = parseInt(content[0]);
-        let noOfNo = parseInt(content[1]);
-        let noOfTwo = parseInt(content[2]);
-        let noOfBlue = parseInt(content[3]);
+        let date = new Date(params[0]);
+        let noOfDays = new Date(date.getFullYear(), date.getMonth()+1, 0).getDate();
+        let noOfNo = parseInt(param[1]);
+        let noOfTwo = parseInt(param[2]);
+        let noOfBlue = parseInt(param[3]);
 
         let noOfFour = noOfDays - noOfTwo - noOfNo;
         let noOfPackets = (normalCount*noOfFour) + (2*noOfTwo);
