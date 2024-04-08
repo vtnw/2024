@@ -799,7 +799,8 @@
 
         let lines = "\xA0\xA0\xA0\xA0".repeat(start.getDay() == 0 ? 6 : start.getDay()-1);
         for (let d = start; d <= end; d.setDate(d.getDate() + 1)) {
-            lines = `${lines}${d.getDate().toString().padStart(3, "\xA0").padEnd(4, "\xA0")}${d.getDay() == 0 ? "\n\n" : ""}`;
+            let mark = isoToString(new Date) == date ? "`" : "\xA0";
+            lines = `${lines}${d.getDate().toString().padStart(3, "\xA0").padEnd(4, mark)}${d.getDay() == 0 ? "\n\n" : ""}`;
         }
 
         return `[${title}]\n\n${columns}\n\n${lines}`;
