@@ -257,12 +257,12 @@
         let total = (greenPrice*normalCount*noOfDays) - (greenPrice*noOfTwo*2) - ((greenPrice-bluePrice)*noOfBlue) - (greenPrice*normalCount*noOfNo) + sc;
 
         let template = "F2 Sriram flats";
-        template += `\n${date.toLocaleString("default", {{ month: "long", year: "numeric" }}`;
+        template += `\n${date.toLocaleString("default", {{ month: "short", year: "numeric" }}`;
         template = (noOfNo == 0) ? template : `${template}\n${noOfNo} X 0 = 0 packets`;
         template = (noOfTwo == 0) ? template : `${template}\n${noOfTwo} X 2 = ${noOfTwo*2} packets`;
         template = `${template}\n${noOfFour} X 4 = ${noOfFour*4} packets`;
-        template = `${template}\n${noOfPackets} X ${greenPrice} = ${greenTotal} packets`;
-        template += `\n${noOfBlue} blue packets = -${(greenPrice-bluePrice)*noOfBlue}`;
+        template = `${template}\n${noOfPackets} X ${greenPrice} = ${greenTotal}`;
+        template += (noOfBlue == 0) ? template :`\n${noOfBlue} blue packets = -${(greenPrice-bluePrice)*noOfBlue}`;
         template += `\nSC ${sc}`;
         template += `\nTotal: ${total}`;;
         
