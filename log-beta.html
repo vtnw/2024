@@ -246,9 +246,9 @@
         let params = content.trim().split(",");
         let date = new Date(params[0]);
         let noOfDays = new Date(date.getFullYear(), date.getMonth()+1, 0).getDate();
-        let noOfNo = parseInt(param[1]);
-        let noOfTwo = parseInt(param[2]);
-        let noOfBlue = parseInt(param[3]);
+        let noOfNo = parseInt(params[1]);
+        let noOfTwo = parseInt(params[2]);
+        let noOfBlue = parseInt(params[3]);
 
         let noOfFour = noOfDays - noOfTwo - noOfNo;
         let noOfPackets = (normalCount*noOfFour) + (2*noOfTwo);
