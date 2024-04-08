@@ -257,7 +257,7 @@
         let total = (greenPrice*normalCount*noOfDays) - (greenPrice*noOfTwo*2) - ((greenPrice-bluePrice)*noOfBlue) - (greenPrice*normalCount*noOfNo) + sc;
 
         let template = "F2 Sriram flats";
-        template += `\nMonth Year`;
+        template += `\n${date.toLocaleString("default", {{ month: "long", year: "numeric" }}`;
         template = (noOfNo == 0) ? template : `${template}\n${noOfNo} X 0 = 0 packets`;
         template = (noOfTwo == 0) ? template : `${template}\n${noOfTwo} X 2 = ${noOfTwo*2} packets`;
         template = `${template}\n${noOfFour} X 4 = ${noOfFour*4} packets`;
@@ -854,7 +854,7 @@
     }
 
     getCalendar = (date) => {
-        let title = date.toLocaleString('default',{month:'long', year:'numeric'});
+        let title = date.toLocaleString("default", { month: "long", year: "numeric"});
         let columns = "mon tue wed thu fri sat sun";
         let day = date.getDay();
         let start = new Date(date.getFullYear(), date.getMonth(), 1);
