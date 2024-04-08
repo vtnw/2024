@@ -248,11 +248,24 @@
         let noOfNo = parseInt(content[1]);
         let noOfTwo = parseInt(content[2]);
         let noOfBlue = parseInt(content[3]);
+
+        let noOfFour = noOfDays - noOfTwo - noOfNo;
+        let noOfPackets = (normalCount*noOfFour) + (2*noOfTwo);
+        let greenTotal = greenPrice*noOfPackets;
         
         let total = (greenPrice*normalCount*noOfDays) - (greenPrice*noOfTwo*2) - ((greenPrice-bluePrice)*noOfBlue) - (greenPrice*normalCount*noofNo) + sc;
 
-        let template = `F2 Sriram flats\nMonth Year\n${} X 0`;
-        showData(`${content}\n${total}`);
+        let template = "F2 Sriram flats";
+        template += `\nMonth Year`;
+        template = (noOfNo == 0) ? template : `${template}\n${noOfNo} X 0 = 0 packets`;
+        template = (noOfTwo == 0) ? template : `${template}\n${noOfTwo} X 2 = ${noOfTwo*2} packets`;
+        template = `${template}\n${noOfFour} X 4 = ${noOfFour*4} packets`;
+        template = `${template}\n${noOfPackets} X ${greenPrice} = ${greenTotal} packets`;
+        template += `\n${noOfBlue} blue packets = -${(greenPrice-bluePrice)*noOfBlue}`;
+        template += `\nSC ${sc}`;
+        template += `\nTotal: ${total}`;;
+        
+        showData(`${content}\n${template}`);
         showStatus("done", true);
     }
 
