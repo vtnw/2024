@@ -239,7 +239,7 @@
         let sc = 30.0;
 
         let params = content.split(",");
-        let date = params.length > 0 ? new Date(params[0]) : new Date();
+        let date = !!content ? new Date(params[0]) : new Date();
         let noOfDays = new Date(date.getFullYear(), date.getMonth()+1, 0).getDate();
         let noOfNo = params.length > 1 ? parseInt(params[1]) : 0;
         let noOfTwo = params.length > 2 ? parseInt(params[2]) : 0;
