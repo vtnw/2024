@@ -233,7 +233,7 @@
     }
 
     doMilk = (content) => {
-        if (!content || content.trim().split().length != 4) {
+        if (!content || content.trim().split(",").length != 4) {
             showStatus("failed", true);
             return;
         }
@@ -251,6 +251,7 @@
         
         let total = (greenPrice*normalCount*noOfDays) - (greenPrice*noOfTwo*2) - ((greenPrice-bluePrice)*noOfBlue) - (greenPrice*normalCount*noofNo) + sc;
 
+        let template = `F2 Sriram flats\nMonth Year\n${} X 0`;
         showData(`${content}\n${total}`);
         showStatus("done", true);
     }
