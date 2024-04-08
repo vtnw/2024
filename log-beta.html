@@ -216,7 +216,7 @@
             }
             case ".calculate": {
                 showStatus(action);
-                doCalculate(action);
+                doCalculate(content);
                 break;
             }
             default: {
@@ -228,7 +228,7 @@
     }
 
     doCalculate = (content) => {
-        if (!content || content.match(/[0-9-+*/%^()]+/g)) {
+        if (!content || !/^[0-9+\-*/()^]+$/g.test(content)) {
             showStatus("failed", true);
             return;
         }
