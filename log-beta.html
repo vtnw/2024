@@ -234,7 +234,7 @@
         }
 
         let fn = new Function(`return (${content})`);
-        fun();
+        showData(`${content}\n${fn()}`);
         showStatus("done", true);
     }
 
