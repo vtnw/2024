@@ -228,7 +228,7 @@
     }
 
     doCalculate = (content) => {
-        if (!content || !/^[0-9+\-*/()^]+$/g.test(content)) {
+        if (!content || !/^[0-9+\-*/()^.]+$/g.test(content)) {
             showStatus("failed", true);
             return;
         }
