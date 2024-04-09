@@ -841,7 +841,7 @@
 
     showData = (text, append = false, splitter = "") => document.getElementById("dv").innerText = `${append ? document.getElementById("dv").innerText + splitter : ""}${text}`;
 
-    showStatus = (text, append, splitter = "-") => document.getElementById("spn").innerText = `${append ? document.getElementById("spn").innerText + splitter : ""}${text}`;
+    showStatus = (text, append, splitter = " - ") => document.getElementById("spn").innerText = `${append ? document.getElementById("spn").innerText + splitter : ""}${text}`;
 
     saveNotes = () => localStorage.setItem("notes", JSON.stringify(notes));
 
