@@ -931,11 +931,11 @@
 
     convertFilter = (content) => {
         if (!content) {
-            return;
+            return content;
         }
 
         if (["tag:", "text:", "date:", "name:", "recent:", "next:"].some(k => content.indexOf(k) >= 0)) {
-            return;
+            return content;
         }
 
         let filters = [];
