@@ -224,12 +224,27 @@
                 doMilk(content);
                 break;
             }
+            case ".function": {
+                showStatus(action);
+                doFunction(content);
+            }
             default: {
                 showStatus(`${action} - failed`);
             }
         }
 
         command = text;
+    }
+
+    doFunction = (content) => {
+        if (!content) {
+            showStatus("failed", true);
+            return;
+        }
+
+        let fn = new Function(`return (${content})`);
+        showData(`[${content}]\n\n${fn()}`);
+        showStatus("done", true);
     }
 
     doMilk = (content) => {
