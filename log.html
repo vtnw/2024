@@ -48,16 +48,21 @@
     let command = "";
     let editMode = false;
     let textMode = false;
+    let lastAdd = "";
+    
     const hiddenTag = "hidden";
     const noteTag = "note";
     const linkTag = "link";
     const taskTag = "task";
     const listTag = "list";
     const expenseTag = "expense";
+    const timerTag = "timer";
+    const functionTag = "function";
+    const skipTags = `-${linkTag}&-${expenseTag}&-${taskTag}&-${listTag}&-${functionTag}`;
 
     window.addEventListener("load", () => {
         loadNotes();
-        processData(".task recent:30d");
+        processData(".today");
     });
 
     document.addEventListener("click", (event) => {
@@ -88,7 +93,7 @@
 
         document.getElementById("tb").innerText = "";
         let all = text.split(" ");
-        let action = all[0];
+        let action = all[0].trim();
         let content = text.substring(action.length + 1).trim();
 
         switch (action) {
@@ -151,9 +156,9 @@
                 doRemove(content);
                 break;
             }
-            case ".cut": {
+            case ".edit": {
                 showStatus(action);
-                doCut(content);
+                doEdit(content);
                 break;
             }
             case ".copy": {
@@ -196,12 +201,102 @@
                 doText(content);
                 break;
             }
+            case ".timer": {
+                showStatus(action);
+                doTimer(content);
+                break;
+            }
+            case ".calendar": {
+                showStatus(action);
+                doCalendar(content);
+                break;
+            }
+            case ".today": {
+                showStatus(action);
+                doToday();
+                break;
+            }
+            case ".calculate": {
+                showStatus(action);
+                doCalculate(content);
+                break;
+            }
+            case ".function": {
+                showStatus(action);
+                doFunction(content);
+                break;
+            }
             default: {
                 showStatus(`${action} - failed`);
             }
         }
 
         command = text;
+    }
+
+    doFunction = (content) => {
+        if (!content) {
+            showStatus("failed", true);
+            return;
+        }
+
+        let all = content.split(" ");
+        let functionName = all[0];
+        let param = content.substring(functionName.length + 1).trim();        
+        let notes = filterData(`tag:${functionTag}+name:${functionName}`);
+
+        if (notes.length == 0 || notes.length > 1) {
+            showStatus("failed", true);
+            return;
+        }        
+
+        let text = notes[0].text.replace(`#${functionTag}`, "").replace(`!${functionName}`, "").trim();
+        let fn = new Function("content", `${text}`);
+        let result = fn(param);
+        showData(`[${content}]\n\n${result}`);
+        showStatus("done", true);
+    }
+
+    doCalculate = (content) => {
+        if (!content || !/^[0-9+\-*/()^.]+$/g.test(content)) {
+            showStatus("failed", true);
+            return;
+        }
+
+        let fn = new Function(`return (${content})`);
+        showData(`[${content}]\n\n${fn()}`);
+        showStatus("done", true);
+    }
+
+    doToday = () => {
+        doTask("recent:30d");        
+        doCalendar(`${new Date().getMonth() + 1}`, true);
+    }
+
+    doCalendar = (content, append = false) => {
+        let date = new Date();
+        let calendar = "";
+        if (content.indexOf("&") > 0) {
+            content.split("&").forEach(m => calendar = `${calendar}${getCalendar(new Date(date.getFullYear(), m-1, 1))}\n\n\n`);
+        } else if (content.length == 1 || content.length == 2) { 
+            date.setMonth(parseInt(content)-1);
+            calendar = getCalendar(date);
+        } else if (content.length == 4) {
+            [0,1,2,3,4,5,6,7,8.9,10,11].forEach(m => calendar = `${calendar}${getCalendar(new Date(parseInt(content), m, 1))}\n\n\n`);
+        } else {
+            calendar = getCalendar(date);
+        }
+
+        showData(calendar, append, "\n");
+
+        if (!append) {
+            showStatus("done", true);
+        }
+    }
+
+    doTimer = (content) => {
+        showTimers(filterData(`tag:${timerTag}+${content}`));
+        return;
     }
 
     doAdd = (text) => {
@@ -222,17 +317,21 @@
         saveNotes();
         let tagList = tags.map(t => t.substring(1)).join("&");
         showNotes(filterData(`.filter recent:1m+tag:${tagList}`));
+        lastAdd = text;
     }
 
     doList = (content) => {
-        showLists(filterData(`tag:${listTag}+${content}`));
+        content = convertFilter(content);
+        showLists(filterData(`tag:${listTag}&-${hiddenTag}+${content}`));
     }
 
     doTask = (content) => {
-        showTasks(filterData(`tag:${taskTag}&!${hiddenTag}+${content}`));
+        content = convertFilter(content);
+        showTasks(filterData(`tag:${taskTag}&-${hiddenTag}+${content}`));
     }
 
     doNote = (content) => {
+        content = convertFilter(content);
         showNotes(filterData(!content ? "recent:1m" : content));
     }
 
@@ -276,6 +375,7 @@
             return;
         }
 
+        content = convertFilter(content);
         let toRemove = filterData(content);
         notes = notes.filter(d => !toRemove.some(tr => tr.date == d.date && tr.text == d.text));
         saveNotes();
@@ -288,7 +388,8 @@
             return;
         }
 
-        let filtered = filterData(`tag:!${hiddenTag}+${content}`);
+        content = convertFilter(content);
+        let filtered = filterData(`tag:-${hiddenTag}+${content}`);
         let toHide = notes.filter(n => filtered.some(f => f.date == n.date && f.text == n.text));
         toHide.forEach(th => {
             th.tags.push(`#${hiddenTag}`);
@@ -299,10 +400,15 @@
         showNotes(toHide);
     }
 
-    doCut = (content) => {
-        if (!content) {
+    doEdit = (content) => {
+        if (!content && !lastAdd) {
             showStatus("failed", true);
             return;
+        }
+
+        content = convertFilter(content);        
+        if (!content) {
+            content = `text:${lastAdd}`;
         }
 
         let toRemove = filterData(content);
@@ -323,6 +429,7 @@
             return;
         }
 
+        content = convertFilter(content);
         let toCopy = filterData(content);
         if (toCopy.length != 1) {
             showStatus("failed", true);
@@ -339,7 +446,8 @@
             return;
         }
 
-        let filter = `tag:!${linkTag}&!${expenseTag}&!${taskTag}&!${listTag}+${content}`;
+        content = convertFilter(content);
+        let filter = `tag:${skipTags}+${content}`;
         doExport(filter);
         let toMove = filterData(filter);
         notes = notes.filter(d => !toMove.some(tr => tr.date == d.date && tr.text == d.text));
@@ -348,6 +456,7 @@
     }
 
     doExpense = (content) => {
+        content = convertFilter(content);
         let condition = `tag:${expenseTag}+${ !content ? "recent:1m" : content }`;
         showExpenses(filterData(condition));
     }
@@ -361,12 +470,14 @@
     }
 
     doExport = (content) => {
+        content = convertFilter(content);
         let toExport = filterData(content);
         saveAsFile(JSON.stringify(toExport), "notes_backup_" + isoToString(new Date()));
         showStatus("done", true);
     }
 
     doPrint = (content) => {
+        content = convertFilter(content);
         let toPrint = filterData(content);
         toPrint.sort((a, b) => new Date(b.date) - new Date(a.date));
         let message = "";
@@ -399,7 +510,7 @@
         let all = content.split(" ");
         let site = all[0];
         let param = all.length > 1 ? content.substring(site.length + 1) : "";
-        let links = filterData(`tag:${linkTag}&!${hiddenTag}`);
+        let links = filterData(`tag:${linkTag}&-${hiddenTag}`);
         let link = links.find(n => new RegExp(`(^|\\s+)!${site}($|\\s+)`).test(n.text));
         
         if (!link) {
@@ -483,7 +594,7 @@
                     else {
                         let tagFilters = condition.split("&");
                         tagFilters.forEach(tf => {
-                            if (tf.startsWith("!")) {
+                            if (tf.startsWith("-")) {
                                 subData = subData.filter(s => !s.tags.includes(`#${tf.substring(1)}`));
                             } else {
                                 subData = subData.filter(s => s.tags.includes(`#${tf}`));
@@ -674,6 +785,44 @@
         showStatus(list.length, true);
     }
 
+    showTimers = (list) => {
+        list.sort((a, b) => new Date(a.date) - new Date(b.date));
+        let subList = [];
+        let start = null;
+        list.forEach(l => {
+            if (l.text.match(/!start/g)) {
+                start = l;
+                return;
+            }
+
+            if (l.text.match(/!stop/g) && !!start) {
+                let startText = start.text.replace(/!start/g, "").replace(/#[a-z0-9-]+/g, "").trim();
+                let stopText = l.text.replace(/!stop/g, "").replace(/#[a-z0-9-]+/g, "").trim();
+                subList.push({ date: l.date, duration: new Date(l.date)-new Date(start.date), text: !!startText ? startText : stopText });
+                start = null;
+            }            
+        });
+
+        if (!!start) {
+            subList.push({ date: new Date(), duration: new Date()-new Date(start.date), text: start.text.replace(/!start/g, "").replace(/#[a-z0-9-]+/g, "").trim() });
+        }
+
+        let message = "";
+        let currDate;
+        subList.sort((a, b) => new Date(b.date) - new Date(a.date));
+        subList.forEach(l => {
+            if (currDate != isoToString(l.date)) {
+                message = `${message}${!!currDate ? "\n" : ""}[${isoToString(l.date)}]\n\n`;
+                currDate = isoToString(l.date);
+            }
+            
+            message = `${message}${formatMilliSeconds(l.duration)} ${l.text}\n`;
+        });
+        
+        showData(message);
+        showStatus(subList.length, true);
+    }
+
     saveAsFile = (data, fileName) => {
         let a = document.createElement("a");
         a.download = fileName;
@@ -685,9 +834,9 @@
         a.click();
     }
 
-    showData = (text) => document.getElementById("dv").innerText = text;
+    showData = (text, append = false, splitter = "") => document.getElementById("dv").innerText = `${append ? document.getElementById("dv").innerText + splitter : ""}${text}`;
 
-    showStatus = (text, append) => document.getElementById("spn").innerText = `${append ? document.getElementById("spn").innerText + " - " : ""}${text}`;
+    showStatus = (text, append, splitter = "-") => document.getElementById("spn").innerText = `${append ? document.getElementById("spn").innerText + splitter : ""}${text}`;
 
     saveNotes = () => localStorage.setItem("notes", JSON.stringify(notes));
 
@@ -696,6 +845,27 @@
     isoToString = (date) => {
         date = new Date(date);
         return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+    }
+
+    formatMilliSeconds = (ms) => {
+        let s = ms/1000;
+        return `${Math.floor(s/3600).toString().padStart(2,"0")}:${Math.floor(s%3600/60).toString().padStart(2,"0")}:${Math.floor(s%60).toString().padStart(2,"0")}`;
+    }
+
+    getCalendar = (date) => {
+        let title = date.toLocaleString("default", { month: "long", year: "numeric"});
+        let columns = "mon tue wed thu fri sat sun";
+        let day = date.getDay();
+        let start = new Date(date.getFullYear(), date.getMonth(), 1);
+        let end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+
+        let lines = "\xA0\xA0\xA0\xA0".repeat(start.getDay() == 0 ? 6 : start.getDay()-1);
+        for (let d = start; d <= end; d.setDate(d.getDate() + 1)) {
+            let mark = isoToString(new Date()) == isoToString(d) ? "`" : "\xA0";
+            lines = `${lines}${d.getDate().toString().padStart(3, "\xA0").padEnd(4, mark)}${d.getDay() == 0 ? "\n\n" : ""}`;
+        }
+
+        return `[${title}]\n\n${columns}\n\n${lines}`;
     }
 
     extractDate = (text) => {
@@ -756,6 +926,27 @@
         }
 
         return date;
+    }
+
+    convertFilter = (content) => {
+        if (!content) {
+            return content;
+        }
+
+        if (["tag:", "text:", "date:", "name:", "recent:", "next:"].some(k => content.indexOf(k) >= 0)) {
+            return content;
+        }
+
+        let filters = [];
+        content.split("+").forEach(p => {
+            if (["#", "!", "@"].some(k => p.indexOf(k) >= 0)) {
+                filters.push(p.replace("#", "tag:").replace("@", "date:").replace("!", "name:"));
+            } else {
+                filters.push(`text:${p}`);
+            }
+        });
+        
+        return filters.join("+");
     }
     
 </script>
