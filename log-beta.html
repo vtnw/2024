@@ -253,7 +253,7 @@
         let text = notes[0].text.replace(`#${functionTag}`, "").replace(`!${functionName}`, "").trim();
         let fn = new Function("content", `${text}`);
         let result = fn(param);
-        if (!result) {
+        if (!!result) {
             showData(`[${content}]\n\n${result}`);
         }
         
