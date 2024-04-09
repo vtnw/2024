@@ -256,7 +256,7 @@
         }        
 
         let text = notes[0].text.replace(`#${functionTag}`, "").replace(`!${functionName}`, "").trim();
-        let fn = new Function(`${text}`);
+        let fn = new Function(params.join(","), `${text}`);
         let result = fn();
         showData(`[${content}]\n\n${result}`);
         showStatus("done", true);
