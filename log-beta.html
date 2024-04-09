@@ -328,7 +328,6 @@
 
     doTask = (content) => {
         content = convertFilter(content);
-        content = !content ? "recent:1m" : content;
         showTasks(filterData(`tag:${taskTag}&-${hiddenTag}+${content}`));
     }
 
