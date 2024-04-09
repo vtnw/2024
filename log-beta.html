@@ -57,6 +57,7 @@
     const listTag = "list";
     const expenseTag = "expense";
     const timerTag = "timer";
+    const functionTag = "function";
 
     window.addEventListener("load", () => {
         loadNotes();
@@ -242,7 +243,20 @@
             return;
         }
 
-        let fn = new Function(`return (${content})`);
+        let all = content.split(" ");
+        let functionName = all[0];
+        let param = content.substring(functionName.length + 1).trim();
+        let params = !param && !param.trim() ? param.trim().split(",") : [];
+        
+        let notes = filterData(`tag:${functionTag}+name:${functionName}`);
+
+        if (notes.length == 0 || notes.length > 1) {
+            showStatus("failed", true);
+            return;
+        }        
+
+        let text = notes[0].text.replace(/![a-z0-9-]+/g, "").replace(/#[a-z0-9-]+/g, "").replace(/@\S+/g, "").trim();
+        let fn = new Function(`return (${text})`);
         showData(`[${content}]\n\n${fn()}`);
         showStatus("done", true);
     }
