@@ -242,13 +242,15 @@
 
         let all = content.split(" ");
         let functionName = all[0];
+        showStatus(functionName, true, " ")
+        
         let param = content.substring(functionName.length + 1).trim();        
         let notes = filterData(`tag:${functionTag}+name:${functionName}`);
 
         if (notes.length == 0 || notes.length > 1) {
             showStatus("failed", true);
             return;
-        }        
+        }
 
         let text = notes[0].text.replace(`#${functionTag}`, "").replace(`!${functionName}`, "").trim();
         let fn = new Function("content", `${text}`);
