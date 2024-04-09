@@ -255,7 +255,7 @@
             return;
         }        
 
-        let text = notes[0].text.replace(/![a-z0-9-]+/g, "").replace(/#[a-z0-9-]+/g, "").replace(/@\S+/g, "").trim();
+        let text = notes[0].text.replace(`#${functionTag}`, "").replace(`!${functionName}`, "").trim();
         let fn = new Function(`${text}`);
         let result = fn();
         showData(`[${content}]\n\n${result}`);
