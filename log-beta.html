@@ -969,7 +969,25 @@
     }
 
     convertFilter = (content) => {
-        return !content ? content : content.replace("#", "tag:").replace("@", "date:").replace("!", "name:");
+        if (!content) {
+            return;
+        }
+
+        if (["tag:", "text:", "date:", "name:"].some(k => content.indexOf(k) >= 0)) {
+            return;
+        }
+
+        let params = content.split("+");
+        let filters = [];
+        params.forEach(p => {
+            if (["#", "!", "@"].some(k => content.indexOf(k) >= 0)) {
+                filters.push(p.replace("#", "tag:").replace("@", "date:").replace("!", "name:")
+            } else {
+                filters.push(`text:`${p});
+            }
+        });
+        
+        return filters.join("+");
     }
     
 </script>
