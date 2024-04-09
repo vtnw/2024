@@ -331,14 +331,18 @@
     }
 
     doList = (content) => {
-        showLists(filterData(`tag:${listTag}&!${hiddenTag}+${content}`));
+        content = convertFilter(content);
+        showLists(filterData(`tag:${listTag}&-${hiddenTag}+${content}`));
     }
 
     doTask = (content) => {
-        showTasks(filterData(`tag:${taskTag}&!${hiddenTag}+${content}`));
+        content = convertFilter(content);
+        content = !content ? "recent:1m" : content;
+        showTasks(filterData(`tag:${taskTag}&-${hiddenTag}+${content}`));
     }
 
     doNote = (content) => {
+        content = convertFilter(content);
         showNotes(filterData(!content ? "recent:1m" : content));
     }
 
@@ -382,6 +386,7 @@
             return;
         }
 
+        content = convertFilter(content);
         let toRemove = filterData(content);
         notes = notes.filter(d => !toRemove.some(tr => tr.date == d.date && tr.text == d.text));
         saveNotes();
@@ -394,6 +399,7 @@
             return;
         }
 
+        content = convertFilter(content);
         let filtered = filterData(`tag:!${hiddenTag}+${content}`);
         let toHide = notes.filter(n => filtered.some(f => f.date == n.date && f.text == n.text));
         toHide.forEach(th => {
@@ -409,7 +415,10 @@
         if (!content && !lastAdd) {
             showStatus("failed", true);
             return;
-        } else if (!content) {
+        }
+
+        content = convertFilter(content);        
+        if (!content) {
             content = `text:${lastAdd}`;
         }
 
@@ -431,6 +440,7 @@
             return;
         }
 
+        content = convertFilter(content);
         let toCopy = filterData(content);
         if (toCopy.length != 1) {
             showStatus("failed", true);
@@ -447,6 +457,7 @@
             return;
         }
 
+        content = convertFilter(content);
         let filter = `tag:!${linkTag}&!${expenseTag}&!${taskTag}&!${listTag}+${content}`;
         doExport(filter);
         let toMove = filterData(filter);
@@ -456,6 +467,7 @@
     }
 
     doExpense = (content) => {
+        content = convertFilter(content);
         let condition = `tag:${expenseTag}+${ !content ? "recent:1m" : content }`;
         showExpenses(filterData(condition));
     }
@@ -469,12 +481,14 @@
     }
 
     doExport = (content) => {
+        content = convertFilter(content);
         let toExport = filterData(content);
         saveAsFile(JSON.stringify(toExport), "notes_backup_" + isoToString(new Date()));
         showStatus("done", true);
     }
 
     doPrint = (content) => {
+        content = convertFilter(content);
         let toPrint = filterData(content);
         toPrint.sort((a, b) => new Date(b.date) - new Date(a.date));
         let message = "";
@@ -591,7 +605,7 @@
                     else {
                         let tagFilters = condition.split("&");
                         tagFilters.forEach(tf => {
-                            if (tf.startsWith("!")) {
+                            if (tf.startsWith("-")) {
                                 subData = subData.filter(s => !s.tags.includes(`#${tf.substring(1)}`));
                             } else {
                                 subData = subData.filter(s => s.tags.includes(`#${tf}`));
@@ -923,6 +937,10 @@
         }
 
         return date;
+    }
+
+    convertFilter = (content) {
+        return !content ? content : content.replace("#", "tag:").replace("@", "date:").replace("!", "name:");
     }
     
 </script>
