@@ -390,7 +390,7 @@
         }
 
         content = convertFilter(content);
-        let filtered = filterData(`tag:!${hiddenTag}+${content}`);
+        let filtered = filterData(`tag:-${hiddenTag}+${content}`);
         let toHide = notes.filter(n => filtered.some(f => f.date == n.date && f.text == n.text));
         toHide.forEach(th => {
             th.tags.push(`#${hiddenTag}`);
@@ -511,7 +511,7 @@
         let all = content.split(" ");
         let site = all[0];
         let param = all.length > 1 ? content.substring(site.length + 1) : "";
-        let links = filterData(`tag:${linkTag}&!${hiddenTag}`);
+        let links = filterData(`tag:${linkTag}&-${hiddenTag}`);
         let link = links.find(n => new RegExp(`(^|\\s+)!${site}($|\\s+)`).test(n.text));
         
         if (!link) {
