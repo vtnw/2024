@@ -256,8 +256,9 @@
         }        
 
         let text = notes[0].text.replace(/![a-z0-9-]+/g, "").replace(/#[a-z0-9-]+/g, "").replace(/@\S+/g, "").trim();
-        let fn = new Function(`return (${text})`);
-        showData(`[${content}]\n\n${fn()}`);
+        let fn = new Function(`${text}`);
+        let result = fn();
+        showData(`[${content}]\n\n${result}\n\n${text}`);
         showStatus("done", true);
     }
 
