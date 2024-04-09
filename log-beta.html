@@ -270,8 +270,7 @@
 
     doToday = () => {
         doTask("recent:30d");        
-        let month = new Date().getMonth() + 1;
-        doCalendar(`${month}&${month + 1}`, true);
+        doCalendar(`${new Date().getMonth() + 1}`, true);
     }
 
     doCalendar = (content, append = false) => {
