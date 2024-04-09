@@ -58,6 +58,7 @@
     const expenseTag = "expense";
     const timerTag = "timer";
     const functionTag = "function";
+    const skipTags = `-${linkTag}&-${expenseTag}&-${taskTag}&-${listTag}&-${functionTag}`;
 
     window.addEventListener("load", () => {
         loadNotes();
@@ -220,14 +221,10 @@
                 doCalculate(content);
                 break;
             }
-            case ".milk": {
-                showStatus(action);
-                doMilk(content);
-                break;
-            }
             case ".function": {
                 showStatus(action);
                 doFunction(content);
+                break;
             }
             default: {
                 showStatus(`${action} - failed`);
@@ -245,9 +242,7 @@
 
         let all = content.split(" ");
         let functionName = all[0];
-        let param = content.substring(functionName.length + 1).trim();
-        let params = !param && !param.trim() ? param.trim().split(",") : [];
-        
+        let param = content.substring(functionName.length + 1).trim();        
         let notes = filterData(`tag:${functionTag}+name:${functionName}`);
 
         if (notes.length == 0 || notes.length > 1) {
@@ -259,40 +254,6 @@
         let fn = new Function("content", `${text}`);
         let result = fn(param);
         showData(`[${content}]\n\n${result}`);
-        showStatus("done", true);
-    }
-
-    doMilk = (content) => {
-        let greenPrice = 23.50;
-        let bluePrice = 21.50;
-        let normalCount = 4.0;
-        let sc = 30.0;
-
-        let params = content.split(",");
-        let date = !!content ? new Date(params[0]) : new Date();
-        let noOfDays = new Date(date.getFullYear(), date.getMonth()+1, 0).getDate();
-        let noOfNo = params.length > 1 ? parseInt(params[1]) : 0;
-        let noOfTwo = params.length > 2 ? parseInt(params[2]) : 0;
-        let noOfBlue = params.length > 3 ? parseInt(params[3]) : 0;
-
-        let noOfFour = noOfDays - noOfTwo - noOfNo;
-        let noOfPackets = (normalCount*noOfFour) + (2*noOfTwo);
-        let greenTotal = greenPrice*noOfPackets;        
-        let total = (greenPrice*normalCount*noOfDays) - (greenPrice*noOfTwo*2) - ((greenPrice-bluePrice)*noOfBlue) - (greenPrice*normalCount*noOfNo) + sc;
-
-        let summary = "F2 Sriram flats";
-        summary += "\n" + date.toLocaleString("default", { month: "short", year: "numeric" });
-        summary = (noOfNo == 0) ? summary : `${summary}\n${noOfNo} X 0 = 0 packets`;
-        summary = (noOfTwo == 0) ? summary : `${summary}\n${noOfTwo} X 2 = ${noOfTwo*2} packets`;
-        summary = `${summary}\n${noOfFour} X 4 = ${noOfFour*4} packets`;
-        summary = `${summary}\n${noOfPackets} X ${greenPrice} = ${greenTotal}`;
-        summary = (noOfBlue == 0) ? summary :`${summary}\n${noOfBlue} blue packets = -${(greenPrice-bluePrice)*noOfBlue}`;
-        summary = `${summary}\nSC ${sc}`;
-        summary = `${summary}\nTotal: ${total}`;
-
-        summary = !content ? summary : `[${content}]\n\n${summary}`;
-        
-        showData(summary);
         showStatus("done", true);
     }
 
@@ -488,7 +449,7 @@
         }
 
         content = convertFilter(content);
-        let filter = `tag:!${linkTag}&!${expenseTag}&!${taskTag}&!${listTag}+${content}`;
+        let filter = `tag:${skipTags}+${content}`;
         doExport(filter);
         let toMove = filterData(filter);
         notes = notes.filter(d => !toMove.some(tr => tr.date == d.date && tr.text == d.text));
