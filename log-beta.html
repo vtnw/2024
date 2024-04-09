@@ -954,7 +954,7 @@
         return date;
     }
 
-    convertFilter = (content) {
+    convertFilter = (content) => {
         return !content ? content : content.replace("#", "tag:").replace("@", "date:").replace("!", "name:");
     }
     
