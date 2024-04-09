@@ -977,13 +977,12 @@
             return;
         }
 
-        let params = content.split("+");
         let filters = [];
-        params.forEach(p => {
-            if (["#", "!", "@"].some(k => content.indexOf(k) >= 0)) {
-                filters.push(p.replace("#", "tag:").replace("@", "date:").replace("!", "name:")
+        content.split("+").forEach(p => {
+            if (["#", "!", "@"].some(k => p.indexOf(k) >= 0)) {
+                filters.push(p.replace("#", "tag:").replace("@", "date:").replace("!", "name:"));
             } else {
-                filters.push(`text:`${p});
+                filters.push(`text:${p}`);
             }
         });
         
