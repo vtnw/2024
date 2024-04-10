@@ -732,7 +732,7 @@
         let message = `[${isoToString(minDate)} - ${isoToString(maxDate)}]\n\nTotal ${total}\n`;
         summaryList.forEach(sl => message = `${message}\n${sl.category} ${sl.value}`);
         message = `${message}\n`;
-        summaryList.forEach(sl => message = `${message}\n${sl.category} ${sl.value}\n\n${sl.detail}`);
+        summaryList.forEach(sl => message = `${message}\n${sl.category} ${sl.value}\n${sl.detail}\n`);
         showData(message);
         showStatus(summaryList.length, true);
     }
