@@ -847,7 +847,7 @@
             let category = (categories || []).length > 0 ? categories[0].substring(1) : contactTag;
             let name = l.text.replace(/\+[0-9a-z/]+/g, "").replace(/![a-z0-9-]+/g, "").replace(/#[a-z0-9-]+/g, "");
             let all = name.split("/");
-            let contact = { date: l.date, name: all[0], comment: all[1], category, numbers = [] };
+            let contact = { l.date, name: all[0], comment: all[1], category, numbers: [] };
             numbers.forEach(n => {
                 let all = n.split("/");
                 contact.numbers.push({ number, comment: all[1]});
