@@ -59,7 +59,8 @@
     const timerTag = "timer";
     const functionTag = "function";
     const contactTag = "contact";
-    const skipTags = `-${linkTag}&-${expenseTag}&-${taskTag}&-${listTag}&-${functionTag}&-${contactTag}`;
+    const diaryTag = "diary";
+    const skipTags = `-${linkTag}&-${expenseTag}&-${taskTag}&-${listTag}&-${functionTag}&-${contactTag}&-${diaryTag}`;
 
     window.addEventListener("load", () => {
         loadNotes();
@@ -125,6 +126,11 @@
             case ".note": {
                 showStatus(action);
                 doNote(content);
+                break;
+            }
+            case ".log": {
+                showStatus(action);
+                doLog(content);
                 break;
             }
             case ".clear": {
@@ -348,6 +354,12 @@
 
     doNote = (content) => {
         content = convertFilter(content);
+        let filter = `tag:${skipTags}+${!content ? "recent:1m" : content}`;
+        showNotes(filterData(filter));
+    }
+
+    doLog = (content) => {
+        content = convertFilter(content);
         showNotes(filterData(!content ? "recent:1m" : content));
     }
 
@@ -440,12 +452,16 @@
     }
 
     doCopy = (content) => {
-        if (!content) {
+        if (!content && !lastAdd) {
             showStatus("failed", true);
             return;
         }
 
-        content = convertFilter(content);
+        content = convertFilter(content);        
+        if (!content) {
+            content = `text:${lastAdd}`;
+        }
+
         let toCopy = filterData(content);
         if (toCopy.length != 1) {
             showStatus("failed", true);
@@ -843,27 +859,27 @@
         let subList = [];
         list.forEach(l => {
             let numbers = l.text.match(/\+[0-9a-z/]+/g) || ["?"];
-            let categories = l.text.match(/![a-z0-9-]+/g);
-            let category = (categories || []).length > 0 ? categories[0].substring(1) : contactTag;
-            let name = l.text.replace(/\+[0-9a-z/]+/g, "").replace(/![a-z0-9-]+/g, "").replace(/#[a-z0-9-]+/g, "");
-            let all = !name || !name.trim() ? ["?"] : name.split("/");
-            let comment = all.length > 1 ? all[1].trim() : "";
-            let contact = { date: l.date, name: all[0], comment, category, numbers: [] };
+            let categories = l.text.match(/![a-z0-9-]+/g) || [`#${contactTag}`];
+            let category = categories[0].substring(1);
+            let rest = l.text.replace(/\+[0-9a-z/]+/g, "").replace(/![a-z0-9-]+/g, "").replace(/#[a-z0-9-]+/g, "");
+            let all = rest.split("^");
+            let name = all[0].trim() ? all[0].trim() : "?";
+            let context = all.length > 1 && all[1] ? all[1].trim() : ""
+            let contact = { date: l.date, name, category, numbers: [], context };
             numbers.forEach(n => {
                 all = n.split("/");
                 comment = all.length > 1 ? all[1] : "";
-                contact.numbers.push({ number: all[0], comment});
+                contact.numbers.push({ number: all[0], comment });
             });
-            numbers
             subList.push(contact);
         });
         subList.sort((a, b) => b.name == a.name ? new Date(b.date) - new Date(a.date)  : a.name.localeCompare(b.name));
         let message = "";
         let wrap = (text) => !text ? "" : ` (${text})`;
         subList.forEach(sl => {
-            message = `${message}${sl.name}${wrap(sl.comment)}`;
+            message = `${message}${sl.name}`;
             sl.numbers.forEach(n => message = `${message}\n${n.number}${wrap(n.comment)}`);
-            message = `${message}\n\n`;
+            message = !sl.context ? `${message}\n\n` : `${message}\n~ ${sl.context}\n\n`;
         });
         showData(message);
         showStatus(subList.length, true);
