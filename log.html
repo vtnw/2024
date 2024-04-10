@@ -242,18 +242,23 @@
 
         let all = content.split(" ");
         let functionName = all[0];
+        showStatus(functionName, true, " ")
+        
         let param = content.substring(functionName.length + 1).trim();        
         let notes = filterData(`tag:${functionTag}+name:${functionName}`);
 
         if (notes.length == 0 || notes.length > 1) {
             showStatus("failed", true);
             return;
-        }        
+        }
 
         let text = notes[0].text.replace(`#${functionTag}`, "").replace(`!${functionName}`, "").trim();
         let fn = new Function("content", `${text}`);
         let result = fn(param);
-        showData(`[${content}]\n\n${result}`);
+        if (!!result) {
+            showData(`[${content}]\n\n${result}`);
+        }
+        
         showStatus("done", true);
     }
 
@@ -727,7 +732,7 @@
         let message = `[${isoToString(minDate)} - ${isoToString(maxDate)}]\n\nTotal ${total}\n`;
         summaryList.forEach(sl => message = `${message}\n${sl.category} ${sl.value}`);
         message = `${message}\n`;
-        summaryList.forEach(sl => message = `${message}\n${sl.category} ${sl.value}\n${sl.detail}`);
+        summaryList.forEach(sl => message = `${message}\n${sl.category} ${sl.value}\n\n${sl.detail}`);
         showData(message);
         showStatus(summaryList.length, true);
     }
@@ -836,7 +841,7 @@
 
     showData = (text, append = false, splitter = "") => document.getElementById("dv").innerText = `${append ? document.getElementById("dv").innerText + splitter : ""}${text}`;
 
-    showStatus = (text, append, splitter = "-") => document.getElementById("spn").innerText = `${append ? document.getElementById("spn").innerText + splitter : ""}${text}`;
+    showStatus = (text, append, splitter = " - ") => document.getElementById("spn").innerText = `${append ? document.getElementById("spn").innerText + splitter : ""}${text}`;
 
     saveNotes = () => localStorage.setItem("notes", JSON.stringify(notes));
 
