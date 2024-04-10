@@ -856,10 +856,11 @@
         });
         subList.sort((a, b) => b.name == a.name ? new Date(b.date) - new Date(a.date)  : b.name - a.name);
         let message = "";
+        let wrap = (text) => !text ? "" : ` (${text})`;
         subList.forEach(sl => {
-            message = `${message}${sl.name} (${sl.comment})`);
-            sl.numbers.forEach(n => message = `${message}\n${n.number} (${n.comment})`);
-            message = `${message}\n\n`);
+            message = `${message}${sl.name}${wrap(sl.comment)}`;
+            sl.numbers.forEach(n => message = `${message}\n${n.number}${wrap(n.comment)}`);
+            message = `${message}\n\n`;
         });
         showData(message);
         showStatus(subList.length, true);
