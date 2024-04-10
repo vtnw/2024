@@ -846,9 +846,11 @@
             let numbers = l.text.match(/\+[0-9a-z/]+/g) || ["?"];
             let categories = l.text.match(/![a-z0-9-]+/g) || [];
             let category = categories.length > 0 ? categories[0].substring(1) : contactTag;
-            let comment = l.text.replace(/\+[0-9a-z/]+/g, "").replace(/![a-z0-9-]+/g, "").replace(/#[a-z0-9-]+/g, "").replace(name, "");
-            let all = !name || !name.trim() ? ["?"] : name.split("/");
-            let contact = { date: l.date, name: (name || name.trim()) ? name : "?", comment: comment ? comment.trim() : "", category, numbers: [] };
+            let context = l.text.replace(/\+[0-9a-z/]+/g, "").replace(/![a-z0-9-]+/g, "").replace(/#[a-z0-9-]+/g, "").replace(name, "");
+            let all = name.split("/");
+            name = all[0] ? all[0].trim() : "?";
+            let comment = all.length > 1 && all[1] ? all[1].trim() : ""
+            let contact = { date: l.date, name, comment, category, numbers: [], context };
             numbers.forEach(n => {
                 all = n.split("/");
                 comment = all.length > 1 ? all[1] : "";
@@ -861,8 +863,9 @@
         let message = "";
         let wrap = (text) => !text ? "" : ` (${text})`;
         subList.forEach(sl => {
+            message = `${message}\n${sl.name}${wrap(sl.comment)}`;
             sl.numbers.forEach(n => message = `${message}\n${n.number}${wrap(n.comment)}`);
-            message = !sl.comment ? `${message}\n\n` : `${message}\n${sl.comment}\n\n`;
+            message = !sl.context ? `${message}\n\n` : `${message}\n${sl.context}\n\n`;
         });
         showData(message);
         showStatus(subList.length, true);
