@@ -865,7 +865,7 @@
         let message = "";
         let wrap = (text) => !text ? "" : ` (${text})`;
         subList.forEach(sl => {
-            message = `${message}\n${sl.name}`;
+            message = `${message}${sl.name}`;
             sl.numbers.forEach(n => message = `${message}\n${n.number}${wrap(n.comment)}`);
             message = !sl.context ? `${message}\n\n` : `${message}\n~ ${sl.context}\n\n`;
         });
