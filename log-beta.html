@@ -842,7 +842,7 @@
     showContacts = (list) => {
         let subList = [];
         list.forEach(l => {
-            let numbers = l.text.match(/+[0-9-/]+/g);
+            let numbers = l.text.match(/+[0-9-/]+\/g);
             let categories = l.text.match(/![a-z0-9-]+/g);
             let category = (categories || []).length > 0 ? categories[0].substring(1) : contactTag;
             let name = l.text.replace(/+[0-9-/]+/g, "").replace(/![a-z0-9-]+/g, "").replace(/#[a-z0-9-]+/g, "");
