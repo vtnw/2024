@@ -846,7 +846,7 @@
             let categories = l.text.match(/![a-z0-9-]+/g) || [`#${contactTag}`];
             let category = categories[0].substring(1);
             let rest = l.text.replace(/\+[0-9a-z/]+/g, "").replace(/![a-z0-9-]+/g, "").replace(/#[a-z0-9-]+/g, "");
-            let all = name.split("^");
+            let all = rest.split("^");
             let name = all[0] ? all[0].trim() : "?";
             let context = all.length > 1 && all[1] ? all[1].trim() : ""
             let contact = { date: l.date, name, category, numbers: [], context };
