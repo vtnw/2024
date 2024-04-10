@@ -343,7 +343,7 @@
 
     doContact = (content) => {
         content = convertFilter(content);
-        showTasks(filterData(`tag:${contactTag}&-${hiddenTag}+${content}`));
+        showContacts(filterData(`tag:${contactTag}&-${hiddenTag}+${content}`));
     }
 
     doNote = (content) => {
