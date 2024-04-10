@@ -58,6 +58,7 @@
     const expenseTag = "expense";
     const timerTag = "timer";
     const functionTag = "function";
+    const contactTag = "contact";
     const skipTags = `-${linkTag}&-${expenseTag}&-${taskTag}&-${listTag}&-${functionTag}`;
 
     window.addEventListener("load", () => {
@@ -226,6 +227,11 @@
                 doFunction(content);
                 break;
             }
+            case ".contact": {
+                showStatus(action);
+                doFunction(content);
+                break;
+            }
             default: {
                 showStatus(`${action} - failed`);
             }
@@ -333,6 +339,11 @@
     doTask = (content) => {
         content = convertFilter(content);
         showTasks(filterData(`tag:${taskTag}&-${hiddenTag}+${content}`));
+    }
+
+    doContact = (content) => {
+        content = convertFilter(content);
+        showTasks(filterData(`tag:${contactTag}&-${hiddenTag}+${content}`));
     }
 
     doNote = (content) => {
@@ -824,6 +835,32 @@
             message = `${message}${formatMilliSeconds(l.duration)} ${l.text}\n`;
         });
         
+        showData(message);
+        showStatus(subList.length, true);
+    }
+
+    showContacts = (list) => {
+        let subList = [];
+        list.forEach(l => {
+            let numbers = l.text.match(/+[0-9-/]+/g);
+            let categories = l.text.match(/![a-z0-9-]+/g);
+            let category = (categories || []).length > 0 ? categories[0].substring(1) : contactTag;
+            let name = l.text.replace(/+[0-9-/]+/g, "").replace(/![a-z0-9-]+/g, "").replace(/#[a-z0-9-]+/g, "");
+            let all = name.split("/");
+            let contact = { l.date, name: all[0], comment: all[1], category, numbers = [], comment = "" };
+            numbers.forEach(n => {
+                let all = n.split("/");
+                contact.numbers.push({ number, comment: all[1]});
+            });
+            subList.push(contact);
+        });
+        subList.sort((a, b) => b.name == a.name ? new Date(b.date) - new Date(a.date)  : b.name - a.name);
+        let message = "";
+        subList.forEach(sl => {
+            message = `${message}${sl.name} (${sl.comment})`);
+            sl.numbers.forEach(n => message = `${message}\n${n.number} (${n.comment})`);
+            message = `${message}\n\n`);
+        });
         showData(message);
         showStatus(subList.length, true);
     }
