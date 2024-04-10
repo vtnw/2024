@@ -59,7 +59,8 @@
     const timerTag = "timer";
     const functionTag = "function";
     const contactTag = "contact";
-    const skipTags = `-${linkTag}&-${expenseTag}&-${taskTag}&-${listTag}&-${functionTag}&-${contactTag}`;
+    const diaryTag = "diary";
+    const skipTags = `-${linkTag}&-${expenseTag}&-${taskTag}&-${listTag}&-${functionTag}&-${contactTag}&-${diaryTag}`;
 
     window.addEventListener("load", () => {
         loadNotes();
@@ -125,6 +126,11 @@
             case ".note": {
                 showStatus(action);
                 doNote(content);
+                break;
+            }
+            case ".log": {
+                showStatus(action);
+                doLog(content);
                 break;
             }
             case ".clear": {
@@ -347,6 +353,12 @@
     }
 
     doNote = (content) => {
+        content = convertFilter(content);
+        let filter = `tag:${skipTags}+${!content ? "recent:1m" : content}`;
+        showNotes(filterData(filter));
+    }
+
+    doLog = (content) => {
         content = convertFilter(content);
         showNotes(filterData(!content ? "recent:1m" : content));
     }
