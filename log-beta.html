@@ -842,28 +842,26 @@
     showContacts = (list) => {
         let subList = [];
         list.forEach(l => {
-            let name = l.text.split("+")[0];
             let numbers = l.text.match(/\+[0-9a-z/]+/g) || ["?"];
-            let categories = l.text.match(/![a-z0-9-]+/g) || [];
-            let category = categories.length > 0 ? categories[0].substring(1) : contactTag;
-            let context = l.text.replace(/\+[0-9a-z/]+/g, "").replace(/![a-z0-9-]+/g, "").replace(/#[a-z0-9-]+/g, "").replace(name, "");
-            let all = name.split("/");
-            name = all[0] ? all[0].trim() : "?";
-            let comment = all.length > 1 && all[1] ? all[1].trim() : ""
-            let contact = { date: l.date, name, comment, category, numbers: [], context };
+            let categories = l.text.match(/![a-z0-9-]+/g) || [`#${contactTag}`];
+            let category = categories[0].substring(1);
+            let rest = l.text.replace(/\+[0-9a-z/]+/g, "").replace(/![a-z0-9-]+/g, "").replace(/#[a-z0-9-]+/g, "");
+            let all = name.split("^");
+            let name = all[0] ? all[0].trim() : "?";
+            let context = all.length > 1 && all[1] ? all[1].trim() : ""
+            let contact = { date: l.date, name, category, numbers: [], context };
             numbers.forEach(n => {
                 all = n.split("/");
                 comment = all.length > 1 ? all[1] : "";
-                contact.numbers.push({ number: all[0], comment});
+                contact.numbers.push({ number: all[0], comment });
             });
-            numbers
             subList.push(contact);
         });
         subList.sort((a, b) => b.name == a.name ? new Date(b.date) - new Date(a.date)  : a.name.localeCompare(b.name));
         let message = "";
         let wrap = (text) => !text ? "" : ` (${text})`;
         subList.forEach(sl => {
-            message = `${message}\n${sl.name}${wrap(sl.comment)}`;
+            message = `${message}\n${sl.name}`;
             sl.numbers.forEach(n => message = `${message}\n${n.number}${wrap(n.comment)}`);
             message = !sl.context ? `${message}\n\n` : `${message}\n${sl.context}\n\n`;
         });
