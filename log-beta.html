@@ -440,12 +440,16 @@
     }
 
     doCopy = (content) => {
-        if (!content) {
+        if (!content && !lastAdd) {
             showStatus("failed", true);
             return;
         }
 
-        content = convertFilter(content);
+        content = convertFilter(content);        
+        if (!content) {
+            content = `text:${lastAdd}`;
+        }
+
         let toCopy = filterData(content);
         if (toCopy.length != 1) {
             showStatus("failed", true);
@@ -847,7 +851,7 @@
             let category = categories[0].substring(1);
             let rest = l.text.replace(/\+[0-9a-z/]+/g, "").replace(/![a-z0-9-]+/g, "").replace(/#[a-z0-9-]+/g, "");
             let all = rest.split("^");
-            let name = all[0] ? all[0].trim() : "?";
+            let name = all[0].trim() ? all[0].trim() : "?";
             let context = all.length > 1 && all[1] ? all[1].trim() : ""
             let contact = { date: l.date, name, category, numbers: [], context };
             numbers.forEach(n => {
@@ -863,7 +867,7 @@
         subList.forEach(sl => {
             message = `${message}\n${sl.name}`;
             sl.numbers.forEach(n => message = `${message}\n${n.number}${wrap(n.comment)}`);
-            message = !sl.context ? `${message}\n\n` : `${message}\n${sl.context}\n\n`;
+            message = !sl.context ? `${message}\n\n` : `${message}\n~ ${sl.context}\n\n`;
         });
         showData(message);
         showStatus(subList.length, true);
