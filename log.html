@@ -58,7 +58,8 @@
     const expenseTag = "expense";
     const timerTag = "timer";
     const functionTag = "function";
-    const skipTags = `-${linkTag}&-${expenseTag}&-${taskTag}&-${listTag}&-${functionTag}`;
+    const contactTag = "contact";
+    const skipTags = `-${linkTag}&-${expenseTag}&-${taskTag}&-${listTag}&-${functionTag}&-${contactTag}`;
 
     window.addEventListener("load", () => {
         loadNotes();
@@ -226,6 +227,11 @@
                 doFunction(content);
                 break;
             }
+            case ".contact": {
+                showStatus(action);
+                doContact(content);
+                break;
+            }
             default: {
                 showStatus(`${action} - failed`);
             }
@@ -333,6 +339,11 @@
     doTask = (content) => {
         content = convertFilter(content);
         showTasks(filterData(`tag:${taskTag}&-${hiddenTag}+${content}`));
+    }
+
+    doContact = (content) => {
+        content = convertFilter(content);
+        showContacts(filterData(`tag:${contactTag}&-${hiddenTag}+${content}`));
     }
 
     doNote = (content) => {
@@ -824,6 +835,36 @@
             message = `${message}${formatMilliSeconds(l.duration)} ${l.text}\n`;
         });
         
+        showData(message);
+        showStatus(subList.length, true);
+    }
+
+    showContacts = (list) => {
+        let subList = [];
+        list.forEach(l => {
+            let numbers = l.text.match(/\+[0-9a-z/]+/g) || ["?"];
+            let categories = l.text.match(/![a-z0-9-]+/g);
+            let category = (categories || []).length > 0 ? categories[0].substring(1) : contactTag;
+            let name = l.text.replace(/\+[0-9a-z/]+/g, "").replace(/![a-z0-9-]+/g, "").replace(/#[a-z0-9-]+/g, "");
+            let all = !name || !name.trim() ? ["?"] : name.split("/");
+            let comment = all.length > 1 ? all[1].trim() : "";
+            let contact = { date: l.date, name: all[0], comment, category, numbers: [] };
+            numbers.forEach(n => {
+                all = n.split("/");
+                comment = all.length > 1 ? all[1] : "";
+                contact.numbers.push({ number: all[0], comment});
+            });
+            numbers
+            subList.push(contact);
+        });
+        subList.sort((a, b) => b.name == a.name ? new Date(b.date) - new Date(a.date)  : a.name.localeCompare(b.name));
+        let message = "";
+        let wrap = (text) => !text ? "" : ` (${text})`;
+        subList.forEach(sl => {
+            message = `${message}${sl.name}${wrap(sl.comment)}`;
+            sl.numbers.forEach(n => message = `${message}\n${n.number}${wrap(n.comment)}`);
+            message = `${message}\n\n`;
+        });
         showData(message);
         showStatus(subList.length, true);
     }
