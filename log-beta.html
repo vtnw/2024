@@ -857,7 +857,7 @@
             numbers
             subList.push(contact);
         });
-        subList.sort((a, b) => b.name == a.name ? new Date(b.date) - new Date(a.date)  : b.name - a.name);
+        subList.sort((a, b) => b.name == a.name ? new Date(b.date) - new Date(a.date)  : a.name.localeCompare(b.name));
         let message = "";
         let wrap = (text) => !text ? "" : ` (${text})`;
         subList.forEach(sl => {
