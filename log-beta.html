@@ -300,14 +300,14 @@
         let date = new Date();
         let calendar = "";
         if (content.indexOf("&") > 0) {
-            content.split("&").forEach(m => calendar = `${calendar}${getCalendar(new Date(date.getFullYear(), m-1, 1))}\n\n\n`);
+            content.split("&").forEach(m => calendar = `${calendar}${getCalendar(new Date(date.getFullYear(), m-1, 1), eventTag)}\n\n\n`);
         } else if (content.length == 1 || content.length == 2) { 
             date.setMonth(parseInt(content)-1);
-            calendar = getCalendar(date);
+            calendar = getCalendar(date, eventTag);
         } else if (content.length == 4) {
             [0,1,2,3,4,5,6,7,8.9,10,11].forEach(m => calendar = `${calendar}${getCalendar(new Date(parseInt(content), m, 1))}\n\n\n`);
         } else {
-            calendar = getCalendar(date);
+            calendar = getCalendar(date, eventTag);
         }
 
         showData(calendar, append, "\n");
@@ -925,16 +925,25 @@
         return `${Math.floor(s/3600).toString().padStart(2,"0")}:${Math.floor(s%3600/60).toString().padStart(2,"0")}:${Math.floor(s%60).toString().padStart(2,"0")}`;
     }
 
-    getCalendar = (date) => {
+    getCalendar = (date, tag = "") => {
         let title = date.toLocaleString("default", { month: "long", year: "numeric"});
         let columns = "mon tue wed thu fri sat sun";
         let day = date.getDay();
         let start = new Date(date.getFullYear(), date.getMonth(), 1);
         let end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+        let events = !tag ? filterData(`tag:${tag}+date:${start}-${end}`) : [];
 
         let lines = "\xA0\xA0\xA0\xA0".repeat(start.getDay() == 0 ? 6 : start.getDay()-1);
         for (let d = start; d <= end; d.setDate(d.getDate() + 1)) {
-            let mark = isoToString(new Date()) == isoToString(d) ? "`" : "\xA0";
+            let currDate = isoToString(d);
+            let mark = "\xA0";
+            if (events.some(e => isoToString(e.date) == currDate)) {
+                mark = "`";
+            }
+            else if (currDate == isoToString(new Date())) {
+                mark = "°";
+            }
+            
             lines = `${lines}${d.getDate().toString().padStart(3, "\xA0").padEnd(4, mark)}${d.getDay() == 0 ? "\n\n" : ""}`;
         }
 
