@@ -949,10 +949,10 @@
         let evMessage = "";
         events.forEach(e => {
             let number = new Date(e.date).getDate().toString().padStart(3, " ");
-            evMessage = `${evMessage}${number} - ${e.text.replace(/![a-z0-9-]+/g, "").replace(/#[a-z0-9-]+/g, "")}\n`;
+            evMessage = `${evMessage}${number} - ${e.text.replace(/![a-z0-9-]+/g, "").replace(/#[a-z0-9-]+/g, "").replace(/@[a-z0-9-]+/g, "")}\n`;
         });
 
-        return `[${title}]\n\n${columns}\n\n${lines}\n${evMessage}`;
+        return `[${title}]\n\n${columns}\n\n${lines}\n\n${evMessage}`;
     }
 
     extractDate = (text) => {
