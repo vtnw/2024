@@ -355,7 +355,7 @@
 
     doEvent = (content) => {
         content = convertFilter(content);
-        showEvents(filterData(`tag:${eventTag}&-${hiddenTag}+${content}`));
+        showTasks(filterData(`tag:${eventTag}&-${hiddenTag}+${content}`));
     }
 
     doContact = (content) => {
@@ -795,9 +795,6 @@
         showStatus(list.length, true);
     }
 
-    showEvents = (list) => {
-    }
-
     showTasks = (list) => {
         let subList = [];
         let currDate = new Date();
@@ -805,7 +802,7 @@
         list.sort((a, b) => new Date(a.date) - new Date(b.date));
         list.forEach(l => {
             let names = l.text.match(/![a-z0-9-]+/g);
-            let name = (names || []).length > 0 ? names[0].substring(1) : taskTag;
+            let name = (names || []).length > 0 ? names[0].substring(1) : "";
             let item = l.text.replace(/![a-z0-9-]+/g, "").replace(/#[a-z0-9-]+/g, "").replace(/@\S+/g, "");
             let date = isoToString(l.date);
             let matchingDate = subList.find(sl => sl.date == date);
