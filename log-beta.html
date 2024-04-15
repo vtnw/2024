@@ -60,6 +60,7 @@
     const functionTag = "function";
     const contactTag = "contact";
     const diaryTag = "diary";
+    const eventTag = "diary";
     const skipTags = `-${linkTag}&-${expenseTag}&-${taskTag}&-${listTag}&-${functionTag}&-${contactTag}&-${diaryTag}`;
 
     window.addEventListener("load", () => {
@@ -238,6 +239,11 @@
                 doContact(content);
                 break;
             }
+            case ".event": {
+                showStatus(action);
+                doEvent(content);
+                break;
+            }
             default: {
                 showStatus(`${action} - failed`);
             }
@@ -345,6 +351,11 @@
     doTask = (content) => {
         content = convertFilter(content);
         showTasks(filterData(`tag:${taskTag}&-${hiddenTag}+${content}`));
+    }
+
+    doEvent = (content) => {
+        content = convertFilter(content);
+        showEvents(filterData(`tag:${eventTag}&-${hiddenTag}+${content}`));
     }
 
     doContact = (content) => {
@@ -782,6 +793,9 @@
         subList.forEach(sl => message = `${message}[${sl.name}]\n\n${sl.item}\n\n`);
         showData(message);
         showStatus(list.length, true);
+    }
+
+    showEvents = (list) => {
     }
 
     showTasks = (list) => {
