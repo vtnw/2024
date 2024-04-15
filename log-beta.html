@@ -937,17 +937,21 @@
         for (let d = start; d <= end; d.setDate(d.getDate() + 1)) {
             let currDate = isoToString(d);
             let mark = "\xA0";
-            if (events.some(e => isoToString(e.date) == currDate)) {
-                mark = "`";
-            }
-            else if (currDate == isoToString(new Date())) {
+            if (currDate == isoToString(new Date())) {
                 mark = "°";
+            } else if (events.some(e => isoToString(e.date) == currDate)) {
+                mark = "`";
             }
             
             lines = `${lines}${d.getDate().toString().padStart(3, "\xA0").padEnd(4, mark)}${d.getDay() == 0 ? "\n\n" : ""}`;
         }
 
-        return `[${title}]\n\n${columns}\n\n${lines}`;
+        let evMessage = "";
+        events.forEach(e => {
+            evMessage = `${evMessage}${new Date(e.date).date} - ${e.text.replace(/![a-z0-9-]+/g, "").replace(/#[a-z0-9-]+/g, "")}\n`;
+        });
+
+        return `[${title}]\n\n${columns}\n\n${lines}\n${evMessage}`;
     }
 
     extractDate = (text) => {
