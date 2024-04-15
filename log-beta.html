@@ -943,7 +943,7 @@
                 mark = "`";
             }
             
-            lines = `${lines}${d.getDate().toString().padStart(3, "\xA0").padEnd(4, mark)}${d.getDay() == 0 ? "\n\n" : ""}`;
+            lines = `${lines}${d.getDate().toString().padStart(3, "\xA0").padEnd(4, mark)}${d.getDay() == 0 && d != end ? "\n\n" : ""}`;
         }
 
         let evMessage = "";
