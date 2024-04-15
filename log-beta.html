@@ -948,7 +948,7 @@
 
         let evMessage = "";
         events.forEach(e => {
-            let number = new Date(isoToString(e.date)).date.toString().padStart(3, " ");
+            let number = new Date(e.date).getDate().toString().padStart(3, " ");
             evMessage = `${evMessage}${number} - ${e.text.replace(/![a-z0-9-]+/g, "").replace(/#[a-z0-9-]+/g, "")}\n`;
         });
 
