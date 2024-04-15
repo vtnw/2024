@@ -931,7 +931,7 @@
         let day = date.getDay();
         let start = new Date(date.getFullYear(), date.getMonth(), 1);
         let end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-        let events = !!tag ? filterData(`tag:${tag}+date:${isoToString(start)}-${isoToString((end)}`) : [];
+        let events = !!tag ? filterData(`tag:${tag}+date:${isoToString(start)}-${isoToString(end)}`) : [];
 
         let lines = "\xA0\xA0\xA0\xA0".repeat(start.getDay() == 0 ? 6 : start.getDay()-1);
         for (let d = start; d <= end; d.setDate(d.getDate() + 1)) {
