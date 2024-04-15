@@ -947,9 +947,9 @@
         }
 
         let evMessage = "";
-        events.sort((a, b) => a.date - b.date);
+        events.sort((a, b) => new Date(a.date) - new Date(b.date));
         events.forEach(e => {
-            let number = new Date(e.date).getDate().toString().padStart(4, "\xA0");
+            let number = new Date(e.date).getDate().toString().padStart(3, "\xA0");
             evMessage = `${evMessage}${number} - ${e.text.replace(/![a-z0-9-]+/g, "").replace(/#[a-z0-9-]+/g, "").replace(/@\S+/g, "")}\n`;
         });
 
