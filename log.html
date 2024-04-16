@@ -221,7 +221,7 @@
             }
             case ".today": {
                 showStatus(action);
-                doToday();
+                doToday(content);
                 break;
             }
             case ".calculate": {
@@ -291,9 +291,17 @@
         showStatus("done", true);
     }
 
-    doToday = () => {
-        doTask("recent:30d");        
-        doCalendar(`${new Date().getMonth() + 1}`, true);
+    doToday = (content) => {
+        let date = new Date();
+        if (!content) {
+            content = "recent:30d";
+        } else {
+            date = extractDate(content);
+            content = `date:${isoToString(date)}`;
+        }
+        
+        doTask(content);        
+        doCalendar(`${date.getMonth() + 1}`, true);
     }
 
     doCalendar = (content, append = false) => {
@@ -305,7 +313,7 @@
             date.setMonth(parseInt(content)-1);
             calendar = getCalendar(date, eventTag);
         } else if (content.length == 4) {
-            [0,1,2,3,4,5,6,7,8.9,10,11].forEach(m => calendar = `${calendar}${getCalendar(new Date(parseInt(content), m, 1), eventTag)}\n\n`);
+            [0,1,2,3,4,5,6,7,8,9,10,11].forEach(m => calendar = `${calendar}${getCalendar(new Date(parseInt(content), m, 1), eventTag)}\n\n`);
         } else {
             calendar = getCalendar(date, eventTag);
         }
