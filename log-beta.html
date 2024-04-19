@@ -840,22 +840,34 @@
         list.sort((a, b) => new Date(a.date) - new Date(b.date));
         let subList = [];
         let start = null;
+        let prev = null;
         list.forEach(l => {
             if (l.text.match(/!start/g)) {
                 start = l;
+                prev = l;
+                let startText = start.text.replace(/!start/g, "").replace(/#[a-z0-9-]+/g, "").trim();
+                subList.push({ date: l.date, duration: 0, text: startText });
                 return;
             }
-
+            
             if (l.text.match(/!stop/g) && !!start) {
-                let startText = start.text.replace(/!start/g, "").replace(/#[a-z0-9-]+/g, "").trim();
                 let stopText = l.text.replace(/!stop/g, "").replace(/#[a-z0-9-]+/g, "").trim();
-                subList.push({ date: l.date, duration: new Date(l.date)-new Date(start.date), text: !!startText ? startText : stopText });
+                subList.push({ date: l.date, duration: new Date(l.date)-new Date(start.date), text: stopText });
                 start = null;
-            }            
+                prev = null;
+                return;
+            }
+            
+            (!!start) {
+                let text = l.text.replace(/#[a-z0-9-]+/g, "").trim();
+                subList.push({ date: l.date, duration: new Date(l.date)-new Date(prev.date), text });
+                prev = l;
+            }
         });
 
-        if (!!start) {
-            subList.push({ date: new Date(), duration: new Date()-new Date(start.date), text: start.text.replace(/!start/g, "").replace(/#[a-z0-9-]+/g, "").trim() });
+        if (!!prev) {
+            let text = l.text.replace(/!start/g, "").replace(/#[a-z0-9-]+/g, "").trim();
+            subList.push({ date: new Date(), duration: new Date()-new Date(prev.date), text });
         }
 
         let message = "";
