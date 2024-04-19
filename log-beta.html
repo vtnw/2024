@@ -846,12 +846,14 @@
                 start = l;
                 prev = l;
                 let startText = start.text.replace(/!start/g, "").replace(/#[a-z0-9-]+/g, "").trim();
+                startText = !!startText ? `${startText} !start` : "!start";
                 subList.push({ date: l.date, duration: 0, text: startText });
                 return;
             }
             
             if (l.text.match(/!stop/g) && !!start) {
                 let stopText = l.text.replace(/!stop/g, "").replace(/#[a-z0-9-]+/g, "").trim();
+                stopText = !!stopText ? `${stopText} !start` : "!stop";
                 subList.push({ date: l.date, duration: new Date(l.date)-new Date(start.date), text: stopText });
                 start = null;
                 prev = null;
@@ -878,7 +880,7 @@
                 message = `${message}${!!currDate ? "\n" : ""}[${isoToString(l.date)}]\n\n`;
                 currDate = isoToString(l.date);
             }
-            
+
             message = `${message}${formatMilliSeconds(l.duration)} ${l.text}\n`;
         });
         
