@@ -853,7 +853,7 @@
             
             if (l.text.match(/!stop/g) && !!start) {
                 let stopText = l.text.replace(/!stop/g, "").replace(/#[a-z0-9-]+/g, "").trim();
-                stopText = !!stopText ? `${stopText} !start` : "!stop";
+                stopText = !!stopText ? `${stopText} !stop` : "!stop";
                 subList.push({ date: l.date, duration: new Date(l.date)-new Date(start.date), text: stopText });
                 start = null;
                 prev = null;
