@@ -858,7 +858,7 @@
                 return;
             }
             
-            (!!start) {
+            if (!!start) {
                 let text = l.text.replace(/#[a-z0-9-]+/g, "").trim();
                 subList.push({ date: l.date, duration: new Date(l.date)-new Date(prev.date), text });
                 prev = l;
