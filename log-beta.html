@@ -970,7 +970,7 @@
         }
 
         let evMessage = "";
-        events = events.filter(e => new Date(isoToString(e.date)) >= date);
+        events = events.filter(e => new Date(isoToString(e.date)) >= new Date(date.getFullYear(), date.getMonth(), date.getDate()));
         events.sort((a, b) => new Date(a.date) - new Date(b.date));
         events.forEach(e => {
             let number = new Date(e.date).getDate().toString().padStart(2, "\xA0");
