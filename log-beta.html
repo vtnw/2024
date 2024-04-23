@@ -301,7 +301,7 @@
         }
         
         doTask(content);        
-        doCalendar(`@${isoToString(date)}`);
+        doCalendar(`@${isoToString(date)}`, true);
     }
 
     doCalendar = (content, append = false) => {
@@ -320,7 +320,7 @@
             calendar = getCalendar(date, eventTag);
         }
 
-        showData(calendar, append, "\n");
+        showData(calendar, append, "");
 
         if (!append) {
             showStatus("done", true);
