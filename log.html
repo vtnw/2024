@@ -61,7 +61,7 @@
     const contactTag = "contact";
     const diaryTag = "diary";
     const eventTag = "event";
-    const skipTags = `-${linkTag}&-${expenseTag}&-${taskTag}&-${listTag}&-${functionTag}&-${contactTag}&-${diaryTag}&-${eventTag}`;
+    const skipTags = `-${linkTag}&-${expenseTag}&-${taskTag}&-${listTag}&-${functionTag}&-${contactTag}&-${diaryTag}&-${eventTag}&-${timerTag}`;
 
     window.addEventListener("load", () => {
         loadNotes();
@@ -301,7 +301,7 @@
         }
         
         doTask(content);        
-        doCalendar(`${date.getMonth() + 1}`, true);
+        doCalendar(`@${isoToString(date)}`, true);
     }
 
     doCalendar = (content, append = false) => {
@@ -310,11 +310,13 @@
         if (content.indexOf("&") > 0) {
             content.split("&").forEach(m => calendar = `${calendar}${getCalendar(new Date(date.getFullYear(), m-1, 1), eventTag)}\n\n`);
         } else if (content.length == 1 || content.length == 2) { 
+            date.setDate(1);
             date.setMonth(parseInt(content)-1);
             calendar = getCalendar(date, eventTag);
         } else if (content.length == 4) {
             [0,1,2,3,4,5,6,7,8,9,10,11].forEach(m => calendar = `${calendar}${getCalendar(new Date(parseInt(content), m, 1), eventTag)}\n\n`);
         } else {
+            date = extractDate(content);
             calendar = getCalendar(date, eventTag);
         }
 
@@ -832,6 +834,7 @@
             });
             message = `${message}\n`;
         });
+        message = message.length > 0 ? message.substring(0, message.length - 1) : message;
         showData(message);
         showStatus(list.length, true);
     }
@@ -840,22 +843,36 @@
         list.sort((a, b) => new Date(a.date) - new Date(b.date));
         let subList = [];
         let start = null;
+        let prev = null;
         list.forEach(l => {
             if (l.text.match(/!start/g)) {
                 start = l;
+                prev = l;
+                let startText = start.text.replace(/!start/g, "").replace(/#[a-z0-9-]+/g, "").trim();
+                startText = !!startText ? `${startText} !start` : "!start";
+                subList.push({ date: l.date, duration: 0, text: startText });
                 return;
             }
-
+            
             if (l.text.match(/!stop/g) && !!start) {
-                let startText = start.text.replace(/!start/g, "").replace(/#[a-z0-9-]+/g, "").trim();
                 let stopText = l.text.replace(/!stop/g, "").replace(/#[a-z0-9-]+/g, "").trim();
-                subList.push({ date: l.date, duration: new Date(l.date)-new Date(start.date), text: !!startText ? startText : stopText });
+                stopText = !!stopText ? `${stopText} !stop` : "!stop";
+                subList.push({ date: l.date, duration: new Date(l.date)-new Date(start.date), text: stopText });
                 start = null;
-            }            
+                prev = null;
+                return;
+            }
+            
+            if (!!start) {
+                let text = l.text.replace(/#[a-z0-9-]+/g, "").trim();
+                subList.push({ date: l.date, duration: new Date(l.date)-new Date(prev.date), text });
+                prev = l;
+            }
         });
 
-        if (!!start) {
-            subList.push({ date: new Date(), duration: new Date()-new Date(start.date), text: start.text.replace(/!start/g, "").replace(/#[a-z0-9-]+/g, "").trim() });
+        if (!!prev) {
+            let text = l.text.replace(/!start/g, "").replace(/#[a-z0-9-]+/g, "").trim();
+            subList.push({ date: new Date(), duration: new Date()-new Date(prev.date), text });
         }
 
         let message = "";
@@ -866,7 +883,7 @@
                 message = `${message}${!!currDate ? "\n" : ""}[${isoToString(l.date)}]\n\n`;
                 currDate = isoToString(l.date);
             }
-            
+
             message = `${message}${formatMilliSeconds(l.duration)} ${l.text}\n`;
         });
         
@@ -915,8 +932,12 @@
         a.click();
     }
 
-    showData = (text, append = false, splitter = "") => document.getElementById("dv").innerText = `${append ? document.getElementById("dv").innerText + splitter : ""}${text}`;
-
+    showData = (text, append = false, splitter = "") => {
+        let existing = document.getElementById("dv").innerText;
+        let newContent = append && !!existing ? `${splitter}${text}` : text;
+        document.getElementById("dv").innerText = append ? `${existing}${newContent}` : text;
+    }
+    
     showStatus = (text, append, splitter = " - ") => document.getElementById("spn").innerText = `${append ? document.getElementById("spn").innerText + splitter : ""}${text}`;
 
     saveNotes = () => localStorage.setItem("notes", JSON.stringify(notes));
@@ -955,6 +976,7 @@
         }
 
         let evMessage = "";
+        events = events.filter(e => new Date(isoToString(e.date)) >= new Date(date.getFullYear(), date.getMonth(), date.getDate()));
         events.sort((a, b) => new Date(a.date) - new Date(b.date));
         events.forEach(e => {
             let number = new Date(e.date).getDate().toString().padStart(2, "\xA0");
