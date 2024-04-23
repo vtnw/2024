@@ -834,7 +834,7 @@
             });
             message = `${message}\n`;
         });
-        message = message.length > 0 ? message.substring(message.length - 1);
+        message = message.length > 0 ? message.substring(0, message.length - 1);
         showData(message);
         showStatus(list.length, true);
     }
