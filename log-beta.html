@@ -301,7 +301,7 @@
         }
         
         doTask(content);        
-        doCalendar(isoToString(date), true);
+        doCalendar(`@${isoToString(date)}`, true);
     }
 
     doCalendar = (content, append = false) => {
@@ -316,6 +316,7 @@
         } else if (content.length == 4) {
             [0,1,2,3,4,5,6,7,8,9,10,11].forEach(m => calendar = `${calendar}${getCalendar(new Date(parseInt(content), m, 1), eventTag)}\n\n`);
         } else {
+            date = extractDate(content);
             calendar = getCalendar(date, eventTag);
         }
 
