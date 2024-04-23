@@ -935,7 +935,7 @@
     showData = (text, append = false, splitter = "") => {
         let existing = document.getElementById("dv").innerText;
         let newContent = append && !!existing ? `${text}${splitter}` : text;
-        document.getElementById("dv").innerText = append ? `${newContent}${existing}` : text;
+        document.getElementById("dv").innerText = append ? `${existing}${newContent}` : text;
     }
     
     showStatus = (text, append, splitter = " - ") => document.getElementById("spn").innerText = `${append ? document.getElementById("spn").innerText + splitter : ""}${text}`;
