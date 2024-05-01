@@ -160,7 +160,13 @@ bindCategories = () => {
 
     dvNames.innerText = "";
     names.forEach(n => {
-        addDiv(dvNames, n, "name-selected", null);
+        addDiv(dvNames, n, "name-selected", (event) => {
+            let index = names.indexOf(event.target.innerText);
+            names.splice(index);
+            name = names.length > 0 ? names.at(-1) : null;
+            names = [];
+            bindCategories();
+        });
     });
 
     let currNames = categories.filter(c => names.length === 0 && c.parent === tag && c.type === "name");
