@@ -17,8 +17,9 @@ let tbName = document.getElementById("tbName");
 let tb = document.getElementById("tb");
 let btnAdd = document.getElementById("btnAdd");
 let btnSearch = document.getElementById("btnSearch");
-let btnGo = document.getElementById("btnGo");
-let btnClear = document.getElementById("btnClear");
+let btnEdit = document.getElementById("btnEdit");
+let btnCopy = document.getElementById("btnCopy");
+let btnHide = document.getElementById("btnHide");
 
 window.addEventListener("load", () => {
     initializeDates();
@@ -46,7 +47,7 @@ btnAdd.addEventListener("click", (event) => {
     let command = "";
     tags.forEach(t => command = `${command} #${t}`);
     names.forEach(n => command = `${command} !${n}`);
-    if (!tb.innerText) {
+    if (!!tb.innerText) {
         command = `${command} ${tb.innerText.trim()}`;
     }
 
@@ -55,25 +56,63 @@ btnAdd.addEventListener("click", (event) => {
         command = `${command} @${date}`
     }
 
-    command = `.add ${command.trim()}`;
+    command = `${command.trim()}`;
     processData(command);
-});
-
-btnGo.addEventListener("click", (event) => {
-    editDiv(false);
-    processData(tb.innerText.trim());
 });
 
 btnSearch.addEventListener("click", (event) => {
     editDiv(false);
-
     if (tags.length === 0) {
         return;
     }
 
-    let command = "";
-    command = `.${tags[0]}`;
-    let tagFilter = tags.filter(t => t !== tags[0]).join("&");
+    let command = `.${tags[0]}`;
+    let filter = getFilter(tags[0]);
+    if (!!filter) {
+        command = `${command} ${filter}`;    
+    }
+
+    processData(command);
+});
+
+btnEdit.addEventListener("click", (event) => {
+    editDiv(false);
+
+    let command = `.edit`;
+    let filter = getFilter("");
+    if (!!filter) {
+        command = `${command} ${filter}`;    
+    }
+
+    processData(command);
+});
+
+btnCopy.addEventListener("click", (event) => {
+    editDiv(false);
+
+    let command = `.copy`;
+    let filter = getFilter("");
+    if (!!filter) {
+        command = `${command} ${filter}`;    
+    }
+
+    processData(command);
+});
+
+btnHide.addEventListener("click", (event) => {
+    editDiv(false);
+
+    let command = `.hide`;
+    let filter = getFilter("");
+    if (!!filter) {
+        command = `${command} ${filter}`;    
+    }
+
+    processData(command);
+});
+
+getFilter = (skipTag) => {
+    let tagFilter = tags.filter(t => t !== skipTag).join("&");
     let nameFilter = names.join("&");
     let textFilter = tb.innerText ? tb.innerText.trim() : "";
     let dateFilter = !!year && !!month && !!day ? isoToString(new Date(`${day}-${month}-${year}`)) : "";
@@ -83,29 +122,8 @@ btnSearch.addEventListener("click", (event) => {
     if (!!nameFilter) filters.push(`!${nameFilter}`);
     if (!!textFilter) filters.push(textFilter);
     if (!!dateFilter) filters.push(`@${dateFilter}`);
-    let filter = filters.join("+").trim();
-
-    if (!!filter) {
-        command = `${command} ${filter}`;    
-    }
-
-    processData(command);
-});
-
-btnClear.addEventListener("click", (event) => {
-    editDiv(false);
-    tags = [];
-    names = [];
-    tag = null;
-    name = null;
-    year = null;
-    month = null;
-    week = null;
-    day = null;
-    bindDates();
-    bindCategories();
-    tb.innerText = "";
-});
+    return filters.join("+").trim();
+}
 
 addCategory = (parent, type, text) => {
     categories.push({
