@@ -213,7 +213,7 @@ doFunction = (content) => {
     }
 
     let all = content.split(" ");
-    let functionName = all[0];
+    let functionName = all[0].replace("!", "");
     showStatus(functionName, true, " ")
     
     let param = content.substring(functionName.length + 1).trim();        
