@@ -20,6 +20,8 @@ let btnSearch = document.getElementById("btnSearch");
 let btnClear = document.getElementById("btnClear");
 
 window.addEventListener("load", () => {
+    categories = [];
+    saveCategories();
     initializeDates();
     loadCategories();
     bindCategories();
