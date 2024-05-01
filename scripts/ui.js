@@ -17,11 +17,10 @@ let tbName = document.getElementById("tbName");
 let tb = document.getElementById("tb");
 let btnAdd = document.getElementById("btnAdd");
 let btnSearch = document.getElementById("btnSearch");
+let btnGo = document.getElementById("btnGo");
 let btnClear = document.getElementById("btnClear");
 
 window.addEventListener("load", () => {
-    categories = [];
-    saveCategories();
     initializeDates();
     loadCategories();
     bindCategories();
@@ -29,14 +28,14 @@ window.addEventListener("load", () => {
 });
 
 tbTag.addEventListener("keyup", (event) => {
-    if (event.key === "Enter") {
+    if (event.key === "Enter" && !!tbTag.value && !!tbTag.value.trim()) {
         addCategory(tag, "tag", tbTag.value);
         tbTag.value = "";
     }
 });
 
 tbName.addEventListener("keyup", (event) => {
-    if (event.key === "Enter") {
+    if (event.key === "Enter" && !!tbName.value && !!tbName.value.trim()) {
         addCategory(tag, "name", tbName.value);
         tbName.value = "";
     }
@@ -45,20 +44,52 @@ tbName.addEventListener("keyup", (event) => {
 btnAdd.addEventListener("click", (event) => {
     editDiv(false);
     let command = "";
-    tags.forEach(t => command = ` ${command} #${t}`);
-    names.forEach(n => command = `${command} !${n} `);
-    command = `.add ${command} ${tb.innerText}`;
+    tags.forEach(t => command = `${command} #${t}`);
+    names.forEach(n => command = `${command} !${n}`);
+    if (!tb.innerText) {
+        command = `${command} ${tb.innerText.trim()}`;
+    }
+
     if (!!year && !!month && !!day) {
         let date = isoToString(new Date(`${day}-${month}-${year}`));
         command = `${command} @${date}`
     }
 
+    command = `.add ${command.trim()}`;
     processData(command);
+});
+
+btnGo.addEventListener("click", (event) => {
+    editDiv(false);
+    processData(tb.innerText.trim());
 });
 
 btnSearch.addEventListener("click", (event) => {
     editDiv(false);
-    processData(tb.innerText);
+
+    if (tags.length === 0) {
+        return;
+    }
+
+    let command = "";
+    command = `.${tags[0]}`;
+    let tagFilter = tags.filter(t => t !== tags[0]).join("&");
+    let nameFilter = names.join("&");
+    let textFilter = tb.innerText ? tb.innerText.trim() : "";
+    let dateFilter = !!year && !!month && !!day ? isoToString(new Date(`${day}-${month}-${year}`)) : "";
+
+    let filters = [];
+    if (!!tagFilter) filters.push(`#${tagFilter}`);
+    if (!!nameFilter) filters.push(`!${nameFilter}`);
+    if (!!textFilter) filters.push(textFilter);
+    if (!!dateFilter) filters.push(`@${dateFilter}`);
+    let filter = filters.join("+").trim();
+
+    if (!!filter) {
+        command = `${command} ${filter}`;    
+    }
+
+    processData(command);
 });
 
 btnClear.addEventListener("click", (event) => {
@@ -71,7 +102,6 @@ btnClear.addEventListener("click", (event) => {
     month = null;
     week = null;
     day = null;
-    initializeDates();
     bindDates();
     bindCategories();
     tb.innerText = "";
