@@ -250,7 +250,7 @@ doToday = (content) => {
     if (!content) {
         content = "recent:30d";
     } else {
-        date = extractDate(content);
+        date = extractDate(content).date;
         content = `date:${isoToString(date)}`;
     }
     
@@ -270,7 +270,7 @@ doCalendar = (content, append = false) => {
     } else if (content.length == 4) {
         [0,1,2,3,4,5,6,7,8,9,10,11].forEach(m => calendar = `${calendar}${getCalendar(new Date(parseInt(content), m, 1), eventTag)}\n\n`);
     } else {
-        date = extractDate(content);
+        date = extractDate(content).date;
         calendar = getCalendar(date, eventTag);
     }
 
@@ -294,7 +294,9 @@ doAdd = (text) => {
 
     let pattern = /#[a-z0-9-]+/g;
     let tags = text.match(pattern);
-    let date = extractDate(text);
+    let extracted = extractDate(text);
+    let date = extracted.date;
+    text = extracted.text;
     if (!(tags || []).some(t => t.length > 0)) {
         tags = [`#${noteTag}`];
         text = `${text} #${noteTag}`;
@@ -1002,7 +1004,7 @@ extractDate = (text) => {
         }
     }
 
-    return date;
+    return { text: !dateString ? text : text.replace(dateString, `@${isoToString(date)}`), date };
 }
 
 convertFilter = (content) => {
