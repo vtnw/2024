@@ -1004,7 +1004,7 @@ extractDate = (text) => {
         }
     }
 
-    return { text: !dateString ? text : text.replace(dateString, `@${isoToString(date)}`), date };
+    return { text: !dateString ? text : text.replace(dateString, isoToString(date)), date };
 }
 
 convertFilter = (content) => {
