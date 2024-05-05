@@ -158,7 +158,9 @@ bindCategories = () => {
         addDiv(dvTags, t.text, t, "tag", (event) => {
             tag = JSON.parse(event.target.dataset.category);
             tags.push(tag);
-            selectedTags.push(tag.text);
+            if (!selectedTags.includes(tag.text)) {
+                selectedTags.push(tag.text);
+            }
             names = [];
             bindCategories();
             bindFilters();
@@ -182,7 +184,9 @@ bindCategories = () => {
         addDiv(dvNames, n.text, n, "name", (event) => {
             name = JSON.parse(event.target.dataset.category);
             names = [name];
-            selectedNames.push(name.text);
+            if (!selectedNames.includes(tag.text)) {
+                selectedNames.push(name.text);
+            }
             bindCategories();
             bindFilters();
         });
