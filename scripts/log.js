@@ -212,7 +212,7 @@ doFunction = (content) => {
         return;
     }
 
-    let all = content.split(" ");
+    let all = content.split("+");
     let functionName = all[0].replace("!", "");
     showStatus(functionName, true, " ")
     
