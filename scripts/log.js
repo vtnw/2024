@@ -304,8 +304,8 @@ doAdd = (text) => {
 
     notes.push({ date: date, tags: tags, text: text });
     saveNotes();
-    let tagList = tags.map(t => t.substring(1)).join("&");
-    showNotes(filterData(`.filter recent:1m+tag:${tagList[0]}`));
+    let tagList = tags.map(t => t.substring(1)).join("|");
+    showNotes(filterData(`.filter recent:1m+tag:${tagList}`));
     lastAdd = text;
 }
 
