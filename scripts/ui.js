@@ -1,17 +1,21 @@
 let categories = [];
 let tags = [];
-let tag = null;
+let tag = { id: 0 };
 let names = [];
-let name = null;
+let name = { id: 0 };
 let dates = [];
 let year = null;
 let month = null;
 let week = null;
 let day = null;
+let selectedTags = [];
+let selectedNames = [];
+let selectedDates = [];
 
 let dvTags = document.getElementById("dvTags");
 let dvNames = document.getElementById("dvNames");
 let dvDates = document.getElementById("dvDates");
+let dvFilters = document.getElementById("dvFilters");
 let tbTag = document.getElementById("tbTag");
 let tbName = document.getElementById("tbName");
 let tb = document.getElementById("tb");
@@ -30,14 +34,14 @@ window.addEventListener("load", () => {
 
 tbTag.addEventListener("keyup", (event) => {
     if (event.key === "Enter" && !!tbTag.value && !!tbTag.value.trim()) {
-        addCategory(tag, "tag", tbTag.value);
+        addCategory(tag.id, "tag", tbTag.value);
         tbTag.value = "";
     }
 });
 
 tbName.addEventListener("keyup", (event) => {
     if (event.key === "Enter" && !!tbName.value && !!tbName.value.trim()) {
-        addCategory(tag, "name", tbName.value);
+        addCategory(tag.id, "name", tbName.value);
         tbName.value = "";
     }
 });
@@ -45,15 +49,14 @@ tbName.addEventListener("keyup", (event) => {
 btnAdd.addEventListener("click", (event) => {
     editDiv(false);
     let command = "";
-    tags.forEach(t => command = `${command} #${t}`);
-    names.forEach(n => command = `${command} !${n}`);
+    selectedTags.forEach(t => command = `${command} #${t}`);
+    selectedNames.forEach(n => command = `${command} !${n}`);
     if (!!tb.innerText) {
         command = `${command} ${tb.innerText.trim()}`;
     }
 
-    if (!!year && !!month && !!day) {
-        let date = isoToString(new Date(`${day}-${month}-${year}`));
-        command = `${command} @${date}`
+    if (selectedDates.length > 0) {
+        command = `${command} @${selectedDates[0]}`
     }
 
     command = `${command.trim()}`;
@@ -66,8 +69,8 @@ btnSearch.addEventListener("click", (event) => {
         return;
     }
 
-    let command = `.${tags[0]}`;
-    let filter = getFilter(tags[0]);
+    let command = `.${selectedTags[0]}`;
+    let filter = getFilter(selectedTags[0]);
     if (!!filter) {
         command = `${command} ${filter}`;    
     }
@@ -112,10 +115,10 @@ btnHide.addEventListener("click", (event) => {
 });
 
 getFilter = (skipTag) => {
-    let tagFilter = tags.filter(t => t !== skipTag).join("&");
-    let nameFilter = names.join("&");
+    let tagFilter = selectedTags.filter(t => t !== skipTag).join("&");
+    let nameFilter = selectedNames.join("&");
     let textFilter = tb.innerText ? tb.innerText.trim() : "";
-    let dateFilter = !!year && !!month && !!day ? isoToString(new Date(`${day}-${month}-${year}`)) : "";
+    let dateFilter = selectedDates.join("-");
 
     let filters = [];
     if (!!tagFilter) filters.push(`#${tagFilter}`);
@@ -125,9 +128,10 @@ getFilter = (skipTag) => {
     return filters.join("+").trim();
 }
 
-addCategory = (parent, type, text) => {
+addCategory = (parentId, type, text) => {
     categories.push({
-        parent,
+        id: new Date().getTime(),
+        parentId,
         type,
         text,
     });
@@ -139,108 +143,146 @@ addCategory = (parent, type, text) => {
 bindCategories = () => {
     dvTags.innerText = "";
     tags.forEach(t => {
-        addDiv(dvTags, t, "tag-selected", (event) => {
-            let index = tags.indexOf(event.target.innerText);
+        addDiv(dvTags, t.text, t, "tag-selected", (event) => {
+            let category = JSON.parse(event.target.dataset.category);
+            let index = tags.findIndex(t => t.id === category.id);
             tags.splice(index);
-            tag = tags.length > 0 ? tags.at(-1) : null;
+            tag = tags.length > 0 ? tags.at(-1) : { id: 0};
             names = [];
             bindCategories();
         });
     });
 
-    let currTags = categories.filter(c => c.parent === tag && c.type === "tag");
+    let currTags = categories.filter(c => c.parentId === tag.id && c.type === "tag");
     currTags.forEach(t => {
-        addDiv(dvTags, t.text, "tag", (event) => {
-            tag = event.target.innerText;
-            tags.push(event.target.innerText);
+        addDiv(dvTags, t.text, t, "tag", (event) => {
+            tag = JSON.parse(event.target.dataset.category);
+            tags.push(tag);
+            selectedTags.push(tag.text);
             names = [];
             bindCategories();
+            bindFilters();
         });
     });
 
     dvNames.innerText = "";
     names.forEach(n => {
-        addDiv(dvNames, n, "name-selected", (event) => {
-            let index = names.indexOf(event.target.innerText);
+        addDiv(dvNames, n.text, n, "name-selected", (event) => {
+            let category = JSON.parse(event.target.dataset.category);
+            let index = names.findIndex(n => n.id === category.id);
             names.splice(index);
-            name = names.length > 0 ? names.at(-1) : null;
+            name = names.length > 0 ? names.at(-1) : { id: 0};
             names = [];
             bindCategories();
         });
     });
 
-    let currNames = categories.filter(c => names.length === 0 && c.parent === tag && c.type === "name");
-    currNames.forEach(t => {
-        addDiv(dvNames, t.text, "name", (event) => {
-            name = event.target.innerText;
-            names = [event.target.innerText];
+    let currNames = categories.filter(c => names.length === 0 && c.parentId === tag.id && c.type === "name");
+    currNames.forEach(n => {
+        addDiv(dvNames, n.text, n, "name", (event) => {
+            name = JSON.parse(event.target.dataset.category);
+            names = [name];
+            selectedNames.push(name.text);
             bindCategories();
+            bindFilters();
         });
     });
 }
 
 bindDates = () => {
     dvDates.innerText = "";
-    let dv = null;
 
     if (!year) {
         dates.forEach(y => {
-            addDiv(dvDates, y.name, "date", (event) => {
+            addDiv(dvDates, y.name, null, "date", (event) => {
                 year = event.target.innerText;
+                month = null;
+                week = null;
+                day = null;
                 bindDates();
             });
         });
         return;
     }
 
-    addDiv(dvDates, year, "date-selected", (event) => {
+    addDiv(dvDates, year, null, "date-selected", (event) => {
         year = null;
         bindDates();
     });
 
     if (!month) {
         dates.find(y => y.name == year).months.forEach(m => {
-            addDiv(dvDates, m.name, "date", (event) => {
+            addDiv(dvDates, m.name, null, "date", (event) => {
                 month = event.target.innerText;
+                week = null;
+                day = null;
                 bindDates();
             });
         });
         return;
     }
         
-    addDiv(dvDates, month, "date-selected", (event) => {
+    addDiv(dvDates, month, null, "date-selected", (event) => {
         month = null;
         bindDates();
     });
 
     if (!week) {
         dates.find(y => y.name == year).months.find(m => m.name == month).weeks.forEach(w => {
-            addDiv(dvDates, w.name, "date", (event) => {
+            addDiv(dvDates, w.name, null, "date", (event) => {
                 week = event.target.innerText;
+                day = null;
                 bindDates();
             });
         });
         return;
     }
 
-    addDiv(dvDates, week, "date-selected", (event) => {
+    addDiv(dvDates, week, null, "date-selected", (event) => {
         week = null;
         bindDates();
     });
 
     if (!day) {
-        dates.find(y => y.name == year).months.find(m => m.name == month).weeks.find(d => d.name == week).days.forEach(d => {
-            addDiv(dvDates, d, "date", (event) => {
+        dates.find(y => y.name == year).months.find(m => m.name == month).weeks.find(w => w.name == week).days.forEach(d => {
+            addDiv(dvDates, d, null, "date", (event) => {
                 day = event.target.innerText;
+                selectedDates.push(isoToString(new Date(`${day.split(" ")[0]}-${month}-${year}`)))
                 bindDates();
+                bindFilters();
             });
         });
         return;
     }
 
-    addDiv(dvDates, day, "date-selected", (event) => {
+    addDiv(dvDates, day, null, "date-selected", (event) => {
         day = null;
         bindDates();
+    });
+}
+
+bindFilters = () => {
+    dvFilters.innerText = "";
+
+    selectedTags.forEach(t => {
+        addDiv(dvFilters, `#${t}`, null, "filter", (event) => {
+            selectedTags = selectedTags.filter(st => st !== event.target.innerText.substring(1));
+            bindFilters();
+        });
+    });
+
+    selectedNames.forEach(n => {
+        addDiv(dvFilters, `!${n}`, null, "filter", (event) => {
+            selectedNames = selectedNames.filter(sn => sn !== event.target.innerText.substring(1));
+            bindFilters();
+        });
+    });
+
+    selectedDates.forEach(d => {
+        addDiv(dvFilters, `@${d}`, null, "filter", (event) => {
+            selectedDates = selectedDates.filter(sd => sd !== event.target.innerText.substring(1));
+            bindFilters();
+        });
     });
 }
 
@@ -253,31 +295,39 @@ initializeDates = () => {
     month = date.toLocaleString("default", { month: "short" }).toLowerCase();
 
     years.forEach(y => {
-        let year = {name: y, months: []};
+        let currYear = {name: y, months: []};
         months.forEach(m => {
-            let month = {name: new Date(date.getFullYear(), m, 1).toLocaleString("default", { month: "short" }).toLowerCase(), weeks: []};
+            let currMonth = {name: new Date(date.getFullYear(), m, 1).toLocaleString("default", { month: "short" }).toLowerCase(), weeks: []};
             let days = [];
+            let weekdays = [];
             let w = 1;
             for (let d = new Date(y, m, 1); d <= new Date(y, m + 1, 0); d.setDate(d.getDate() + 1)) {
                 days.push(d.getDate());
+                weekdays.push(`${d.getDate().toString().padStart(2,"0")} ${d.toLocaleString("default", { weekday: "short" }).toLowerCase().slice(0, -1)}`);
                 if (d.getDay() == 0 || d.getDate() ==  new Date(y, m + 1, 0).getDate()) {
-                    let week = {name: `${days[0]}-${days.at(-1)}`, days: days};
-                    month.weeks.push(week);
-                    week = m == date.getMonth() && days.includes(date.getDate()) ? week.name : week;
+                    let currWeek = {name: `${days[0]}-${days.at(-1)}`, days: weekdays};
+                    currMonth.weeks.push(currWeek);
+                    if (y == date.getFullYear() && m == date.getMonth() && days.includes(date.getDate())) {
+                        week = currWeek.name;
+                        let currDayIndex = days.indexOf(date.getDate());
+                        currWeek.days[currDayIndex] = `${currWeek.days[currDayIndex]}°`;
+                    }
                     w++;
                     days = [];
+                    weekdays = [];
                 }
             }
 
-            year.months.push(month);
+            currYear.months.push(currMonth);
         });
-        dates.push(year);
+        dates.push(currYear);
     });        
 }
 
-addDiv = (target, content, className, onClick) => {
+addDiv = (target, content, data, className, onClick) => {
     let dv = document.createElement("div");
     dv.innerText = content;
+    dv.setAttribute("data-category", JSON.stringify(data));
     dv.setAttribute("class", className);
     dv.addEventListener("click", onClick);
     target.appendChild(dv);
