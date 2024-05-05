@@ -27,6 +27,13 @@
     color: white;
 }
 
+.filter {
+    border: 1px solid #555555;
+    color: #999999;
+    display: inline-block;
+    margin: 0px 5px 5px 0px;
+}
+
 input {
     background-color: black;
     color: white;
