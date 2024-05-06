@@ -34,14 +34,26 @@ window.addEventListener("load", () => {
 
 tbTag.addEventListener("keyup", (event) => {
     if (event.key === "Enter" && !!tbTag.value && !!tbTag.value.trim()) {
-        addCategory(tag.id, "tag", tbTag.value);
+        let value = tbTag.value.trim();
+        if (value.startsWith("-")) {
+            removeCategory(tag.id, "tag", value.substring(1));
+        } else {
+            addCategory(tag.id, "tag", value);
+        }
+
         tbTag.value = "";
     }
 });
 
 tbName.addEventListener("keyup", (event) => {
     if (event.key === "Enter" && !!tbName.value && !!tbName.value.trim()) {
-        addCategory(tag.id, "name", tbName.value);
+        let value = tbName.value.trim();
+        if (value.startsWith("-")) {
+            removeCategory(tag.id, "name", value.substring(1));
+        } else {
+            addCategory(tag.id, "name", value);
+        }
+
         tbName.value = "";
     }
 });
@@ -65,7 +77,8 @@ btnAdd.addEventListener("click", (event) => {
 
 btnSearch.addEventListener("click", (event) => {
     editDiv(false);
-    if (tags.length === 0) {
+    if (selectedTags.length === 0 && selectedNames.length === 0 && selectedDates.length === 0) {
+        processData(!tb.innerText && !tb.innerText.trim() ? tb.innerText.trim() : ".log");
         return;
     }
 
@@ -115,20 +128,24 @@ btnHide.addEventListener("click", (event) => {
 });
 
 getFilter = (skipTag) => {
-    let tagFilter = selectedTags.filter(t => t !== skipTag).join("&");
-    let nameFilter = selectedNames.join("&");
+    let tagFilter = selectedTags.filter(t => t !== skipTag).map(t => `#${t}`).join(" ");
+    let nameFilter = selectedNames.map(t => `!${t}`).join(" ");
     let textFilter = tb.innerText ? tb.innerText.trim() : "";
-    let dateFilter = selectedDates.join("-");
+    let dateFilter = selectedDates.map(t => `@${t}`).join(" ");
 
     let filters = [];
-    if (!!tagFilter) filters.push(`#${tagFilter}`);
-    if (!!nameFilter) filters.push(`!${nameFilter}`);
+    if (!!tagFilter) filters.push(tagFilter);
+    if (!!nameFilter) filters.push(nameFilter);
     if (!!textFilter) filters.push(textFilter);
-    if (!!dateFilter) filters.push(`@${dateFilter}`);
-    return filters.join("+").trim();
+    if (!!dateFilter) filters.push(dateFilter);
+    return filters.join(" ").trim();
 }
 
 addCategory = (parentId, type, text) => {
+    if (categories.some(c => c.text === text && c.type === type && c.parentId === parentId)) {
+        return;
+    }
+
     categories.push({
         id: new Date().getTime(),
         parentId,
@@ -136,6 +153,12 @@ addCategory = (parentId, type, text) => {
         text,
     });
     categories.sort((a, b) => a.text.localeCompare(b.text));
+    saveCategories();
+    bindCategories();
+}
+
+removeCategory = (parentId, type, text) => {
+    categories = categories.filter(c => c.text !== text && c.type !== type && c.parentId !== parentId);
     saveCategories();
     bindCategories();
 }
