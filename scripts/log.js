@@ -721,8 +721,12 @@ showExpenses = (list) => {
     list.forEach(l => {
         let categories = l.text.match(/![a-z0-9-]+/g);
         let category = (categories || []).length >= 1 ? categories[0].substring(1) : expenseTag;
-        let values = l.text.match(/£[0-9.-]+/g);
-        let value = (values || []).length == 0 || isNaN(parseInt(values[0].substring(1))) ? 0 : parseInt(values[0].substring(1));
+        let values = l.text.match(/£[0-9.-]+/g) || [];
+        let value = 0;
+        values.map(v => (v || " ").substring(1)).forEach(v => {
+            let num = parseInt(v);
+            value += isNaN(num) ? 0 : num;
+        });
         let matchingEntry = summaryList.find(sl => sl.category == category);
         minDate = minDate > new Date(l.date) ? new Date(l.date) : minDate;
         maxDate = maxDate < new Date(l.date) ? new Date(l.date) : maxDate;
