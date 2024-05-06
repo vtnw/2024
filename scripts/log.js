@@ -724,7 +724,7 @@ showExpenses = (list) => {
         let values = l.text.match(/£[0-9.-]+/g) || [];
         let value = 0;
         values.map(v => (v || " ").substring(1)).forEach(v => {
-            let num = parseInt(v);
+            let num = parseFloat(v);
             value += isNaN(num) ? 0 : num;
         });
         let matchingEntry = summaryList.find(sl => sl.category == category);
