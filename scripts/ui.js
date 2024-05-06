@@ -78,7 +78,7 @@ btnAdd.addEventListener("click", (event) => {
 btnSearch.addEventListener("click", (event) => {
     editDiv(false);
     if (selectedTags.length === 0 && selectedNames.length === 0 && selectedDates.length === 0) {
-        processData(!tb.innerText && !tb.innerText.trim() ? tb.innerText.trim() : ".log");
+        processData(!!tb.innerText && !!tb.innerText.trim() ? tb.innerText.trim() : ".log");
         return;
     }
 
