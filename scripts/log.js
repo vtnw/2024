@@ -212,7 +212,7 @@ doFunction = (content) => {
         return;
     }
 
-    let all = content.split("+");
+    let all = content.split(" ");
     let functionName = all[0].replace("!", "");
     showStatus(functionName, true, " ")
     
@@ -1017,13 +1017,15 @@ convertFilter = (content) => {
     }
 
     let filters = [];
-    content.split("+").forEach(p => {
-        if (["#", "!", "@"].some(k => p.indexOf(k) >= 0)) {
-            filters.push(p.replace("#", "tag:").replace("@", "date:").replace("!", "name:"));
-        } else {
-            filters.push(`text:${p}`);
-        }
-    });
+    let tags = content.match(/#[a-z0-9-]+/g) || [];
+    let names = content.match(/![a-z0-9-]+/g) || [];
+    let dates = content.match(/@\S+/g) || [];
+    let text = content.replace(/#[a-z0-9-]+/g, "").replace(/![a-z0-9-]+/g, "").replace(/@\S+/g, "");
+
+    if (tags.length > 0) filters.push(`tag:${tags.join("&").replaceAll("#", "")}`);
+    if (names.length > 0) filters.push(`name:${names.join("&").replaceAll("!", "")}`);
+    if (dates.length > 0) filters.push(`date:${dates.join("-").replaceAll("@", "")}`);
+    if (!!text && !!text.trim()) filters.push(`text:${text.trim()}`);
     
     return filters.join("+");
 }
