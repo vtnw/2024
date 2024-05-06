@@ -12,6 +12,8 @@ let selectedTags = [];
 let selectedNames = [];
 let selectedDates = [];
 
+let spn = document.getElementById("spn");
+let dvUi = document.getElementById("dvUi");
 let dvTags = document.getElementById("dvTags");
 let dvNames = document.getElementById("dvNames");
 let dvDates = document.getElementById("dvDates");
@@ -30,6 +32,11 @@ window.addEventListener("load", () => {
     loadCategories();
     bindCategories();
     bindDates();
+});
+
+spn.addEventListener("click", (event) => {
+    uiMode = !uiMode;
+    dvUi.style.display = uiMode ? "block" : "none";
 });
 
 tbTag.addEventListener("keyup", (event) => {
