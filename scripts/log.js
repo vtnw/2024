@@ -740,7 +740,7 @@ showExpenses = (list) => {
     });
     let total = summaryList.reduce((accumulated, item) => accumulated + item.value, 0);
     summaryList.sort((a, b) => b.value == a.value ? b.category - a.category  : b.value - a.value);
-    let message = `[${isoToString(minDate)} - ${isoToString(maxDate)}]\n\nTotal ${total}\n`;
+    let message = `[${isoToString(minDate)} - ${isoToString(maxDate)}]\n\nTotal ${total.toFixed(2)}\n`;
     summaryList.forEach(sl => message = `${message}\n${sl.category} ${sl.value}`);
     message = `${message}\n`;
     summaryList.forEach(sl => message = `${message}\n${sl.category} ${sl.value}\n${sl.detail}\n`);
