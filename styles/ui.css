@@ -1,3 +1,7 @@
+#dvUi {
+    display: none;
+}
+
 .container {
     width: 100%;
     display: inline;
