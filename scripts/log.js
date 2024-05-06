@@ -2,6 +2,7 @@ let notes = [];
 let command = "";
 let editMode = false;
 let textMode = false;
+let uiMode = false;
 let lastAdd = "";
 
 const hiddenTag = "hidden";
@@ -23,14 +24,16 @@ window.addEventListener("load", () => {
 });
 
 document.addEventListener("click", (event) => {
-    // if (!editMode) {
-    //     document.getElementById("tb").focus();
-    // }
+    if (!editMode && !uiMode) {
+        document.getElementById("tb").focus();
+    }
 });
 
 document.getElementById("tb").addEventListener("blur", (event) => {
-    // editDiv(false);
-    // processData(document.getElementById("tb").innerText);
+    if (!uiMode) {
+        editDiv(false);
+        processData(document.getElementById("tb").innerText);
+    }
 });
 
 document.getElementById("fl").addEventListener("change", () => {
