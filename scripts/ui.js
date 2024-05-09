@@ -337,14 +337,14 @@ initializeDates = () => {
             let w = 1;
             for (let d = new Date(y, m, 1); d <= new Date(y, m + 1, 0); d.setDate(d.getDate() + 1)) {
                 days.push(d.getDate());
-                weekdays.push(`${d.getDate().toString().padStart(2,"0")}  ${d.toLocaleString("default", { weekday: "short" }).toLowerCase().slice(0, -1)}`);
+                weekdays.push(`${d.getDate().toString().padStart(2,"0")}\xA0\xA0${d.toLocaleString("default", { weekday: "short" }).toLowerCase().slice(0, -1)}`);
                 if (d.getDay() == 0 || d.getDate() ==  new Date(y, m + 1, 0).getDate()) {
                     let currWeek = {name: `${days[0]}-${days.at(-1)}`, days: weekdays};
                     currMonth.weeks.push(currWeek);
                     if (y == date.getFullYear() && m == date.getMonth() && days.includes(date.getDate())) {
                         week = currWeek.name;
                         let currDayIndex = days.indexOf(date.getDate());
-                        currWeek.days[currDayIndex] = `${currWeek.days[currDayIndex].replace("  ", "° ")}`;
+                        currWeek.days[currDayIndex] = `${currWeek.days[currDayIndex].replace("\xA0\xA0", "°\xA0")}`;
                     }
                     w++;
                     days = [];
