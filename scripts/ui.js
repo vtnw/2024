@@ -344,7 +344,7 @@ initializeDates = () => {
                     if (y == date.getFullYear() && m == date.getMonth() && days.includes(date.getDate())) {
                         week = currWeek.name;
                         let currDayIndex = days.indexOf(date.getDate());
-                        currWeek.days[currDayIndex] = `${currWeek.days[currDayIndex]}.replace("  ", "° ")`;
+                        currWeek.days[currDayIndex] = `${currWeek.days[currDayIndex].replace("  ", "° ")}`;
                     }
                     w++;
                     days = [];
