@@ -8,9 +8,13 @@
 }
 
 .tags, .names, .dates {
-    width: 30%;
+    width: 35%;
     display: inline-block;
     vertical-align: top;
+}
+
+.dates {
+    width: 20%;
 }
 
 .button {
