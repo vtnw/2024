@@ -165,7 +165,8 @@ addCategory = (parentId, type, text) => {
 }
 
 removeCategory = (parentId, type, text) => {
-    categories = categories.filter(c => c.text !== text && c.type !== type && c.parentId !== parentId);
+    let index = categories.findIndex(c => c.text === text && c.type === type && c.parentId === parentId);
+    categories.splice(index, 1);
     saveCategories();
     bindCategories();
 }
