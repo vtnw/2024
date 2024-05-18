@@ -110,6 +110,7 @@ btnEdit.addEventListener("click", (event) => {
     }
 
     processData(command);
+    clearFilters();
 });
 
 btnCopy.addEventListener("click", (event) => {
@@ -148,6 +149,12 @@ getFilter = (skipTag) => {
     if (!!textFilter) filters.push(textFilter);
     if (!!dateFilter) filters.push(dateFilter);
     return filters.join(" ").trim();
+}
+
+clearFilters = () => {
+    selectedTags = [];
+    selectedNames = [];
+    selectedDates = [];
 }
 
 addCategory = (parentId, type, text) => {
