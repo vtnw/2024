@@ -95,7 +95,9 @@ btnSearch.addEventListener("click", (event) => {
         command = `${command} ${filter}`;    
     }
 
+    let text = tb.innerText ? tb.innerText.trim() : "";
     processData(command);
+    tb.innerText = text;
 });
 
 btnEdit.addEventListener("click", (event) => {
