@@ -86,6 +86,11 @@ processData = (text) => {
             doNote(content);
             break;
         }
+        case ".diary": {
+            showStatus(action);
+            doDiary(content);
+            break;
+        }
         case ".log": {
             showStatus(action);
             doLog(content);
@@ -335,6 +340,12 @@ doContact = (content) => {
 doNote = (content) => {
     content = convertFilter(content);
     let filter = `tag:${skipTags}+${!content ? "recent:1m" : content}`;
+    showNotes(filterData(filter));
+}
+
+doDiary = (content) => {
+    content = convertFilter(content);
+    let filter = `tag:${diaryTag}+${!content ? "recent:1m" : content}`;
     showNotes(filterData(filter));
 }
 
