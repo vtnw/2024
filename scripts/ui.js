@@ -162,7 +162,7 @@ btnRefresh.addEventListener("click", (event) => {
     command = "";
     editMode = false;
     textMode = false;
-    uiMode = false;
+    uiMode = true;
     lastAdd = "";
     loadNotes();
     processData(".today");
