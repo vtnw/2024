@@ -139,8 +139,6 @@ btnHide.addEventListener("click", (event) => {
 });
 
 btnRefresh.addEventListener("click", (event) => {
-    editDiv(false);
-    
     categories = [];
     tags = [];
     tag = { id: 0 };
@@ -159,6 +157,15 @@ btnRefresh.addEventListener("click", (event) => {
     bindCategories();
     bindDates();
     bindFilters();
+
+    notes = [];
+    command = "";
+    editMode = false;
+    textMode = false;
+    uiMode = false;
+    lastAdd = "";
+    loadNotes();
+    processData(".today");
 });
 
 getFilter = (skipTag) => {
