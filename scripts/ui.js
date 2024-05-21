@@ -26,6 +26,7 @@ let btnSearch = document.getElementById("btnSearch");
 let btnEdit = document.getElementById("btnEdit");
 let btnCopy = document.getElementById("btnCopy");
 let btnHide = document.getElementById("btnHide");
+let btnRefresh = document.getElementById("btnRefresh");
 
 window.addEventListener("load", () => {
     initializeDates();
@@ -135,6 +136,29 @@ btnHide.addEventListener("click", (event) => {
     }
 
     processData(command);
+});
+
+btnRefresh.addEventListener("click", (event) => {
+    editDiv(false);
+    
+    categories = [];
+    tags = [];
+    tag = { id: 0 };
+    names = [];
+    name = { id: 0 };
+    dates = [];
+    year = null;
+    month = null;
+    week = null;
+    day = null;
+    selectedTags = [];
+    selectedNames = [];
+    selectedDates = [];
+    initializeDates();
+    loadCategories();
+    bindCategories();
+    bindDates();
+    bindFilters();
 });
 
 getFilter = (skipTag) => {
