@@ -155,6 +155,7 @@ clearFilters = () => {
     selectedTags = [];
     selectedNames = [];
     selectedDates = [];
+    bindFilters();
 }
 
 addCategory = (parentId, type, text) => {
@@ -193,7 +194,7 @@ bindCategories = () => {
         });
     });
 
-    let currTags = categories.filter(c => c.parentId === tag.id && c.type === "tag");
+    let currTags = categories.filter(c => c.parentId === tag.id && c.type === "tag" && (!tbTag.value || c.text.includes(tbTag.value)));
     currTags.forEach(t => {
         addDiv(dvTags, t.text, t, "tag", (event) => {
             tag = JSON.parse(event.target.dataset.category);
@@ -219,7 +220,7 @@ bindCategories = () => {
         });
     });
 
-    let currNames = categories.filter(c => names.length === 0 && c.parentId === tag.id && c.type === "name");
+    let currNames = categories.filter(c => names.length === 0 && c.parentId === tag.id && c.type === "name" && (!tbName.value || c.text.includes(tbName.value)));
     currNames.forEach(n => {
         addDiv(dvNames, n.text, n, "name", (event) => {
             name = JSON.parse(event.target.dataset.category);
