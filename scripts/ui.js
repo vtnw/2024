@@ -50,6 +50,8 @@ tbTag.addEventListener("keyup", (event) => {
         }
 
         tbTag.value = "";
+    } else {
+        bindCategories();
     }
 });
 
@@ -63,6 +65,8 @@ tbName.addEventListener("keyup", (event) => {
         }
 
         tbName.value = "";
+    } else {
+        bindCategories();
     }
 });
 
