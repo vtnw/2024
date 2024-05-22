@@ -290,7 +290,9 @@ doCalendar = (content, append = false) => {
 }
 
 doTimer = (content) => {
-    showTimers(filterData(`tag:${timerTag}+${content}`));
+    content = convertFilter(content);
+    let condition = `tag:${timerTag}+${ !content ? "recent:1m" : content }`;
+    showTimers(condition);
     return;
 }
 
