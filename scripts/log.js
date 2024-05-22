@@ -292,7 +292,7 @@ doCalendar = (content, append = false) => {
 doTimer = (content) => {
     content = convertFilter(content);
     let condition = `tag:${timerTag}+${ !content ? "recent:1m" : content }`;
-    showTimers(condition);
+    showTimers(filterData(condition));
     return;
 }
 
