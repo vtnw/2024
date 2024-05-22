@@ -848,7 +848,7 @@ showTimers = (list) => {
     });
 
     if (!!prev) {
-        let text = l.text.replace(/!start/g, "").replace(/#[a-z0-9-]+/g, "").trim();
+        let text = prev.text.replace(/!start/g, "").replace(/#[a-z0-9-]+/g, "").trim();
         subList.push({ date: new Date(), duration: new Date()-new Date(prev.date), text });
     }
 
