@@ -43,13 +43,12 @@ spn.addEventListener("click", (event) => {
 tbTag.addEventListener("keyup", (event) => {
     if (event.key === "Enter" && !!tbTag.value && !!tbTag.value.trim()) {
         let value = tbTag.value.trim();
+        tbTag.value = "";
         if (value.startsWith("-")) {
             removeCategory(tag.id, "tag", value.substring(1));
         } else {
             addCategory(tag.id, "tag", value);
         }
-
-        tbTag.value = "";
     } else {
         bindCategories();
     }
@@ -58,13 +57,12 @@ tbTag.addEventListener("keyup", (event) => {
 tbName.addEventListener("keyup", (event) => {
     if (event.key === "Enter" && !!tbName.value && !!tbName.value.trim()) {
         let value = tbName.value.trim();
+        tbName.value = "";
         if (value.startsWith("-")) {
             removeCategory(tag.id, "name", value.substring(1));
         } else {
             addCategory(tag.id, "name", value);
         }
-
-        tbName.value = "";
     } else {
         bindCategories();
     }
