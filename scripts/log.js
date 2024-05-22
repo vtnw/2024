@@ -578,7 +578,8 @@ doText = (content) => {
             break;
         }
         default: {
-            showStatus("failed", true);
+            editDiv(false);
+            showStatus("done", true);
         }
     }
 }
