@@ -154,6 +154,8 @@ btnRefresh.addEventListener("click", (event) => {
     selectedTags = [];
     selectedNames = [];
     selectedDates = [];
+    tbTag.value = "";
+    tbName.value = "";
     initializeDates();
     loadCategories();
     bindCategories();
@@ -218,6 +220,8 @@ bindCategories = () => {
     dvTags.innerText = "";
     tags.forEach(t => {
         addDiv(dvTags, t.text, t, "tag-selected", (event) => {
+            tbTag.value = "";
+            tbName.value = "";
             let category = JSON.parse(event.target.dataset.category);
             let index = tags.findIndex(t => t.id === category.id);
             tags.splice(index);
@@ -230,6 +234,8 @@ bindCategories = () => {
     let currTags = categories.filter(c => c.parentId === tag.id && c.type === "tag" && (!tbTag.value || c.text.includes(tbTag.value)));
     currTags.forEach(t => {
         addDiv(dvTags, t.text, t, "tag", (event) => {
+            tbTag.value = "";
+            tbName.value = "";
             tag = JSON.parse(event.target.dataset.category);
             tags.push(tag);
             if (!selectedTags.includes(tag.text)) {
@@ -244,6 +250,8 @@ bindCategories = () => {
     dvNames.innerText = "";
     names.forEach(n => {
         addDiv(dvNames, n.text, n, "name-selected", (event) => {
+            tbTag.value = "";
+            tbName.value = "";
             let category = JSON.parse(event.target.dataset.category);
             let index = names.findIndex(n => n.id === category.id);
             names.splice(index);
@@ -256,6 +264,8 @@ bindCategories = () => {
     let currNames = categories.filter(c => names.length === 0 && c.parentId === tag.id && c.type === "name" && (!tbName.value || c.text.includes(tbName.value)));
     currNames.forEach(n => {
         addDiv(dvNames, n.text, n, "name", (event) => {
+            tbTag.value = "";
+            tbName.value = "";
             name = JSON.parse(event.target.dataset.category);
             names = [name];
             if (!selectedNames.includes(tag.text)) {
