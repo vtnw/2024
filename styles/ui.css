@@ -10,10 +10,6 @@
     width: 100%;
 }
 
-.tag-container {
-    margin-bottom: 10px;
-}
-
 .button-container {
     overflow-x: auto;
     white-space: nowrap;
