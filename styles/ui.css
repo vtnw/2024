@@ -2,9 +2,19 @@
     display: none;
 }
 
-.container {
+.button-container, .tag-container {
     width: 100%;
     display: inline;
+}
+
+.tag-container {
+    margin-bottom: 5px;
+    height: 500px;
+    overflow-y: hidden;
+}
+
+.button-container {
+    overflow-x: hidden;
 }
 
 .tags, .names, .dates {
