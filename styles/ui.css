@@ -12,13 +12,16 @@
 
 .tag-container {
     margin-bottom: 10px;
-    height: 310px;
-    overflow-y: auto;
 }
 
 .button-container {
     overflow-x: auto;
     white-space: nowrap;
+}
+
+.tag-list, .name-list {
+    height: 315px;
+    overflow-y: auto;
 }
 
 .tags, .names, .dates {
