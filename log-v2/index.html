@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE =edge">
+    <meta name="viewport" content="width =device-width, initial-scale=1.0">
+    <title>Log</title>
+    <link rel="stylesheet" href="styles/log.css">
+    <link rel="stylesheet" href="styles/ui.css">
+</head>
+<body>
+    <div contenteditable="true" id="tb"></div>
+    <div class="container" id="dvUiHeader">
+        <div id="dvHeader">
+            <div class="action" id="dvClear">note</div>
+            <div id="dvFilters"></div>            
+            <div id="dvActions">
+                <div class="action" id="dvNumber"></div>
+                <div class="action" id="dvDate"></div>
+                <div class="action" id="dvAdd"">+</div>
+            </div>            
+        </div>
+        <div id="dvNumbers">
+            <div>
+                <span id="spn1">1</span></td>
+                <span id="spn2">2</span></td>
+                <span id="spn3">3</span></td>
+            </div>
+            <div>
+                <span id="spn4">4</span></td>
+                <span id="spn5">5</span></td>
+                <span id="spn6">6</span></td>
+            </div>
+            <div>
+                <span id="spn7">7</span></td>
+                <span id="spn8">8</span></td>
+                <span id="spn9">9</span></td>
+            </div>
+            <div>
+                <span id="spn.">.</span></td>
+                <span id="spn0">0</span></td>
+                <span id="spn/">/</span></td>
+            </div>
+        </div>
+    </div>
+    <hr />
+    <span id="spn"></span>
+    <br />
+    <div id="dvUiContent">
+        <div class="tag-container">
+            <div class="tags">
+                <input type="text" id="tbTag" enterkeyhint="done" placeholder=" + tag" autocapitalize="none"/>
+                <div id="dvTags" class="tag-list"></div>
+            </div>
+            <div class="names">
+                <input type="text" id="tbName" enterkeyhint="done" placeholder=" + name" autocapitalize="none"/>
+                <div id="dvNames" class="name-list"></div>
+            </div>
+        </div>
+        <br />
+    </div>
+    <div id="dv"></div>
+    <input class="hidden" type="file" id="fl" />
+</body>
+<script src="scripts/log.js"></script>
+<script src="scripts/ui.js"></script>
+</html>
