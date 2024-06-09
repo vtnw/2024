@@ -7,7 +7,7 @@ let selectedTags = [];
 let selectedNames = [];
 
 let isNumberMode = false;
-const currencySymbol = "$";
+const currencySymbol = "£";
 const dateSymbol = "@";
 
 let spn = document.getElementById("spn");
