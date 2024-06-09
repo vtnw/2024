@@ -50,7 +50,7 @@
     width: 20%;
     align-content: center;
     text-align: center;
-    border-left: 1px solid #999999;
+    border-left: 1px solid #555555;
 }
 
 .tag-selected, .name-selected, .date-selected {
