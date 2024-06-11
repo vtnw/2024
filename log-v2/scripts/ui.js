@@ -14,6 +14,10 @@ const textSymbol = "text";
 const spaces = "\xA0\xA0\xA0\xA0\xA0\xA0\xA0\xA0\xA0\xA0";
 const enter = ">>";
 const back = "<<";
+const numbers1 = ["1", "2", "3"];
+const numbers2 = ["4", "5", "6"];
+const numbers3 = ["7", "8", "9"];
+const numbers4 = [".", "0", "/"];
 const letters1 = ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"];
 const letters2 = ["A", "S", "D", "F", "G", "H", "J", "K", "L"];
 const letters3 = ["Z", "X", "C", "V", "B", "N", "M", back];
@@ -34,12 +38,14 @@ let dvNumber = document.getElementById("dvNumber");
 let dvDate = document.getElementById("dvDate");
 let dvClear = document.getElementById("dvClear");
 let dvAdd = document.getElementById("dvAdd");
+let dvNumbers = document.getElementById("dvNumbers");
 let dvLetters = document.getElementById("dvLetters");
 let numberElement = null;
 let textElement = null;
 
 window.addEventListener("load", () => {
     initialize();
+    loadNumbers();
     loadLetters();
 });
 
@@ -57,10 +63,6 @@ dvDate.addEventListener("click", (event) => toggleNumberMode(event.target, dateS
 dvText.addEventListener("click", (event) => toggleTextMode(event.target, textSymbol));
 
 dvAdd.addEventListener("click", (event) => addNote());
-
-["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", ".", "/"].forEach(i => {
-    document.getElementById(`spn${i}`).addEventListener("click", (event) => appendNumber(event.target));
-})
 
 tbTag.addEventListener("keyup", (event) => {
     if (event.key === "Enter" && !!tbTag.value && !!tbTag.value.trim()) {
@@ -293,12 +295,6 @@ toggleNumberMode = (element, defaultChar) => {
     }
 }
 
-appendNumber = (element) => {
-    element.style.borderColor = "#999999";
-    setTimeout(() => { element.style.borderColor = "#000000" }, 100);
-    numberElement.innerText += element.innerText;
-}
-
 toggleTextMode = (element, defaultChar) => {
     if (!!textElement && textElement != element) {
         return;
@@ -314,6 +310,31 @@ toggleTextMode = (element, defaultChar) => {
         textElement = null;
         listNotes();
     }
+}
+
+loadNumbers = () => {
+    let appendNumber = (event) => {
+        let element = event.target;
+        element.style.borderColor = "#999999";
+        setTimeout(() => { element.style.borderColor = "#000000" }, 100);
+        numberElement.innerText += element.innerText;
+    };
+    let row = addDiv(dvNumbers, "", "", "dvNumberRow", null);
+    numbers1.forEach(n => {
+        addDiv(row, n, "", "dvNumber", appendNumber);
+    });
+    row = addDiv(dvNumbers, "", "", "dvNumberRow", null);
+    numbers2.forEach(n => {
+        addDiv(row, n, "", "dvNumber", appendNumber);
+    });
+    row = addDiv(dvNumbers, "", "", "dvNumberRow", null);
+    numbers3.forEach(n => {
+        addDiv(row, n, "", "dvNumber", appendNumber);
+    });
+    row = addDiv(dvNumbers, "", "", "dvNumberRow", null);
+    numbers4.forEach(n => {
+        addDiv(row, n, "", "dvNumber", appendNumber);
+    });
 }
 
 loadLetters = () => {
