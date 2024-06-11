@@ -7,8 +7,17 @@ let selectedTags = [];
 let selectedNames = [];
 
 let isNumberMode = false;
-const currencySymbol = "£";
+let isTextMode = false;
+const currencySymbol = "$";
 const dateSymbol = "@";
+const textSymbol = "text";
+const spaces = "\xA0\xA0\xA0\xA0\xA0\xA0\xA0\xA0\xA0\xA0";
+const enter = ">>";
+const back = "<<";
+const letters1 = ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"];
+const letters2 = ["A", "S", "D", "F", "G", "H", "J", "K", "L"];
+const letters3 = ["Z", "X", "C", "V", "B", "N", "M", back];
+const letters4 = [",", spaces, ".", enter];
 
 let spn = document.getElementById("spn");
 let dvUiHeader = document.getElementById("dvUiHeader");
@@ -20,14 +29,18 @@ let tbTag = document.getElementById("tbTag");
 let tbName = document.getElementById("tbName");
 let tb = document.getElementById("tb");
 let dvActions = document.getElementById("dvActions");
+let dvText = document.getElementById("dvText");
 let dvNumber = document.getElementById("dvNumber");
 let dvDate = document.getElementById("dvDate");
 let dvClear = document.getElementById("dvClear");
 let dvAdd = document.getElementById("dvAdd");
+let dvLetters = document.getElementById("dvLetters");
 let numberElement = null;
+let textElement = null;
 
 window.addEventListener("load", () => {
     initialize();
+    loadLetters();
 });
 
 spn.addEventListener("click", (event) => {
@@ -40,6 +53,8 @@ dvClear.addEventListener("click", (event) => initialize());
 dvNumber.addEventListener("click", (event) => toggleNumberMode(event.target, currencySymbol));
 
 dvDate.addEventListener("click", (event) => toggleNumberMode(event.target, dateSymbol));
+
+dvText.addEventListener("click", (event) => toggleTextMode(event.target, textSymbol));
 
 dvAdd.addEventListener("click", (event) => addNote());
 
@@ -192,6 +207,10 @@ addNote = () => {
     let command = ".add";
     selectedTags.forEach(t => command = `${command} #${t}`);
     selectedNames.forEach(n => command = `${command} !${n}`);
+    if (dvText.innerText != textSymbol) {
+        command = `${command} ${dvText.innerText}`;
+    }
+
     if (dvNumber.innerText != currencySymbol) {
         command = `${command} ${dvNumber.innerText}`;
     }
@@ -234,6 +253,7 @@ initialize = () => {
 
     dvNumber.innerText = currencySymbol;
     dvDate.innerText = dateSymbol;
+    dvText.innerText = textSymbol;
     loadCategories();
     bindCategories();
     bindFilters();
@@ -273,6 +293,63 @@ appendNumber = (element) => {
     element.style.borderColor = "#999999";
     setTimeout(() => { element.style.borderColor = "#000000" }, 100);
     numberElement.innerText += element.innerText;
+}
+
+toggleTextMode = (element, defaultChar) => {
+    if (!!textElement && textElement != element) {
+        return;
+    }
+
+    textElement = element;
+    isTextMode = !isTextMode;
+
+    if (isTextMode) {
+        // textElement.innerText = defaultChar;
+        dvLetters.style.display = "inline-block";
+    } else {
+        dvLetters.style.display = "none";
+        textElement = null;
+        listNotes();
+    }
+}
+
+loadLetters = () => {
+    let appendText = (event) => {
+        let element = event.target;
+        element.style.borderColor = "#999999";
+        setTimeout(() => { element.style.borderColor = "#000000" }, 100);
+        let letter = element.innerText;
+        switch (letter) {
+            case spaces: {
+                letter = "\xA0";
+                break;
+            }
+            case enter: {
+                letter = "\n";
+                break;
+            }
+        }
+
+        textElement.innerText = letter != back
+            ? textElement.innerText == textSymbol ? letter : textElement.innerText + letter
+            : textElement.innerText.slice(0, -1);
+    };
+    let row = addDiv(dvLetters, "", "", "dvLetterRow", null);
+    letters1.forEach(l => {
+        addDiv(row, l, "", "dvLetter", appendText);
+    });
+    row = addDiv(dvLetters, "", "", "dvLetterRow", null);
+    letters2.forEach(l => {
+        addDiv(row, l, "", "dvLetter", appendText);
+    });
+    row = addDiv(dvLetters, "", "", "dvLetterRow", null);
+    letters3.forEach(l => {
+        addDiv(row, l, "", "dvLetter", appendText);
+    });
+    row = addDiv(dvLetters, "", "", "dvLetterRow", null);
+    letters4.forEach(l => {
+        addDiv(row, l, "", "dvLetter", appendText);
+    });
 }
 
 addDiv = (target, content, data, className, onClick) => {
