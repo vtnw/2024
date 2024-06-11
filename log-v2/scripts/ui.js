@@ -208,7 +208,7 @@ addNote = () => {
     selectedTags.forEach(t => command = `${command} #${t}`);
     selectedNames.forEach(n => command = `${command} !${n}`);
     if (dvText.innerText != textSymbol) {
-        command = `${command} ${dvText.innerText}`;
+        command = `${command} ${dvText.innerText.trim()}`;
     }
 
     if (dvNumber.innerText != currencySymbol) {
@@ -232,6 +232,10 @@ listNotes = () => {
         let days = dvNumber.innerText != currencySymbol ? parseInt(dvNumber.innerText.substring(1)) : 0;
         startDate.setDate(startDate.getDate() - days);
         command = `${command} @${isoToString(startDate)} ${dvDate.innerText}`;
+    }
+
+    if (dvText.innerText != textSymbol) {
+        command = `${command} ${dvText.innerText.trim()}`;
     }
 
     processData(command);
@@ -304,7 +308,6 @@ toggleTextMode = (element, defaultChar) => {
     isTextMode = !isTextMode;
 
     if (isTextMode) {
-        // textElement.innerText = defaultChar;
         dvLetters.style.display = "inline-block";
     } else {
         dvLetters.style.display = "none";
@@ -335,7 +338,7 @@ loadLetters = () => {
 
         textElement.innerText = letter != back
             ? textElement.innerText == textSymbol ? letter : textElement.innerText + letter
-            : textElement.innerText.slice(0, -1);
+            : textElement.innerText.length > 1 ? textElement.innerText.slice(0, -1) : textSymbol;
     };
     let row = addDiv(dvLetters, "", "", "dvLetterRow", null);
     letters1.forEach(l => {
