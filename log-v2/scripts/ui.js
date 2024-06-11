@@ -328,6 +328,9 @@ loadLetters = () => {
                 letter = "\n";
                 break;
             }
+            default: {
+                letter = letter.toLowerCase();
+            }
         }
 
         textElement.innerText = letter != back
