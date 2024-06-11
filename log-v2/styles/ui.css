@@ -72,19 +72,23 @@
     max-width: 93%;
 }
 
-#dvNumbers {
+.dvNumbers {
     border: 1px solid #555555;
     display: none;
     padding: 10px;
     margin-top: 10px;
     color: #999999;
-    
-    span {
-        display: inline-block;
-        padding: 10px 20px 10px 20px;
-        margin: 5px 0px 5px 0px;
-        border: 1px solid #000000;
-    }
+    position: absolute;
+    bottom: 5px;
+    left: 25%;
+    background-color: #000000;
+}
+
+.dvNumber {
+    display: inline-block;
+    padding: 10px 20px 10px 20px;
+    margin: 5px 0px 5px 0px;
+    border: 1px solid #000000;
 }
 
 #dvFilters, #dvActions {
