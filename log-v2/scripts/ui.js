@@ -267,6 +267,8 @@ initialize = () => {
     
     loadNotes();
     processData(".note");
+
+    migrate();
 }
 
 getDate = () => {
@@ -404,3 +406,16 @@ setUiMode = () => {
 saveCategories = () => localStorage.setItem("tags", JSON.stringify(categories));
 
 loadCategories = () => categories = JSON.parse(localStorage.getItem("tags") || "[]");
+
+migrate() {
+    let data = notes;
+    let list = [];
+    data.sort((a, b) => new Date(b.date) - new Date(a.date));
+    data.forEach(d => {
+        let date = `@${d.date.toLocaleDateString()}`;
+        let tag = d.text.match(/#[a-z0-9-]+/g).join(" ");
+        let text = d.text.replace(/#[a-z0-9-]+/g, "").replace(/@\S+/g, "").trim();
+        list.push({`${date} ${tag} ${text}`});
+    });
+    saveAsFile(JSON.stringify(list), "notes_migrate_" + isoToString(new Date()));
+}
