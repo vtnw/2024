@@ -415,7 +415,7 @@ migrate = () => {
         let date = `@${d.date.toLocaleDateString()}`;
         let tag = d.text.match(/#[a-z0-9-]+/g).join(" ");
         let text = d.text.replace(/#[a-z0-9-]+/g, "").replace(/@\S+/g, "").trim();
-        list.push({`${date} ${tag} ${text}`});
+        list.push(`${date} ${tag} ${text}`);
     });
     saveAsFile(JSON.stringify(list), "notes_migrate_" + isoToString(new Date()));
 }
