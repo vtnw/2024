@@ -74,7 +74,7 @@
                 message = `${message} - ${l.text};`;
                 let diffTags = l.tags.filter(t => !tags.includes(t));
                 message = diffTags.length > 0 ? `${message} under ${diffTags.join(", ")}` : message;
-                message = `${message} on ${l.date.toLocaleDateString("default", {day: "numeric", month: "numeric"})}\n`;
+                message = `${message} on ${l.date.toLocaleDateString("en-us", {day: "numeric", month: "numeric"})}\n`;
             });
         } else {
             dvTitle.innerText = `all - ${list.length}`;
@@ -88,7 +88,7 @@
 
     add = () => {
         let tag = (tags.length > 0 ? tags : [defaultTag]).map(t => `#${t}`).join(" ");
-        let date = `@${dates[1].toLocaleDateString()}`;
+        let date = `@${dates[1].toLocaleDateString("en-us")}`;
         let text = prompt(`${tag.replaceAll("#", "")} ${date}`);
         if (text) {
             data.unshift(`${date} ${tag} ${text}`);
