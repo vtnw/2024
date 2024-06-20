@@ -412,7 +412,7 @@ migrate = () => {
     let list = [];
     data.sort((a, b) => new Date(b.date) - new Date(a.date));
     data.forEach(d => {
-        let date = `@${d.date.toLocaleDateString()}`;
+        let date = `@${new Date(d.date).toLocaleDateString()}`;
         let tag = d.text.match(/#[a-z0-9-]+/g).join(" ");
         let text = d.text.replace(/#[a-z0-9-]+/g, "").replace(/@\S+/g, "").trim();
         list.push(`${date} ${tag} ${text}`);
