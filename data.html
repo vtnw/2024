@@ -9,7 +9,6 @@
     </style>
 </head>
 <body>
-    <textarea id="ta"></textarea>
     <div id="dvTitle"></div>
     <hr />
     <div id="dvContent"></div>
@@ -95,13 +94,6 @@
         if (text) {
             data.unshift(`${date} ${tag} ${text}`);
             localStorage.setItem(key, JSON.stringify(data));
-        }
-    }
-
-    migrate = () => {
-        if (document.getElementById("ta").value.length > 0) {
-            localStorage.setItem(key, document.getElementById("ta").value);
-            alert("done");
         }
     }
 </script>
