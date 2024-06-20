@@ -407,7 +407,7 @@ saveCategories = () => localStorage.setItem("tags", JSON.stringify(categories));
 
 loadCategories = () => categories = JSON.parse(localStorage.getItem("tags") || "[]");
 
-migrate() {
+migrate = () => {
     let data = notes;
     let list = [];
     data.sort((a, b) => new Date(b.date) - new Date(a.date));
