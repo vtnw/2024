@@ -5,6 +5,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE =edge">
     <meta name="viewport" content="width =device-width, initial-scale=1.0">
     <title>Log</title>
+    <style>
+        body {
+            line-height: 1.3em;
+        }
+    </style>
 </head>
 <body>
     <div id="dvTitle"></div>
@@ -88,7 +93,6 @@
             }
         });
         dvContent.appendChild(dv);
-        dvContent.appendChild(document.createElement("br"));
     }
 
     addLineDiv = (content, line) => {
@@ -115,7 +119,6 @@
         spn.innerText = content;
         dv.appendChild(spn);
         dvContent.appendChild(dv);
-        dvContent.appendChild(document.createElement("br"));
     }
 
     execute = (content) => {
