@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE =edge">
     <meta name="viewport" content="width =device-width, initial-scale=1.0">
-    <title>Log</title>
+    <title>Data</title>
     <style>
     </style>
 </head>
@@ -74,7 +74,7 @@
 
     addNewDiv = () => {
         let dv = document.createElement("div");
-        dv.innerText = " + add";
+        dv.innerText = " + ";
         dv.addEventListener("click", (event) => {
             let tag = (tags.length > 0 ? tags : [defaultTag]).map(t => `#${t}`).join(" ");
             let date = `@${dates[1].toLocaleDateString("en-us")}`;
