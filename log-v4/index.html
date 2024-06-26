@@ -51,7 +51,11 @@
 
     filter = () => {
         let filter = prompt("filter");
-        let filters = filter?.split(" ") ?? [];
+        if (filter == null) {
+            return;
+        }
+
+        let filters = filter.split(" ").filter(f => !!f);
         tags = filters.filter(f => !f.startsWith(dateSymbol));
         dates = filters.filter(f => f.startsWith(dateSymbol)).map(d => new Date(d.substring(1)));
         dates = dates.length == 0 ? [new Date(new Date().toDateString())] : dates;
@@ -61,10 +65,10 @@
             dates = [date, dates[0]];
         }
         
-        list();
+        list(true);
     }
 
-    list = () => {
+    list = (format = true) => {
         load();
         let list = data.map(line => {
             return {
@@ -84,7 +88,7 @@
             let diffTags = l.tags.filter(t => !tags.includes(t));
             let message = diffTags.length > 0 ? `${l.text} under ${diffTags.join(", ")}` : l.text;
             message = `${message} on ${l.date.toLocaleDateString("en-us", {day: "numeric", month: "numeric"})}`;
-            addLineDiv(message, l.line);
+            addLineDiv(format ? message : l.line, l.line);
         });
     }
 
