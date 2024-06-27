@@ -38,20 +38,20 @@
     let onFileLoad = null;
 
     window.addEventListener("load", () => {
-        filter();        
+        filter(prompt("filter"));        
     });
 
     dvTitle.addEventListener("click", (event) => {
-        filter();
+        filter(prompt("filter"));
     });
 
     hr.addEventListener("click", (event) => {
         execute(prompt("command"), true);
     });
 
-    filter = () => {
-        let filter = prompt("filter");
+    filter = (filter) => {
         if (filter == null) {
+            execute("tags filter 50 false true");
             return;
         }
 
@@ -139,7 +139,7 @@
         let all = content.split(" ");
         let name = all[0];
         let param = content.substring(name.length + 1).trim();
-        dvTitle.innerText = showContent ? content : dvTitle.innerText;
+        dvTitle.innerText = showContent && !!content.trim() ? content : dvTitle.innerText;
         let line = data.find(l => new RegExp(`${tagSymbol}function`, "g").test(l) && new RegExp(`(^|\\s+)${nameSymbol}${name}($|\\s+)`, "g").test(l));
         if (line) {
             let text = line.replace(`${tagSymbol}function`, "").replace(`${nameSymbol}${name}`, "").replace(datePattern, "").trim();
