@@ -50,12 +50,12 @@
     });
 
     filter = (filter) => {
-        if (filter == null) {
+        if (filter == "") {
             execute("tags filter 50 false true");
             return;
         }
 
-        let filters = filter.split(" ").filter(f => !!f);
+        let filters = !!filter ? filter.split(" ").filter(f => !!f) : [];
         tags = filters.filter(f => !f.startsWith(dateSymbol));
         dates = filters.filter(f => f.startsWith(dateSymbol)).map(d => new Date(d.substring(1)));
         dates = dates.length == 0 ? [new Date(new Date().toDateString())] : dates;
