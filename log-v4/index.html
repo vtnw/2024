@@ -104,8 +104,10 @@
         dv.innerText = " + ";
         dv.addEventListener("click", (event) => {
             let tag = (tags.length > 0 ? tags : [defaultTag]).map(t => `${tagSymbol}${t}`).join(" ");
+            let name = names.length > 0 ? names.map(n => `${nameSymbol}${n}`).join(" ") : "";
+            tag = !!name ? `${tag} ${name}` : tag;
             let date = `${dateSymbol}${dates[1].toLocaleDateString("en-us")}`;
-            let text = prompt(`${tag.replaceAll(`${tagSymbol}`, "")} ${date}`);
+            let text = prompt(`${tag.replaceAll(`${tagSymbol}`, "").replaceAll(`${nameSymbol}`, dotSymbol)} ${date}`);
             if (text) {
                 data.unshift(`${date} ${tag} ${text}`);
                 save();
