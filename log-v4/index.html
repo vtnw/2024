@@ -21,17 +21,12 @@
     const key = "data";
     const defaultTag = "note";
     const tagPattern = /#[a-z0-9-]+/g;
-    const namePattern = /~[a-z0-9-]+/g;
     const datePattern = /@[0-9\/]+/g;
     const tagSymbol = "#";
     const dateSymbol = "@";
-    const exclamationSymbol = "!";
-    const nameSymbol = "~";
     const numberSymbol = "£";
-    const dotSymbol = ".";
     let tags = [];
     let dates = [];
-    let names = [];
     let data = [];
     let filteredlist = [];
     let filteredData = [];
@@ -59,8 +54,7 @@
         }
 
         let filters = !!filter ? filter.split(" ").filter(f => !!f) : [];
-        tags = filters.filter(f => !f.startsWith(dateSymbol) && !f.startsWith(dotSymbol));
-        names = filters.filter(f => f.startsWith(dotSymbol) && !!f && !!f.trim()).map(n => n.substring(1));
+        tags = filters.filter(f => !f.startsWith(dateSymbol));
         dates = filters.filter(f => f.startsWith(dateSymbol)).map(d => new Date(d.substring(1)));
         dates = dates.length == 0 ? [new Date(new Date().toDateString())] : dates;
         if (dates.length == 1) {
@@ -78,12 +72,11 @@
             return {
                 date: new Date(line.match(datePattern)[0].substring(1)),
                 tags: line.match(tagPattern).map(t => t.substring(1)),
-                names: line.match(namePattern)?.map(n => n.substring(1)) ?? [],
-                text: line.replace(tagPattern, "").replace(namePattern, "").replace(datePattern, "").trim(),
+                text: line.replace(tagPattern, "").replace(datePattern, "").trim(),
                 line
             };
         });
-        filteredList = list.filter(l => tags.every(t => l.tags.includes(t)) && names.every(n => l.names.includes(n)) && l.date >= dates[0] && l.date <= dates[1]);
+        filteredList = list.filter(l => tags.every(t => l.tags.includes(t)) && l.date >= dates[0] && l.date <= dates[1]);
         filteredData = filteredList.map(l => l.line);
 
         dvTitle.innerText = `${tags.length > 0 ? tags.join(", ") : "all"} - ${filteredList.length}`;
@@ -91,9 +84,7 @@
         addNewDiv();
         filteredList.forEach(l => {
             let diffTags = l.tags.filter(t => !tags.includes(t));
-            let diffNames = l.names.filter(n => !names.includes(n));
             let message = diffTags.length > 0 ? `${l.text} under ${diffTags.join(", ")}` : l.text;
-            message = diffNames.length > 0 ? `${diffNames.join(", ")} ${message}` : message;
             message = `${message} on ${l.date.toLocaleDateString("en-us", {day: "numeric", month: "numeric"})}`;
             addLineDiv(format ? message : l.line, l.line);
         });
@@ -104,10 +95,8 @@
         dv.innerText = " + ";
         dv.addEventListener("click", (event) => {
             let tag = (tags.length > 0 ? tags : [defaultTag]).map(t => `${tagSymbol}${t}`).join(" ");
-            let name = names.length > 0 ? names.map(n => `${nameSymbol}${n}`).join(" ") : "";
-            tag = !!name ? `${tag} ${name}` : tag;
             let date = `${dateSymbol}${dates[1].toLocaleDateString("en-us")}`;
-            let text = prompt(`${tag.replaceAll(`${tagSymbol}`, "").replaceAll(`${nameSymbol}`, dotSymbol)} ${date}`);
+            let text = prompt(`${tag.replaceAll(`${tagSymbol}`, "")} ${date}`);
             if (text) {
                 data.unshift(`${date} ${tag} ${text}`);
                 save();
@@ -149,9 +138,9 @@
         let name = all[0];
         let param = content.substring(name.length + 1).trim();
         dvTitle.innerText = showContent && !!content.trim() ? content : dvTitle.innerText;
-        let line = data.find(l => new RegExp(`${tagSymbol}function`, "g").test(l) && new RegExp(`(^|\\s+)${nameSymbol}${name}($|\\s+)`, "g").test(l));
+        let line = data.find(l => new RegExp(`${tagSymbol}function`, "g").test(l) && new RegExp(`(^|\\s+)${tagSymbol}${name}($|\\s+)`, "g").test(l));
         if (line) {
-            let text = line.replace(`${tagSymbol}function`, "").replace(`${nameSymbol}${name}`, "").replace(datePattern, "").trim();
+            let text = line.replace(tagPattern, "").replace(datePattern, "").trim();
             new Function("content", `${text}`)(param);
         }
     }
