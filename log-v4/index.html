@@ -18,8 +18,6 @@
     <div id="dvContent"></div>
 </body>
 <script>
-    const key = "data";
-    const defaultTag = "note";
     const tagPattern = /#[a-z0-9-]+/g;
     const datePattern = /@[0-9\/]+/g;
     const tagSymbol = "#";
@@ -63,7 +61,7 @@
             dates = [date, dates[0]];
         }
         
-        list(true);
+        list();
     }
 
     list = (format = true) => {
@@ -94,7 +92,7 @@
         let dv = document.createElement("div");
         dv.innerText = " + ";
         dv.addEventListener("click", (event) => {
-            let tag = (tags.length > 0 ? tags : [defaultTag]).map(t => `${tagSymbol}${t}`).join(" ");
+            let tag = (tags.length > 0 ? tags : ["note"]).map(t => `${tagSymbol}${t}`).join(" ");
             let date = `${dateSymbol}${dates[1].toLocaleDateString("en-us")}`;
             let text = prompt(`${tag.replaceAll(`${tagSymbol}`, "")} ${date}`);
             if (text) {
@@ -145,8 +143,8 @@
         }
     }
 
-    load = () => data = JSON.parse(localStorage.getItem(key) || "[]");
+    load = () => data = JSON.parse(localStorage.getItem("data") || "[]");
 
-    save = () => localStorage.setItem(key, JSON.stringify(data));
+    save = () => localStorage.setItem("data", JSON.stringify(data));
 </script>
 </html>
