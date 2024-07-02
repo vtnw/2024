@@ -4,56 +4,45 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE =edge">
     <meta name="viewport" content="width =device-width, initial-scale=1.0">
-    <title>Log</title>
+    <title>Data</title>
     <style>
-        div, span {
-            line-height: 1.5em;
-            overflow-wrap: break-word;
-        }
     </style>
 </head>
 <body>
     <div id="dvTitle"></div>
-    <hr id="hr" />
+    <hr />
     <div id="dvContent"></div>
 </body>
 <script>
+    const key = "data";
+    const defaultTag = "note";
     const tagPattern = /#[a-z0-9-]+/g;
     const datePattern = /@[0-9\/]+/g;
-    const tagSymbol = "#";
-    const dateSymbol = "@";
-    const numberSymbol = "£";
     let tags = [];
     let dates = [];
     let data = [];
-    let filteredlist = [];
-    let filteredData = [];
     let dvTitle = document.getElementById("dvTitle");
     let dvContent = document.getElementById("dvContent");
-    let hr = document.getElementById("hr");
-    let onFileLoad = null;
 
     window.addEventListener("load", () => {
-        filter(prompt("filter"));        
+        load();        
     });
 
     dvTitle.addEventListener("click", (event) => {
-        filter(prompt("filter"));
+        load();
+        event.stopPropagation();
     });
 
-    hr.addEventListener("click", (event) => {
-        execute(prompt("command"), true);
+    document.addEventListener("click", (event) => {
+        add();
+        list();
     });
 
-    filter = (filter) => {
-        if (filter == "") {
-            execute("tags link");
-            return;
-        }
-
-        let filters = !!filter ? filter.split(" ").filter(f => !!f) : [];
-        tags = filters.filter(f => !f.startsWith(dateSymbol));
-        dates = filters.filter(f => f.startsWith(dateSymbol)).map(d => new Date(d.substring(1)));
+    load = () => {
+        let filter = prompt("filter");
+        let filters = filter?.split(" ") ?? [];
+        tags = filters.filter(f => !f.startsWith("@"));
+        dates = filters.filter(f => f.startsWith("@")).map(d => new Date(d.substring(1)));
         dates = dates.length == 0 ? [new Date(new Date().toDateString())] : dates;
         if (dates.length == 1) {
             let date = new Date(dates[0]);
@@ -64,87 +53,47 @@
         list();
     }
 
-    list = (format = true) => {
-        load();
-        let list = data.map(line => {
-            return {
+    list = () => {
+        data = JSON.parse(localStorage.getItem(key) || "[]");
+        let list = [];
+        data.forEach(line => {
+            list.push({
                 date: new Date(line.match(datePattern)[0].substring(1)),
                 tags: line.match(tagPattern).map(t => t.substring(1)),
                 text: line.replace(tagPattern, "").replace(datePattern, "").trim(),
                 line
-            };
+            });
         });
-        filteredList = list.filter(l => tags.every(t => l.tags.includes(t)) && l.date >= dates[0] && l.date <= dates[1]);
-        filteredData = filteredList.map(l => l.line);
 
-        dvTitle.innerText = `${tags.length > 0 ? tags.join(", ") : "all"} - ${filteredList.length}`;
-        dvContent.innerText = "";
-        addNewDiv();
-        filteredList.forEach(l => {
-            let diffTags = l.tags.filter(t => !tags.includes(t));
-            let message = diffTags.length > 0 ? `${l.text} under ${diffTags.join(", ")}` : l.text;
-            message = `${message} on ${l.date.toLocaleDateString("en-us", {day: "numeric", month: "numeric"})}`;
-            addLineDiv(format ? message : l.line, l.line);
-        });
+        list = list.filter(l => tags.every(t => l.tags.includes(t)) && l.date >= dates[0] && l.date <= dates[1]);
+
+        let message = "";
+        if (tags.length > 0) {
+            dvTitle.innerText = `${tags.join(", ")} - ${list.length}`;
+            list.forEach(l => {
+                message = `${message} - ${l.text};`;
+                let diffTags = l.tags.filter(t => !tags.includes(t));
+                message = diffTags.length > 0 ? `${message} under ${diffTags.join(", ")}` : message;
+                message = `${message} on ${l.date.toLocaleDateString("en-us", {day: "numeric", month: "numeric"})}\n`;
+            });
+        } else {
+            dvTitle.innerText = `all - ${list.length}`;
+            list.forEach(l => {
+                message = `${message}${l.line}\n\n`;
+            });
+        }
+
+        dvContent.innerText = message;
     }
 
-    addNewDiv = () => {
-        let dv = document.createElement("div");
-        dv.innerText = " + ";
-        dv.addEventListener("click", (event) => {
-            let tag = (tags.length > 0 ? tags : ["note"]).map(t => `${tagSymbol}${t}`).join(" ");
-            let date = `${dateSymbol}${dates[1].toLocaleDateString("en-us")}`;
-            let text = prompt(`${tag.replaceAll(`${tagSymbol}`, "")} ${date}`);
-            if (text) {
-                data.unshift(`${date} ${tag} ${text}`);
-                save();
-                list();
-            }
-        });
-        dvContent.appendChild(dv);
-    }
-
-    addLineDiv = (content, line) => {
-        let spn = document.createElement("span");
-        spn.innerText = " - ";
-        spn.addEventListener("click", (event) => {
-            let index = data.findIndex(d => d == line);
-            let text = prompt("edit", line);
-            if (text == null) {
-                return;
-            } else if (text.length > 0) {
-                data[index] = text;
-            } else {
-                data.splice(index, 1);
-            }
-
-            save();
-            list();
-        });
-      
-        let dv = document.createElement("div");
-        dv.appendChild(spn);
-        spn = document.createElement("span");
-        spn.innerText = content;
-        dv.appendChild(spn);
-        dvContent.appendChild(dv);
-    }
-
-    execute = (content, showContent = false) => {
-        content ??= " ";
-        let all = content.split(" ");
-        let name = all[0];
-        let param = content.substring(name.length + 1).trim();
-        dvTitle.innerText = showContent && !!content.trim() ? content : dvTitle.innerText;
-        let line = data.find(l => new RegExp(`${tagSymbol}function`, "g").test(l) && new RegExp(`(^|\\s+)${tagSymbol}${name}($|\\s+)`, "g").test(l));
-        if (line) {
-            let text = line.replace(tagPattern, "").replace(datePattern, "").trim();
-            new Function("content", `${text}`)(param);
+    add = () => {
+        let tag = (tags.length > 0 ? tags : [defaultTag]).map(t => `#${t}`).join(" ");
+        let date = `@${dates[1].toLocaleDateString("en-us")}`;
+        let text = prompt(`${tag.replaceAll("#", "")} ${date}`);
+        if (text) {
+            data.unshift(`${date} ${tag} ${text}`);
+            localStorage.setItem(key, JSON.stringify(data));
         }
     }
-
-    load = () => data = JSON.parse(localStorage.getItem("data") || "[]");
-
-    save = () => localStorage.setItem("data", JSON.stringify(data));
 </script>
 </html>
