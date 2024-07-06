@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE =edge">
+    <meta name="viewport" content="width =device-width, initial-scale=1.0">
+    <title>Log</title>
+    <style>
+        div, span {
+            line-height: 1.5em;
+            overflow-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <div id="dvTitle"></div>
+    <hr id="hr" />
+    <div id="dvContent"></div>
+</body>
+<script>
+    const tagPattern = /#[a-z0-9-]+/g;
+    const datePattern = /@[0-9\/]+/g;
+    const tagSymbol = "#";
+    const dateSymbol = "@";
+    const numberSymbol = "£";
+
+    let tags = [];
+    let dates = [];
+    let filteredList = [];
+    let filteredTags = [];
+    let onFileLoad = null;
+    let extension = null;
+
+    let dvTitle = document.getElementById("dvTitle");
+    let dvContent = document.getElementById("dvContent");
+    let hr = document.getElementById("hr");
+
+    window.addEventListener("load", () => initialize(() => {
+        initialize(() => initializeExtension(() => filter(null, list)));
+    }));
+
+    dvTitle.addEventListener("click", (event) => {
+        filter(prompt("filter"), list);
+    });
+
+    hr.addEventListener("click", (event) => {
+        executeExtension(prompt("command"), true);
+    });
+
+    filter = (filter, callback) => {
+        if (filter == "" && extension.tag) {
+            extension.tag("link");
+            return;
+        }
+
+        let filters = !!filter ? filter.split(" ").filter(f => !!f) : [];
+        tags = filters.filter(f => !f.startsWith(dateSymbol));
+        dates = filters.filter(f => f.startsWith(dateSymbol)).map(d => new Date(d.substring(1)));
+        dates = dates.length == 0 ? [new Date(new Date().toDateString())] : dates;
+        if (dates.length == 1) {
+            let date = new Date(dates[0]);
+            date.setDate(date.getDate() - 31);
+            dates = [date, dates[0]];
+        }
+        
+        callback();
+    }
+
+    list = () => {
+        fetchKeys(tags, (result) => filteredTags = result);
+        fetchByDates(dates[0], dates[1], tags, (result) => {
+            filteredList = result;
+            dvTitle.innerText = `${tags.length > 0 ? tags.join(", ") : "all"} - ${result.length}`;
+            dvContent.innerText = "";
+            addNewDiv();
+            result.forEach(l => {
+                let diffTags = l.tags.filter(t => !tags.includes(t));
+                let message = diffTags.length > 0 ? `${l.text} under ${diffTags.join(", ")}` : l.text;
+                message = `${message} on ${l.date.toLocaleDateString("en-us", {day: "numeric", month: "numeric"})}`;
+                addLineDiv(message, l);
+            });
+        });
+    }
+
+    addNewDiv = () => {
+        let dv = document.createElement("div");
+        dv.innerText = " + ";
+        dv.addEventListener("click", (event) => {
+            let tag = (tags.length > 0 ? tags : ["log"]).join(" ");
+            let date = `${dateSymbol}${dates[1].toLocaleDateString("en-us")}`;
+            let text = prompt(`${tag} ${date}`);
+            if (text) {
+                add([{ id: new Date().getTime(), date: dates[1], tags, text }], () => list());
+            }
+        });
+        dvContent.appendChild(dv);
+    }
+
+    addLineDiv = (content, log) => {
+        let spn = document.createElement("span");
+        spn.innerText = " - ";
+        spn.addEventListener("click", (event) => {
+            let text = prompt("edit", log.text);
+            if (text == null) {
+                return;
+            } else if (text.length > 0) {
+                log.text = text;
+                update(log, () => list());
+            } else {
+                remove([log.id], () => list());
+            }
+        });
+      
+        let dv = document.createElement("div");
+        dv.appendChild(spn);
+        spn = document.createElement("span");
+        spn.innerText = content;
+        dv.appendChild(spn);
+        dvContent.appendChild(dv);
+    }
+
+    initializeExtension = (callback) => {
+        extension = { error: new Function("content", "dvContent.innerText = `not found`") };
+        fetchByTags(["extension"], (result) => {
+            result.forEach(r => extension[r.tags.at(-1)] = new Function("param", r.text));
+            callback();
+        });
+    }
+
+    executeExtension = (content) => {
+        if (!!content && !!content.trim()) {
+            let name = content.split(" ")[0];
+            let param = content.substring(name.length + 1).trim();
+            dvTitle.innerText = content;
+            (extension[name] ?? extension.error)(param);
+        }
+    }
+
+    const dbName = "data-db";
+    const dbVersion = 1;
+    const storeName = "log-store"
+    const idField = "id";
+    const dateField = "date";
+    const tagsField = "tags";
+    const dateIndex = "date-index";
+    const tagsIndex = "tags-index";
+    const minValue = "";
+    const maxValue = "\xff";
+
+    initialize = (callback) => {
+        const dbRequest = window.indexedDB.open(dbName, dbVersion);
+        dbRequest.onupgradeneeded = (event) => {
+            const db = event.target.result;
+            const store = db.createObjectStore(storeName, { keyPath: idField });
+            store.createIndex(dateIndex, dateField, { unique: false });
+            store.createIndex(tagsIndex, tagsField, { unique: false });
+            store.transaction.oncomplete = (event) => {
+                callback();
+            };
+        };
+        dbRequest.onsuccess = (event) => callback();
+    }
+
+    fetchByDates = (startDate, endDate, tagList, callback) => {
+        const dbRequest = window.indexedDB.open(dbName, dbVersion);
+        dbRequest.onsuccess = (event) => {
+            const db = event.target.result;
+            const index = db.transaction(storeName, "readonly").objectStore(storeName).index(dateIndex);
+            let result = [];
+            index.openCursor(IDBKeyRange.bound(startDate, endDate)).onsuccess = (event) => {
+                const cursor = event.target.result;
+                if (cursor) {
+                    if (tagList.every(t => cursor.value.tags.includes(t))) {
+                        result.unshift(cursor.value);
+                    }
+
+                    cursor.continue();
+                } else {
+                    callback(result);
+                }
+            };
+        };
+    }
+
+    fetchByTags = (tagList, callback) => {
+        const dbRequest = window.indexedDB.open(dbName, dbVersion);
+        dbRequest.onsuccess = (event) => {
+            const db = event.target.result;
+            const index = db.transaction(storeName, "readonly").objectStore(storeName).index(tagsIndex);
+            let result = [];
+            index.openCursor(IDBKeyRange.bound([...tagList, minValue], [...tagList, maxValue])).onsuccess = (event) => {
+                const cursor = event.target.result;
+                if (cursor) {
+                    result.unshift(cursor.value);
+                    cursor.continue();
+                } else {
+                    callback(result);
+                }
+            };
+        };
+    }
+
+    fetchKeys = (tagList, callback) => {
+        const dbRequest = window.indexedDB.open(dbName, dbVersion);
+        dbRequest.onsuccess = (event) => {
+            const db = event.target.result;
+            const index = db.transaction(storeName, "readonly").objectStore(storeName).index(tagsIndex);
+            let result = [];
+            index.openKeyCursor(null, "nextunique").onsuccess = (event) => {
+                const cursor = event.target.result;
+                if (cursor) {   
+                    if (tagList.every(t => cursor.key.includes(t))) {
+                        result.unshift(cursor.key);
+                    }
+
+                    cursor.continue();
+                } else {
+                    callback(result);
+                }
+            };
+        };
+    }
+
+    add = (logs, callback) => {
+        const dbRequest = window.indexedDB.open(dbName, dbVersion);
+        dbRequest.onsuccess = (event) => {
+            const db = event.target.result;
+            const transaction = db.transaction(storeName, "readwrite");
+            const store = transaction.objectStore(storeName);
+            logs.forEach(log => store.add(log));
+            transaction.oncomplete = (event) => callback();
+        }
+    }
+
+    update = (log, callback) => {
+        const dbRequest = window.indexedDB.open(dbName, dbVersion);
+        dbRequest.onsuccess = (event) => {
+            const db = event.target.result;
+            const store = db.transaction(storeName, "readwrite").objectStore(storeName);
+            store.put(log).onsuccess = (event) => callback();
+        };
+    }
+
+    remove = (ids, callback) => {
+        const dbRequest = window.indexedDB.open(dbName, dbVersion);
+        dbRequest.onsuccess = (event) => {
+            const db = event.target.result;
+            const transaction = db.transaction(storeName, "readwrite");
+            const store = transaction.objectStore(storeName);
+            ids.forEach(id => store.delete(id));
+            transaction.oncomplete = (event) => callback();
+        };
+    }
+
+    // fetch = (tagList, callback) => {
+    //     const dbRequest = window.indexedDB.open(dbName, dbVersion);
+    //     dbRequest.onsuccess = (event) => {
+    //         const db = event.target.result;
+    //         const index = db.transaction(storeName, "readonly").objectStore(storeName).index(tagsIndex);
+    //         index.get(tagList).onsuccess = (event) => callback(event.target.result);
+    //     };
+    // }
+</script>
+</html>
