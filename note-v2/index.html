@@ -11,11 +11,7 @@
             overflow-wrap: anywhere;
             outline: none;
         }
-        #dvContent {
-            display: flex;
-            overflow: auto;
-            height: 70vh;
-        }
+        #dvContent { display: flex; }
     </style>
 </head>
 <body>
@@ -104,8 +100,6 @@
 
                 list();
             };
-            dvContent.onfocus = (event) => dvContent.style.height = "40vh";
-            dvContent.onblur = (event) => dvContent.style.height = "70vh";
         };
         dvContent.childNodes[1].appendChild(dv);
     }
@@ -139,8 +133,6 @@
 
                 removeNote(note.id, list);
             };
-            dvContent.onfocus = (event) => dvContent.style.height = "40vh";
-            dvContent.onblur = (event) => dvContent.style.height = "70vh";
         };
         dvContent.childNodes[1].appendChild(dv);
     }
