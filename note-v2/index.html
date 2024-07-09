@@ -12,7 +12,7 @@
             overflow-wrap: anywhere;
             outline: none;
             overflow: auto;
-            height: 80vh;
+            height: 75vh;
         }
     </style>
 </head>
@@ -65,7 +65,7 @@
 
     addNewTagDiv = () => {
         let dv = document.createElement("div");
-        dv.innerText = " + tag";
+        dv.innerText = " + ";
         dv.onclick = (event) => {
             let name = prompt("tag");
             if (!!name) {
@@ -77,7 +77,7 @@
 
     addNewNoteDiv = () => {
         let dv = document.createElement("div");
-        dv.innerText = " + note";
+        dv.innerText = " + ";
         dv.onclick = (event) => {
             dvContent.innerText = "";
             dvContent.contentEditable = true;
