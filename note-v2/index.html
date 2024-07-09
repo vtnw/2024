@@ -6,13 +6,15 @@
     <meta name="viewport" content="width =device-width, initial-scale=1.0">
     <title>Note</title>
     <style>
-        #dvContent {
-            display: flex;
+        div {
             line-height: 1.5em;
             overflow-wrap: anywhere;
             outline: none;
+        }
+        #dvContent {
+            display: flex;
             overflow: auto;
-            height: 75vh;
+            height: 70vh;
         }
     </style>
 </head>
@@ -67,10 +69,21 @@
         let dv = document.createElement("div");
         dv.innerText = " + ";
         dv.onclick = (event) => {
-            let name = prompt("tag");
-            if (!!name) {
-                addTagDiv(name);
-            }
+            dv.contentEditable = true;
+            dv.innerText = "";
+            dv.focus();
+            dv.onkeydown = (event) => {
+                if (event.key == "Enter") {
+                    addTagDiv(dv.innerText.trim());                
+                    dv.contentEditable = false;
+                    dv.innerText = " + ";
+                    return false;
+                }
+            };
+            dv.onblur = (event) => {
+                dv.contentEditable = false;
+                dv.innerText = " + ";
+            };
         };
         dvContent.childNodes[0].appendChild(dv);
     }
@@ -132,11 +145,11 @@
         dv = document.createElement("div");
         dv.id = dvId;
         if (dvId == "dvTags") {
-            dv.style.width = "30%";
+            dv.style.width = "35%";
             dv.style.borderRight = `1px solid gray`;
             dv.style.marginRight = "0.5em";
         } else {
-            dv.style.width = "70%";
+            dv.style.width = "65%";
         }
 
         dvContent.appendChild(dv);
