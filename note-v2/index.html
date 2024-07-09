@@ -41,6 +41,10 @@
         executeExtension(prompt("command"), true);
     });
 
+    window.addEventListener("resize", () => {
+        dvContent.height = (window.visualViewport.height * 70/100) + 'px';
+    });
+
     list = () => {
         dvTitle.innerText = tags.length > 0 ? tags.join("\\") : "home";
         dvTitle.onclick =(event) => {
