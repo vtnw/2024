@@ -41,10 +41,6 @@
         executeExtension(prompt("command"), true);
     });
 
-    window.addEventListener("resize", () => {
-        dvContent.height = (window.visualViewport.height * 70/100) + 'px';
-    });
-
     list = () => {
         dvTitle.innerText = tags.length > 0 ? tags.join("\\") : "home";
         dvTitle.onclick =(event) => {
@@ -108,6 +104,8 @@
 
                 list();
             };
+            dvContent.onfocus = (event) => dvContent.style.height = "40vh";
+            dvContent.onblur = (event) => dvContent.style.height = "70vh";
         };
         dvContent.childNodes[1].appendChild(dv);
     }
@@ -141,6 +139,8 @@
 
                 removeNote(note.id, list);
             };
+            dvContent.onfocus = (event) => dvContent.style.height = "40vh";
+            dvContent.onblur = (event) => dvContent.style.height = "70vh";
         };
         dvContent.childNodes[1].appendChild(dv);
     }
