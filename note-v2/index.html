@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE =edge">
+    <meta name="viewport" content="width =device-width, initial-scale=1.0">
+    <title>Note</title>
+    <style>
+        #dvContent {
+            display: flex;
+            line-height: 1.5em;
+            overflow-wrap: anywhere;
+            outline: none;
+            overflow: auto;
+            height: 80vh;
+        }
+    </style>
+</head>
+<body>
+    <div id="dvTitle"></div>
+    <hr id="hr" />
+    <div id="dvContent"></div>
+</body>
+<script>
+    let tags = [];
+    let note = null;
+    let onFileLoad = null;
+    let extension = null;
+
+    let dvTitle = document.getElementById("dvTitle");
+    let dvContent = document.getElementById("dvContent");
+    let hr = document.getElementById("hr");
+
+    window.addEventListener("load", () => initialize(() => {
+        initialize(() => initializeExtension(list));
+    }));
+
+    hr.addEventListener("click", (event) => {
+        executeExtension(prompt("command"), true);
+    });
+
+    list = () => {
+        dvTitle.innerText = tags.length > 0 ? tags.join("\\") : "home";
+        dvTitle.onclick =(event) => {
+            if (tags.length > 0) {
+                tags = tags.slice(0, tags.length - 1)
+                list();
+            }
+        };
+
+        dvContent.innerText = "";
+        dvContent.contentEditable = false;
+        addDiv("dvTags");
+        addDiv("dvNotes");
+        addNewTagDiv();
+        addNewNoteDiv();
+        fetchTags(tags, (result) => {
+            result = [...new Set(result.map(r => r.filter(tl => !tags.some(t => t == tl))[0]))].sort();
+            result.forEach(r => addTagDiv(r));
+            fetchNotes(tags, false, (result) => {
+                result.forEach(r => addNoteDiv(r));
+            });
+        });
+    }
+
+    addNewTagDiv = () => {
+        let dv = document.createElement("div");
+        dv.innerText = " + tag";
+        dv.onclick = (event) => {
+            let name = prompt("tag");
+            if (!!name) {
+                addTagDiv(name);
+            }
+        };
+        dvContent.childNodes[0].appendChild(dv);
+    }
+
+    addNewNoteDiv = () => {
+        let dv = document.createElement("div");
+        dv.innerText = " + note";
+        dv.onclick = (event) => {
+            dvContent.innerText = "";
+            dvContent.contentEditable = true;
+            dvContent.focus();
+            dvTitle.innerText = `${dvTitle.innerText}\\note`;
+            dvTitle.onclick = event => {
+                if (!!dvContent.innerText && !!dvContent.innerText.trim()) {
+                    addNote({id: new Date().getTime(), date: new Date(), tags, text: dvContent.innerText.trim()}, list);
+                    return;
+                }
+
+                list();
+            };
+        };
+        dvContent.childNodes[1].appendChild(dv);
+    }
+
+    addTagDiv = (tagName) => {
+        let dv = document.createElement("div");
+        dv.innerText = tagName;
+        dv.style.textDecoration = "underline"
+        dv.onclick = (event) => {
+            tags.push(tagName);
+            list();
+        };
+        dvContent.childNodes[0].appendChild(dv);
+    }
+
+    addNoteDiv = (n) => {
+        let dv = document.createElement("div");
+        dv.innerText = n.text.split("\n")[0];
+        dv.onclick = (event) => {
+            note = n;
+            dvContent.innerText = n.text;
+            dvContent.contentEditable = true;
+            dvTitle.innerText = `${dvTitle.innerText}\\${n.text.split("\n")[0]}`;
+            dvTitle.onclick = event => {
+                if (!!dvContent.innerText && !!dvContent.innerText.trim()) {
+                    note.text = dvContent.innerText;
+                    note.date = new Date();
+                    updateNote(note, list);
+                    return;
+                }
+
+                removeNote(note.id, list);
+            };
+        };
+        dvContent.childNodes[1].appendChild(dv);
+    }
+
+    addDiv = (dvId) => {
+        dv = document.createElement("div");
+        dv.id = dvId;
+        if (dvId == "dvTags") {
+            dv.style.width = "30%";
+            dv.style.borderRight = `1px solid gray`;
+            dv.style.marginRight = "0.5em";
+        } else {
+            dv.style.width = "70%";
+        }
+
+        dvContent.appendChild(dv);
+    }
+
+    initializeExtension = (callback) => {
+        extension = { error: new Function("content", "dvContent.innerText = `not found`") };
+        fetchNotes(["extension"], true, (result) => {
+            result.forEach(r => extension[r.tags.at(-1)] = new Function("param", r.text));
+            callback();
+        });
+    }
+
+    executeExtension = (content) => {
+        if (!!content && !!content.trim()) {
+            let name = content.split(" ")[0];
+            let param = content.substring(name.length + 1).trim();
+            dvTitle.innerText = content;
+            (extension[name] ?? extension.error)(param);
+        }
+    }
+
+    const dbName = "note-db";
+    const dbVersion = 1;
+    const storeName = "note-store"
+    const idField = "id";
+    const dateField = "date";
+    const tagsField = "tags";
+    const dateIndex = "date-index";
+    const tagsIndex = "tags-index";
+    const minValue = "";
+    const maxValue = "\xff";
+
+    initialize = (callback) => {
+        const dbRequest = window.indexedDB.open(dbName, dbVersion);
+        dbRequest.onupgradeneeded = (event) => {
+            const db = event.target.result;
+            const store = db.createObjectStore(storeName, { keyPath: idField });
+            store.createIndex(dateIndex, dateField, { unique: false });
+            store.createIndex(tagsIndex, tagsField, { unique: false });
+            store.transaction.oncomplete = (event) => {
+                callback();
+            };
+        };
+        dbRequest.onsuccess = (event) => callback();
+    }
+
+    fetchNotes = (tagList, includeChildren, callback) => {
+        const dbRequest = window.indexedDB.open(dbName, dbVersion);
+        dbRequest.onsuccess = (event) => {
+            const db = event.target.result;
+            const index = db.transaction(storeName, "readonly").objectStore(storeName).index(tagsIndex);
+            let range = includeChildren ? IDBKeyRange.bound([...tagList, minValue], [...tagList, maxValue]) : IDBKeyRange.only(tagList);
+            index.getAll(range).onsuccess = (event) => {
+                callback(event.target.result);
+            };
+        };
+    }
+
+    fetchTags = (tagList, callback) => {
+        const dbRequest = window.indexedDB.open(dbName, dbVersion);
+        dbRequest.onsuccess = (event) => {
+            const db = event.target.result;
+            const index = db.transaction(storeName, "readonly").objectStore(storeName).index(tagsIndex);
+            let result = [];
+            index.openKeyCursor(IDBKeyRange.bound([...tagList, minValue], [...tagList, maxValue]), "nextunique").onsuccess = (event) => {
+                const cursor = event.target.result;
+                if (cursor) {   
+                    result.push(cursor.key);
+                    cursor.continue();
+                } else {
+                    callback(result);
+                }
+            };
+        };
+    }
+
+    addNote = (n, callback) => {
+        const dbRequest = window.indexedDB.open(dbName, dbVersion);
+        dbRequest.onsuccess = (event) => {
+            const db = event.target.result;
+            const transaction = db.transaction(storeName, "readwrite");
+            const store = transaction.objectStore(storeName);
+            store.add(n);
+            transaction.oncomplete = (event) => callback();
+        }
+    }
+
+    updateNote = (n, callback) => {
+        const dbRequest = window.indexedDB.open(dbName, dbVersion);
+        dbRequest.onsuccess = (event) => {
+            const db = event.target.result;
+            const store = db.transaction(storeName, "readwrite").objectStore(storeName);
+            store.put(n).onsuccess = (event) => callback();
+        };
+    }
+
+    removeNote = (id, callback) => {
+        const dbRequest = window.indexedDB.open(dbName, dbVersion);
+        dbRequest.onsuccess = (event) => {
+            const db = event.target.result;
+            const transaction = db.transaction(storeName, "readwrite");
+            const store = transaction.objectStore(storeName);
+            store.delete(id);
+            transaction.oncomplete = (event) => callback();
+        };
+    }
+</script>
+</html>
