@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE =edge">
+    <meta name="viewport" content="width =device-width, initial-scale=1.0">
+    <title>Log</title>
+    <style>
+        div {
+            line-height: 1.5em;
+            overflow-wrap: anywhere;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="dvTitle"></div>
+    <hr id="hr" />
+    <div id="dvContent"></div>
+</body>
+<script>
+    let tags = [];
+    let list = [];
+    let extension = null;
+
+    let dvTitle = document.getElementById("dvTitle");
+    let dvContent = document.getElementById("dvContent");
+    let hr = document.getElementById("hr");
+
+    window.addEventListener("load", () => {
+        initialize(() => initializeExtension(() => extension.hi()));
+    });
+
+    window.addEventListener("click", (event) => {
+        let text = prompt("command");
+        if (!!text && !!text.trim()) {
+            executeExtension(text.trim());
+        }
+    });
+
+    initializeExtension = (callback) => {
+        extension = { no: new Function("content", "dvContent.innerText = `${content} - not found`") };
+        fetchByTags(["extension"], (result) => {
+            result.forEach(r => extension[r.tags.at(-1)] = new Function("param", r.text));
+            callback();
+        });
+    }
+
+    executeExtension = (content) => {
+        if (!!content && !!content.trim()) {
+            let name = content.split(" ")[0];
+            let param = content.substring(name.length + 1).trim();
+            (extension[name] ?? extension.no)(param);
+        }
+    }
+
+    const dbName = "db-log";
+    const dbVersion = 1;
+    const storeName = "store-log"
+    const idField = "id";
+    const dateField = "date";
+    const tagsField = "tags";
+    const allTagsField = "allTags";
+    const dateIndex = "date-index";
+    const tagsIndex = "tags-index";
+    const allTtagsIndex = "all-tags-index";
+    const minValue = "";
+    const maxValue = "\xff";
+    const maxCount = 100;
+
+    initialize = (callback) => {
+        const dbRequest = window.indexedDB.open(dbName, dbVersion);
+        dbRequest.onupgradeneeded = (event) => {
+            const db = event.target.result;
+            const store = db.createObjectStore(storeName, { keyPath: idField });
+            store.createIndex(dateIndex, dateField, { unique: false });
+            store.createIndex(tagsIndex, tagsField, { unique: false });
+            store.createIndex(allTtagsIndex, allTagsField, { unique: false, multiEntry: true });
+            store.transaction.oncomplete = (event) => {
+                callback();
+            };
+        };
+        dbRequest.onsuccess = (event) => callback();
+        dbRequest.onerror = (event) => console.log(event);
+    }
+
+    fetchByDates = (tagList, startDate, endDate, callback) => {
+        const dbRequest = window.indexedDB.open(dbName, dbVersion);
+        dbRequest.onsuccess = (event) => {
+            const db = event.target.result;
+            const index = db.transaction(storeName, "readonly").objectStore(storeName).index(dateIndex);
+            let result = [];
+            index.openCursor(IDBKeyRange.bound(startDate, endDate), "prev",).onsuccess = (event) => {
+                const cursor = event.target.result;
+                if (cursor && (tags.length == 0 || tags.every(t => cursor.value.tags.includes(t)))) {   
+                    result.push(cursor.value);
+                    cursor.continue();
+                } else if (cursor) {
+                    cursor.continue();
+                } else {
+                    callback(result);
+                }
+            };
+        };
+    }
+
+    fetchByTags = (tagList, callback) => {
+        const dbRequest = window.indexedDB.open(dbName, dbVersion);
+        dbRequest.onsuccess = (event) => {
+            const db = event.target.result;
+            const index = db.transaction(storeName, "readonly").objectStore(storeName).index(allTtagsIndex);
+            let result = [];
+            index.openCursor(IDBKeyRange.only(tagList), "prev",).onsuccess = (event) => {
+                const cursor = event.target.result;
+                if (cursor && result.length < maxCount) {   
+                    result.push(cursor.value);
+                    cursor.continue();
+                } else {
+                    callback(result);
+                }
+            };
+        };
+    }
+
+    fetchTags = (tagList, callback) => {
+        const dbRequest = window.indexedDB.open(dbName, dbVersion);
+        dbRequest.onsuccess = (event) => {
+            const db = event.target.result;
+            const index = db.transaction(storeName, "readonly").objectStore(storeName).index(tagsIndex);
+            let result = [];
+            index.openKeyCursor(IDBKeyRange.bound([...tagList, minValue], [...tagList, maxValue]), "nextunique").onsuccess = (event) => {
+                const cursor = event.target.result;
+                if (cursor) {   
+                    result.push(cursor.key);
+                    cursor.continue();
+                } else {
+                    callback(result);
+                }
+            };
+        };
+    }
+
+    add = (items, callback) => {
+        const dbRequest = window.indexedDB.open(dbName, dbVersion);
+        dbRequest.onsuccess = (event) => {
+            const db = event.target.result;
+            const transaction = db.transaction(storeName, "readwrite");
+            const store = transaction.objectStore(storeName);
+            items.forEach(i => store.add(i));
+            transaction.oncomplete = (event) => callback();
+            transaction.onerror = (event) => {
+                callback();
+            };
+        }
+    }
+
+    update = (items, callback) => {
+        const dbRequest = window.indexedDB.open(dbName, dbVersion);
+        dbRequest.onsuccess = (event) => {
+            const db = event.target.result;
+            const transaction = db.transaction(storeName, "readwrite");
+            const store = transaction.objectStore(storeName);
+            items.forEach(i => store.put(i));
+            transaction.oncomplete = (event) => callback();
+        };
+    }
+
+    remove = (items, callback) => {
+        const dbRequest = window.indexedDB.open(dbName, dbVersion);
+        dbRequest.onsuccess = (event) => {
+            const db = event.target.result;
+            const transaction = db.transaction(storeName, "readwrite");
+            const store = transaction.objectStore(storeName);
+            items.forEach(i => store.delete(i.id));
+            transaction.oncomplete = (event) => callback();
+        };
+    }
+</script>
+</html>
